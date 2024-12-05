@@ -3,8 +3,9 @@ const mysql = require('mysql2');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const http = require('http');
-const routes = require("routes");
 
+
+const User = require('./src/models/modelUser.js')
 require("dotenv").config();
 
 const app = express();
@@ -17,14 +18,14 @@ const port = process.env.PORT
 const server = http.createServer(app)
 
 //Создание коннекта
-const conn = mysql.createConnection({
+const connection = mysql.createConnection({
     host: 'MySQL-8.0',
     user: "root",
     database: "Gold_Cinema",
     password: "",
 });
 //Подключение
-conn.connect(err => {
+connection.connect(err => {
     if (err) {
         return console.error('Ошибка подключения: ' + err.message);
     }
@@ -34,3 +35,36 @@ conn.connect(err => {
         console.log(`Сервер слушает порт ${port}`);
     });
 });
+
+const sql = `create table if not exists users(
+    id int primary key auto_increment,
+    name varchar(255) not null,
+    age int not null
+  )`;
+connection.query(sql, function(err, results) {
+    if(err) console.log(err);
+    else console.log("Таблица создана");
+});
+connection.end();
+
+// const createUser = async () => {
+//     const newUser = await User.create({
+//         username: "tom",
+//         displayName: "Tom",
+//         password: "password",
+//         salt: "salt"
+        
+//     });
+//     console.log('Пользователь создан:', newUser.toJSON());
+//     newUser.setPassword("my_password");
+   
+//     await newUser.save();
+
+//     // const newUser = User.build({
+//     //     username: 'john_doe',
+//     //     displayName: 'John Doe',
+//     //     password: 'securepassword',
+//     //     salt: 'randomsalt'
+//     // });
+    
+// }

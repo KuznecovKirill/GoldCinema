@@ -1,12 +1,12 @@
 //Модель User, который будет заходить в приложение
 const { DataTypes } = require('sequelize');
-const sequelize = require("sequelize"); 
+const sequelize = require('./database.js');
 const crypto = require('crypto');
 const { type } = require('os');
 
 const modelUser = sequelize.define('User', {
     id_user: {
-        type: sequelize.INTEGER,
+        type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true,
         allowNull: false
@@ -70,7 +70,7 @@ modelUser.prototype.toObject = function() {
 //Преобразование в JSON
 modelUser.prototype.toJSON = function() {
     const values = { ...this.get() };
-    delete values.id; 
+    // delete values.id; 
     return values;
 };
 // Экспорт модели
