@@ -4,8 +4,8 @@ const sequelize = require("sequelize");
 const modelExample = require('./options');
 const crypto = require('crypto');
 
-const modelRewiew = sequelize.define("Rewiew", {
-    id_rewiew: {
+const modelFavorite = sequelize.define("Favorite",{
+    id_favorite: {
         type: sequelize.INTEGER,
         autoIncrement: true,
         primaryKey: true,
@@ -18,16 +18,12 @@ const modelRewiew = sequelize.define("Rewiew", {
             model: 'User', 
             key: 'id_user'
         }
-    },
-    content: {
-        type: DataTypes.TEXT, // Используется TEXT для хранения длинного текста
-        allowNull: false
-    },
-    mediaType: { //Тип медиа
+      },
+      mediaType: {
         type: DataTypes.ENUM('tv', 'movie', 'serial'),
         allowNull: false
-    },
-    mediaId: {
+      },
+      mediaId: {
         type: DataTypes.STRING,
         allowNull: false
     },
@@ -39,22 +35,22 @@ const modelRewiew = sequelize.define("Rewiew", {
         type: DataTypes.STRING,
         allowNull: false
     },
-}, {
-    timestamps: true, 
-    freezeTableName: true, 
-}
-);
+    mediaRate: {
+        type: DataTypes.FLOAT,
+        allowNull: false
+      },
+});
 
-modelRewiew.prototype.toObject = function() {
+modelFavorite.prototype.toObject = function() {
     const values = { ...this.get() };
     delete values.id_rewiew; 
     return values;
 };
 
-modelRewiew.prototype.toJSON = function() {
+modelFavorite.prototype.toJSON = function() {
     const values = { ...this.get() };
     delete values.id_rewiew; 
     return values;
 };
 
-module.exports = modelRewiew;
+module.exports = modelFavorite;
