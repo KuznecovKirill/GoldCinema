@@ -17,6 +17,7 @@
     "mysql2": "^3.11.5",
     "nodemon": "^3.1.7",
     "routes": "^2.1.0",
-    "sequelize": "^6.37.5"
+    "sequelize": "^6.37.5",
+    "sequelize-to-json": "^0.10.4"
   }
 }

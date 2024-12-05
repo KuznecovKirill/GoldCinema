@@ -1,10 +1,11 @@
+//Модель User, который будет заходить в приложение
 const { DataTypes } = require('sequelize');
 const mysql = require('mysql2');
 const sequelize = require("sequelize"); 
-const modelExample = require('./model');
+const modelExample = require('./options');
 const crypto = require('crypto');
 
-const userSchema = sequelize.define('User', {
+const modelUser = sequelize.define('User', {
     username: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -30,7 +31,7 @@ const userSchema = sequelize.define('User', {
 });
 
 // Метод для установки пароля
-userSchema.prototype.setPassword = function(password) {
+modelUser.prototype.setPassword = function(password) {
     this.salt = crypto.randomBytes(16).toString("hex");
 
     this.password = crypto.pbkdf2Sync(
@@ -43,7 +44,7 @@ userSchema.prototype.setPassword = function(password) {
 };
 
 // Метод для проверки пароля
-userSchema.prototype.validPassword = function(password) {
+modelUser.prototype.validPassword = function(password) {
     const hash = crypto.pbkdf2Sync(
         password,
         this.salt,
@@ -55,5 +56,19 @@ userSchema.prototype.validPassword = function(password) {
     return this.password === hash;
 };
 
+modelUser.prototype.toObject = function() {
+    const values = { ...this.get() };
+    // const values = Object.assign({}, this.get());
+    delete values.id; 
+    return values;
+};
+
+//Преобразование в JSON
+modelUser.prototype.toJSON = function() {
+    const values = { ...this.get() };
+    // const values = Object.assign({}, this.get());
+    delete values.id; 
+    return values;
+};
 // Экспорт модели
-module.exports = userSchema;
+module.exports = modelUser;
