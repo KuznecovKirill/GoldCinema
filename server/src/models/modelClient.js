@@ -1,6 +1,6 @@
 const { DataTypes } = require('sequelize');
 const mysql = require('mysql2');
-const sequelize = require("sequelize"); // Импортируйте вашу настройку sequelize
+const sequelize = require("sequelize"); 
 const modelExample = require('./model');
 const crypto = require('crypto');
 
@@ -17,16 +17,16 @@ const userSchema = sequelize.define('User', {
     password: {
         type: DataTypes.STRING,
         allowNull: false,
-        select: false // Это свойство не будет включено в результаты выборки по умолчанию
+        select: false 
     },
     salt: {
         type: DataTypes.STRING,
         allowNull: false,
-        select: false // Это свойство также не будет включено в результаты выборки по умолчанию
+        select: false 
     }
 }, {
-    timestamps: true, // Автоматически добавляет createdAt и updatedAt
-    freezeTableName: true, // Отключает автоматическое создание множественного числа для имени таблицы
+    timestamps: true, 
+    freezeTableName: true, 
 });
 
 // Метод для установки пароля
