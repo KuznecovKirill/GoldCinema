@@ -1,11 +1,16 @@
 //Модель User, который будет заходить в приложение
 const { DataTypes } = require('sequelize');
-const mysql = require('mysql2');
 const sequelize = require("sequelize"); 
-const modelExample = require('./options');
 const crypto = require('crypto');
+const { type } = require('os');
 
 const modelUser = sequelize.define('User', {
+    id_user: {
+        type: sequelize.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+        allowNull: false
+    },
     username: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -58,7 +63,6 @@ modelUser.prototype.validPassword = function(password) {
 
 modelUser.prototype.toObject = function() {
     const values = { ...this.get() };
-    // const values = Object.assign({}, this.get());
     delete values.id; 
     return values;
 };
@@ -66,7 +70,6 @@ modelUser.prototype.toObject = function() {
 //Преобразование в JSON
 modelUser.prototype.toJSON = function() {
     const values = { ...this.get() };
-    // const values = Object.assign({}, this.get());
     delete values.id; 
     return values;
 };

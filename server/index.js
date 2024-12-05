@@ -20,7 +20,7 @@ const server = http.createServer(app)
 const conn = mysql.createConnection({
     host: 'MySQL-8.0',
     user: "root",
-    database: "GoldCinema",
+    database: "Gold_Cinema",
     password: "",
 });
 //Подключение
