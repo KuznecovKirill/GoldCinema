@@ -1,9 +1,8 @@
 {
   "name": "gold-cinema",
-  "type": "module",
+  "type": "commonjs",
   "version": "0.0.1",
   "main": "index.js",
-  "license":"MIT",
   "scripts": {
     "start": "nodemon index.js"
   },
@@ -16,6 +15,7 @@
     "express-validator": "^7.2.0",
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.11.5",
-    "nodemon": "^3.1.7"
+    "nodemon": "^3.1.7",
+    "routes": "^2.1.0"
   }
 }
