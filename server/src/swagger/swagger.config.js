@@ -1,9 +1,9 @@
-const baseUrl = process.env.API_URL;
+require('dotenv').config();
+const baseUrl = process.env.BASE_URL;
 const key = process.env.KEY;
 
-const getUrl = (id, params) => {
-  
-    return `${baseUrl}${id}${params}`;
+const getUrl = (version, object, endUrl) => {
+    return `${baseUrl}${version}${object}${endUrl}`;
   };
-  module.exports = getUrl;
-  export default { getUrl };
+
+module.exports = {getUrl};

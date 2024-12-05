@@ -4,6 +4,7 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const http = require('http');
 
+const swaggerUrl = require('./src/swagger/swagger.config');
 
 const User = require('./src/models/modelUser.js')
 require("dotenv").config();
@@ -36,16 +37,32 @@ connection.connect(err => {
     });
 });
 
-const sql = `create table if not exists users(
-    id int primary key auto_increment,
-    name varchar(255) not null,
-    age int not null
-  )`;
-connection.query(sql, function(err, results) {
-    if(err) console.log(err);
-    else console.log("Таблица создана");
-});
-connection.end();
+//Получение списка популярных фильмов
+async function getMovies() {
+    let url = swaggerUrl.getUrl('v2.2/', 'films/','collections?type=TOP_POPULAR_ALL&page=1');
+    console.log(url);
+    const res = await fetch(url, {
+        method: 'GET',
+        headers: {
+            "Content-Type": "application/json",
+            "X-API-KEY": process.env.KEY,
+        },
+    });
+    const respData = await res.json();
+    console.log(respData);
+
+}
+getMovies();
+// const sql = `create table if not exists users(
+//     id int primary key auto_increment,
+//     name varchar(255) not null,
+//     age int not null
+//   )`;
+// connection.query(sql, function(err, results) {
+//     if(err) console.log(err);
+//     else console.log("Таблица создана");
+// });
+// connection.end();
 
 // const createUser = async () => {
 //     const newUser = await User.create({
