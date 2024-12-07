@@ -7,7 +7,7 @@ const modelFavorite = sequelize.define(
   "Favorite",
   {
     id_favorite: {
-      type: sequelize.INTEGER,
+      type: DataTypes.INTEGER,
       autoIncrement: true,
       primaryKey: true,
       allowNull: false,
@@ -51,4 +51,8 @@ modelFavorite.prototype.toJSON = function () {
   const values = { ...this.get() };
   return values;
 };
+(async () => {
+    // Синхронизация моделей с базой данных без удаления существующих данных
+    await sequelize.sync();
+  })();
 module.exports = {modelFavorite};

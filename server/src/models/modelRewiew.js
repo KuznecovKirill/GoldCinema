@@ -48,22 +48,3 @@ modelRewiew.prototype.toJSON = function() {
     return values;
 };
 module.exports =  {modelRewiew};
-
-
-// (async () => {
-//     await modelRewiew.sync(); // Синхронизация таблицы
-
-//     // Создание нового пользователя
-//     const neww = await modelRewiew.create({
-//         id_user: 2, // Используем id_user существующего пользователя
-//         id_media: 1, // Пример значения id_media (можно заменить на реальное значение)
-//         rating_user: 4.5, // Пример рейтинга
-//         comment_text: "Отличный фильм!"
-//     });
-
-//     // Сохранение пользователя с новым хешированным паролем и солью
-//     await neww.save();
-
-//     console.log('Отзыв создан:', neww.toJSON());
-//     // console.log(neww.toJSON());
-// })();
