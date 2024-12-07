@@ -15,7 +15,8 @@ app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 
-const port = process.env.PORT
+const port = process.env.PORT;
+console.log(port);
 const server = http.createServer(app)
 
 //Создание коннекта
