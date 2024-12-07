@@ -6,7 +6,7 @@ const http = require('http');
 
 const swaggerUrl = require('./src/swagger/swagger.config');
 
-const User = require('./src/models/modelUser.js')
+const modelUser = require('./src/models/modelUser');
 require("dotenv").config();
 
 const app = express();
@@ -53,35 +53,7 @@ async function getMovies() {
 
 }
 getMovies();
-// const sql = `create table if not exists users(
-//     id int primary key auto_increment,
-//     name varchar(255) not null,
-//     age int not null
-//   )`;
-// connection.query(sql, function(err, results) {
-//     if(err) console.log(err);
-//     else console.log("Таблица создана");
-// });
-// connection.end();
 
-// const createUser = async () => {
-//     const newUser = await User.create({
-//         username: "tom",
-//         displayName: "Tom",
-//         password: "password",
-//         salt: "salt"
-        
-//     });
-//     console.log('Пользователь создан:', newUser.toJSON());
-//     newUser.setPassword("my_password");
-   
-//     await newUser.save();
+connection.end();
+//modelUser.createUser();
 
-//     // const newUser = User.build({
-//     //     username: 'john_doe',
-//     //     displayName: 'John Doe',
-//     //     password: 'securepassword',
-//     //     salt: 'randomsalt'
-//     // });
-    
-// }

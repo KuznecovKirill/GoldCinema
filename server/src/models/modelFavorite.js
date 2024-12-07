@@ -53,4 +53,4 @@ modelFavorite.prototype.toJSON = function() {
     return values;
 };
 
-module.exports = modelFavorite;
+module.exports = {modelFavorite};

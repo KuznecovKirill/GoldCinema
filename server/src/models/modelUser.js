@@ -1,9 +1,8 @@
-//Модель User, который будет заходить в приложение
-const { DataTypes } = require('sequelize');
-const sequelize = require('./database.js');
+const { Sequelize, DataTypes } = require('sequelize');
+const sequelize = require('./database').sequelize;
 const crypto = require('crypto');
-const { type } = require('os');
 
+//Модель пользователя
 const modelUser = sequelize.define('User', {
     id_user: {
         type: DataTypes.INTEGER,
@@ -13,8 +12,7 @@ const modelUser = sequelize.define('User', {
     },
     username: {
         type: DataTypes.STRING,
-        allowNull: false,
-        unique: true
+        allowNull: false
     },
     displayName: {
         type: DataTypes.STRING,
@@ -31,7 +29,7 @@ const modelUser = sequelize.define('User', {
         select: false 
     }
 }, {
-    timestamps: true, 
+    timestamps: false, 
     freezeTableName: true, 
 });
 
@@ -63,15 +61,34 @@ modelUser.prototype.validPassword = function(password) {
 
 modelUser.prototype.toObject = function() {
     const values = { ...this.get() };
-    delete values.id; 
+    delete values.id_user; // Исправлено на id_user
     return values;
 };
 
-//Преобразование в JSON
+// Преобразование в JSON
 modelUser.prototype.toJSON = function() {
     const values = { ...this.get() };
-    // delete values.id; 
+    // delete values.id_user; 
     return values;
 };
-// Экспорт модели
-module.exports = modelUser;
+
+
+// (async () => {
+//     await modelUser.sync(); // Синхронизация таблицы
+
+//     // Создание нового пользователя
+//     const newUser = await modelUser.create({
+//         username: "toem",
+//         displayName: "Tom",
+//         password: "password", // Временный пароль
+//         salt: crypto.randomBytes(16).toString("hex") // Генерация соли
+//     });
+
+//     // Сохранение пользователя с новым хешированным паролем и солью
+//     await newUser.save();
+
+//     console.log('Пользователь создан:', newUser.toJSON());
+//     console.log(newUser.toJSON());
+// })();
+
+module.exports = { modelUser };

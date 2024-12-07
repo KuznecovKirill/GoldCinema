@@ -1,60 +1,69 @@
-const { DataTypes } = require('sequelize');
-const mysql = require('mysql2');
-const sequelize = require("sequelize"); 
-const modelExample = require('./options');
-const crypto = require('crypto');
+const { Sequelize, DataTypes } = require('sequelize');
+const { modelUser } = require('./modelUser');
+const sequelize = require('./database').sequelize;
 
-const modelRewiew = sequelize.define("Rewiew", {
+//Модель пользователя
+const modelRewiew = sequelize.define('Rewiew', {
     id_rewiew: {
-        type: sequelize.INTEGER,
+        type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true,
         allowNull: false
     },
-    user: {
+    id_user: {
         type: DataTypes.INTEGER,
-        allowNull: false,
         references: {
-            model: 'User', 
+            model: modelUser,
             key: 'id_user'
         }
     },
-    content: {
-        type: DataTypes.TEXT, // Используется TEXT для хранения длинного текста
+    id_media: {
+        type: DataTypes.INTEGER,
+        // references: {
+        //     // model: modelUser,
+        //     // key: 'id_user'
+        // }
+    },
+    rating_user:{
+        type: DataTypes.FLOAT,
         allowNull: false
     },
-    mediaType: { //Тип медиа
-        type: DataTypes.ENUM('tv', 'movie', 'serial'),
+    comment_text:{
+        type: DataTypes.TEXT,
         allowNull: false
-    },
-    mediaId: {
-        type: DataTypes.STRING,
-        allowNull: false
-    },
-    mediaTitle: {
-        type: DataTypes.STRING,
-        allowNull: false
-    },
-    mediaPoster: {
-        type: DataTypes.STRING,
-        allowNull: false
-    },
+    }
 }, {
-    timestamps: true, 
+    timestamps: false, 
     freezeTableName: true, 
-}
-);
+});
 
 modelRewiew.prototype.toObject = function() {
     const values = { ...this.get() };
-    delete values.id_rewiew; 
     return values;
 };
 
+// Преобразование в JSON
 modelRewiew.prototype.toJSON = function() {
-    const values = { ...this.get() };
-    delete values.id_rewiew; 
+    const values = { ...this.get() };; 
     return values;
 };
+module.exports =  modelRewiew;
 
-module.exports = modelRewiew;
+
+// (async () => {
+//     await modelRewiew.sync(); // Синхронизация таблицы
+
+//     // Создание нового пользователя
+//     const neww = await modelRewiew.create({
+//         id_user: 2, // Используем id_user существующего пользователя
+//         id_media: 1, // Пример значения id_media (можно заменить на реальное значение)
+//         rating_user: 4.5, // Пример рейтинга
+//         comment_text: "Отличный фильм!"
+//     });
+
+//     // Сохранение пользователя с новым хешированным паролем и солью
+//     await neww.save();
+
+//     console.log('Отзыв создан:', neww.toJSON());
+//     // console.log(neww.toJSON());
+// })();
