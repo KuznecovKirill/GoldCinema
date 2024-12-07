@@ -1,56 +1,54 @@
-const { DataTypes } = require('sequelize');
-const mysql = require('mysql2');
-const sequelize = require("sequelize"); 
-const modelExample = require('./options');
-const crypto = require('crypto');
+const { Sequelize, DataTypes } = require("sequelize");
+const { modelUser } = require("./modelUser");
+const sequelize = require("./database").sequelize;
 
-const modelFavorite = sequelize.define("Favorite",{
+//Модель пользователя
+const modelFavorite = sequelize.define(
+  "Favorite",
+  {
     id_favorite: {
-        type: sequelize.INTEGER,
-        autoIncrement: true,
-        primaryKey: true,
-        allowNull: false
+      type: sequelize.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+      allowNull: false,
     },
-    user: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        references: {
-            model: 'User', 
-            key: 'id_user'
-        }
+    id_user: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: modelUser,
+        key: "id_user",
       },
-      mediaType: {
-        type: DataTypes.ENUM('tv', 'movie', 'serial'),
-        allowNull: false
-      },
-      mediaId: {
+    },
+    id_media: {
+      type: DataTypes.INTEGER,
+      // references: {
+      //     // model: modelUser,
+      //     // key: 'id_user'
+      // }
+    },
+    media_poster:{
         type: DataTypes.STRING,
         allowNull: false
     },
-    mediaTitle: {
-        type: DataTypes.STRING,
-        allowNull: false
-    },
-    mediaPoster: {
-        type: DataTypes.STRING,
-        allowNull: false
-    },
-    mediaRate: {
+    media_rating:{
         type: DataTypes.FLOAT,
         allowNull: false
-      },
-});
+    }
+  },
+  {
+    timestamps: false,
+    freezeTableName: true,
+  }
+);
 
-modelFavorite.prototype.toObject = function() {
-    const values = { ...this.get() };
-    delete values.id_rewiew; 
-    return values;
+modelFavorite.prototype.toObject = function () {
+  const values = { ...this.get() };
+  return values;
 };
 
-modelFavorite.prototype.toJSON = function() {
-    const values = { ...this.get() };
-    delete values.id_rewiew; 
-    return values;
+// Преобразование в JSON
+modelFavorite.prototype.toJSON = function () {
+  const values = { ...this.get() };
+  return values;
 };
-
 module.exports = {modelFavorite};

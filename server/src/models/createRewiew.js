@@ -1,6 +1,6 @@
 const { Sequelize } = require("sequelize");
 const modelUser = require("./modelUser"); // Импортируйте модель пользователя
-const modelRewiew = require("./modelRewiew"); // Импортируйте модель отзыва
+const {modelRewiew} = require("./modelRewiew"); // Импортируйте модель отзыва
 
 const sequelize = require("./database").sequelize;
 

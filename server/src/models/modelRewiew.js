@@ -47,7 +47,7 @@ modelRewiew.prototype.toJSON = function() {
     const values = { ...this.get() };; 
     return values;
 };
-module.exports =  modelRewiew;
+module.exports =  {modelRewiew};
 
 
 // (async () => {
