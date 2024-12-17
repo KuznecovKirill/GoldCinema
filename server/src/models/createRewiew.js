@@ -36,11 +36,25 @@ async function getMovie() {
   });
   sequelize.sync();
 }
-// async function getMovies() {
-//   const newMedias = await swaggerAPI.
-  
-// }
-getMovie();
+async function getMovies() {
+  const newCollection = await swaggerAPI.mediaCollections({type:'TOP_POPULAR_ALL', page: '1'});
+  newCollection.items.forEach(async (item) => {
+    console.log(item.nameRu);
+    await modelMedia.create({
+        title: item.nameRu,
+        country: item.countries.map(c => c.country).join(', '),
+        genre: item.genres.map(g => g.genre).join(', '),
+        running_time: item.filmLength || null,
+        rars: item.ratingAgeLimits ? `${item.ratingAgeLimits.replace(/\D/g, '')}+` : null,
+        rating: item.ratingImdb || null,
+        descrition: item.description || null,
+        poster: item.posterUrlPreview || null
+    });
+});
+sequelize.sync();
+}
+getMovies();
+// getMovie();
 // (async () => {
 //   // Синхронизация моделей с базой данных без удаления существующих данных
 //   await sequelize.sync();

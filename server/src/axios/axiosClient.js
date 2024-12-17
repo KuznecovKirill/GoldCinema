@@ -14,7 +14,7 @@ const get = async (url) => {
         },
       });
       const result = await conn.json();
-      console.log(result);
+      //console.log(result);
       return result;
 //     const response = await axios.get(url, {
 //         method: 'GET',

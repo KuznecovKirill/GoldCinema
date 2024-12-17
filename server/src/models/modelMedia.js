@@ -24,23 +24,23 @@ const modelMedia = sequelize.define('Media', {
     },
     running_time:{
         type: DataTypes.INTEGER,
-        allowNull: false
+        allowNull: true,
     },
     rars:{
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: true
     },
     rating:{
         type: DataTypes.FLOAT,
-        allowNull: false
+        allowNull: true
     },
     descrition:{
         type: DataTypes.TEXT,
-        allowNull: false
+        allowNull: true
     },
     poster:{
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: true
     }
 }, {
     timestamps: false, 
