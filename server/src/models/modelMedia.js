@@ -61,3 +61,5 @@ modelMedia.prototype.toJSON = function() {
     // Синхронизация моделей с базой данных без удаления существующих данных
     await sequelize.sync();
   })();
+
+  module.exports = { modelMedia };

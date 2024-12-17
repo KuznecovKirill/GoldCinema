@@ -1,13 +1,13 @@
+require('dotenv').config()
 const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const http = require('http');
-
 const swaggerUrl = require('./src/swagger/swagger.config');
 
 const modelUser = require('./src/models/modelUser');
-require("dotenv").config();
+
 
 const app = express();
 
@@ -16,7 +16,8 @@ app.use(express.json());
 app.use(cookieParser());
 
 const port = process.env.PORT;
-console.log(port);
+console.log(process.env.PORT);
+
 const server = http.createServer(app)
 
 //Создание коннекта

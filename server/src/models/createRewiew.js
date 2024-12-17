@@ -1,7 +1,8 @@
 const { Sequelize } = require("sequelize");
-const modelUser = require("./modelUser"); // Импортируйте модель пользователя
-const { modelRewiew } = require("./modelRewiew"); // Импортируйте модель отзыва
+const modelUser = require("./modelUser"); // Импортирт модели пользователя
+const { modelRewiew } = require("./modelRewiew"); 
 const swaggerUrl = require('../swagger/swagger.config');
+const {modelMedia} = require('./modelMedia');
 require('dotenv').config();
 
 const sequelize = require("./database").sequelize;
@@ -20,10 +21,20 @@ async function getMovie() {
   });
   const newMedia = await res.json();
   console.log(newMedia);
-
+  console.log(newMedia.countries[0]);
+  await modelMedia.create({
+    title: newMedia.nameRu,
+    country: newMedia.countries[0].country,
+    genre: newMedia.genres[0].genre,
+    running_time: newMedia.filmLength,
+    rars: newMedia.ratingAgeLimits,
+    rating: newMedia.ratingImdb,
+    descrition: newMedia.description,
+    poster: newMedia.posterUrlPreview
+  });
+  sequelize.sync();
 }
 getMovie();
-
 // (async () => {
 //   // Синхронизация моделей с базой данных без удаления существующих данных
 //   await sequelize.sync();
