@@ -39,22 +39,22 @@ connection.connect(err => {
     });
 });
 
-//Получение списка популярных фильмов
-async function getMovies() {
-    let url = swaggerUrl.getUrl('v2.2/', 'films/','collections?type=TOP_POPULAR_ALL&page=1');
-    console.log(url);
-    const res = await fetch(url, {
-        method: 'GET',
-        headers: {
-            "Content-Type": "application/json",
-            "X-API-KEY": process.env.KEY,
-        },
-    });
-    const respData = await res.json();
-    console.log(respData);
+// //Получение списка популярных фильмов
+// async function getMovies() {
+//     let url = swaggerUrl.getUrl('v2.2/', 'films/','collections?type=TOP_POPULAR_ALL&page=1');
+//     console.log(url);
+//     const res = await fetch(url, {
+//         method: 'GET',
+//         headers: {
+//             "Content-Type": "application/json",
+//             "X-API-KEY": process.env.KEY,
+//         },
+//     });
+//     const respData = await res.json();
+//     console.log(respData);
 
-}
-getMovies();
+// }
+// getMovies();
 
 connection.end();
 //modelUser.createUser();

@@ -1,15 +1,29 @@
 const axios = require("axios");
+const { modelMedia } = require("../models/modelMedia");
+
+require('dotenv').config();
 
 const get = async (url) => {
     // Выполнение GET-запроса
-    const response = await axios.get(url, {
+    console.log(url);
+    const conn = await fetch(url, {
         method: 'GET',
         headers: {
-            "Content-Type": "application/json",
-            "X-API-KEY": key,
+          "Content-Type": "application/json",
+          "X-API-KEY": process.env.KEY,
         },
-  });
-  return response.data;
+      });
+      const result = await conn.json();
+      console.log(result);
+      return result;
+//     const response = await axios.get(url, {
+//         method: 'GET',
+//         headers: {
+//             "Content-Type": "application/json",
+//             "X-API-KEY": process.env.KEY,
+//         },
+//   });
+  return conn.data;
 };
 
-export default { get };
+module.exports = { get };

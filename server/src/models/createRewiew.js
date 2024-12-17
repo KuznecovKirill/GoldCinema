@@ -2,6 +2,7 @@ const { Sequelize } = require("sequelize");
 const modelUser = require("./modelUser"); // Импортирт модели пользователя
 const { modelRewiew } = require("./modelRewiew"); 
 const swaggerUrl = require('../swagger/swagger.config');
+const {swaggerAPI} = require('../swagger/swagger.api');
 const {modelMedia} = require('./modelMedia');
 require('dotenv').config();
 
@@ -10,16 +11,17 @@ const sequelize = require("./database").sequelize;
 
 //Получение фильма по ID
 async function getMovie() {
-  let url = swaggerUrl.getUrl('v2.2/', 'films/', '301');
-  console.log(url);
-  const res = await fetch(url, {
-    method: 'GET',
-    headers: {
-      "Content-Type": "application/json",
-      "X-API-KEY": process.env.KEY,
-    },
-  });
-  const newMedia = await res.json();
+  const newMedia = await swaggerAPI.mediaByID({id: 301}); 
+  // let url = swaggerUrl.getUrl('v2.2/', 'films/', '301');
+  // console.log(url);
+  // const res = await fetch(url, {
+  //   method: 'GET',
+  //   headers: {
+  //     "Content-Type": "application/json",
+  //     "X-API-KEY": process.env.KEY,
+  //   },
+  // });
+  // const newMedia = await res.json();
   console.log(newMedia);
   console.log(newMedia.countries);
   await modelMedia.create({
@@ -34,6 +36,10 @@ async function getMovie() {
   });
   sequelize.sync();
 }
+// async function getMovies() {
+//   const newMedias = await swaggerAPI.
+  
+// }
 getMovie();
 // (async () => {
 //   // Синхронизация моделей с базой данных без удаления существующих данных
