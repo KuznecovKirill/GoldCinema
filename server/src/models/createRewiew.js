@@ -8,9 +8,9 @@ require('dotenv').config();
 const sequelize = require("./database").sequelize;
 //'collections?type=TOP_POPULAR_ALL&page=1'
 
-//Получение списка популярных фильмов
+//Получение фильма по ID
 async function getMovie() {
-  let url = swaggerUrl.getUrl('v2.2/', 'films/', '2345');
+  let url = swaggerUrl.getUrl('v2.2/', 'films/', '301');
   console.log(url);
   const res = await fetch(url, {
     method: 'GET',
@@ -21,13 +21,13 @@ async function getMovie() {
   });
   const newMedia = await res.json();
   console.log(newMedia);
-  console.log(newMedia.countries[0]);
+  console.log(newMedia.countries);
   await modelMedia.create({
     title: newMedia.nameRu,
-    country: newMedia.countries[0].country,
-    genre: newMedia.genres[0].genre,
+    country: newMedia.countries.map(c => c.country).join(', '), //список фильмов
+    genre: newMedia.genres.map(g => g.genre).join(', '), //список жанров
     running_time: newMedia.filmLength,
-    rars: newMedia.ratingAgeLimits,
+    rars: `${newMedia.ratingAgeLimits.replace(/\D/g, '')}+`, //удаление всех нечисловых символов и добавление плюса на конце
     rating: newMedia.ratingImdb,
     descrition: newMedia.description,
     poster: newMedia.posterUrlPreview
