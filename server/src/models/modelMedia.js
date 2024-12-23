@@ -1,8 +1,7 @@
 const { Sequelize, DataTypes } = require('sequelize');
-const { modelUser } = require('./modelUser');
 const sequelize = require('./database').sequelize;
 
-//Модель пользователя
+//Модель медиа
 const modelMedia = sequelize.define('Media', {
     id_media: {
         type: DataTypes.INTEGER,

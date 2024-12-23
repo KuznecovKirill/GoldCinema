@@ -14,16 +14,7 @@ const get = async (url) => {
         },
       });
       const result = await conn.json();
-      //console.log(result);
       return result;
-//     const response = await axios.get(url, {
-//         method: 'GET',
-//         headers: {
-//             "Content-Type": "application/json",
-//             "X-API-KEY": process.env.KEY,
-//         },
-//   });
-  return conn.data;
 };
 
 module.exports = { get };

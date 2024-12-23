@@ -7,7 +7,6 @@ const {modelMedia} = require('./modelMedia');
 require('dotenv').config();
 
 const sequelize = require("./database").sequelize;
-//'collections?type=TOP_POPULAR_ALL&page=1'
 
 //Получение фильма по ID
 async function getMovie() {
@@ -36,6 +35,7 @@ async function getMovie() {
   });
   sequelize.sync();
 }
+//Получение списка фильмов
 async function getMovies() {
   const newCollection = await swaggerAPI.mediaCollections({type:'TOP_POPULAR_ALL', page: '1'});
   newCollection.items.forEach(async (item) => {
@@ -52,6 +52,9 @@ async function getMovies() {
     });
 });
 sequelize.sync();
+}
+async function getSimilars() {
+  
 }
 getMovies();
 // getMovie();

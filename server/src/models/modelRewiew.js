@@ -2,7 +2,7 @@ const { Sequelize, DataTypes } = require('sequelize');
 const { modelUser } = require('./modelUser');
 const sequelize = require('./database').sequelize;
 
-//Модель пользователя
+//Модель отзыва
 const modelRewiew = sequelize.define('Rewiew', {
     id_rewiew: {
         type: DataTypes.INTEGER,
