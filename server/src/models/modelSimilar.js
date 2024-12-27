@@ -2,7 +2,7 @@ const { Sequelize, DataTypes } = require('sequelize');
 const {modelMedia} = require('./modelMedia');
 const sequelize = require('./database').sequelize;
 
-//Модель медиа
+//Модель похожих проектов
 const modelSimilar = sequelize.define('Similar', {
     id_similar: {
         type: DataTypes.INTEGER,
@@ -17,6 +17,14 @@ const modelSimilar = sequelize.define('Similar', {
             key: 'id_media'
         }
       },
+    title:{
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    poster:{
+        type: DataTypes.STRING,
+        allowNull: true
+    }
 },
     {
     timestamps: false, 
@@ -37,5 +45,4 @@ modelSimilar.prototype.toJSON = function() {
     // Синхронизация моделей с базой данных без удаления существующих данных
     await sequelize.sync();
   })();
-
-  module.exports = { modelSimilar };
+module.exports = { modelSimilar };

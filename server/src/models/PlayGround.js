@@ -4,6 +4,7 @@ const { modelRewiew } = require("./modelRewiew");
 const swaggerUrl = require('../swagger/swagger.config');
 const {swaggerAPI} = require('../swagger/swagger.api');
 const {modelMedia} = require('./modelMedia');
+const {modelSimilar} = require('./modelSimilar')
 require('dotenv').config();
 
 const sequelize = require("./database").sequelize;
@@ -11,19 +12,10 @@ const sequelize = require("./database").sequelize;
 //Получение фильма по ID
 async function getMovie() {
   const newMedia = await swaggerAPI.mediaByID({id: 301}); 
-  // let url = swaggerUrl.getUrl('v2.2/', 'films/', '301');
-  // console.log(url);
-  // const res = await fetch(url, {
-  //   method: 'GET',
-  //   headers: {
-  //     "Content-Type": "application/json",
-  //     "X-API-KEY": process.env.KEY,
-  //   },
-  // });
-  // const newMedia = await res.json();
   console.log(newMedia);
   console.log(newMedia.countries);
   await modelMedia.create({
+    id_media: newMedia.kinopoiskId,
     title: newMedia.nameRu,
     country: newMedia.countries.map(c => c.country).join(', '), //список фильмов
     genre: newMedia.genres.map(g => g.genre).join(', '), //список жанров
@@ -39,8 +31,11 @@ async function getMovie() {
 async function getMovies() {
   const newCollection = await swaggerAPI.mediaCollections({type:'TOP_POPULAR_ALL', page: '1'});
   newCollection.items.forEach(async (item) => {
-    console.log(item.nameRu);
+    if (item.nameRu !== null){
+      console.log(item.nameRu);
+    try{
     await modelMedia.create({
+        id_media: item.kinopoiskId,
         title: item.nameRu,
         country: item.countries.map(c => c.country).join(', '),
         genre: item.genres.map(g => g.genre).join(', '),
@@ -50,32 +45,35 @@ async function getMovies() {
         descrition: item.description || null,
         poster: item.posterUrlPreview || null
     });
+  }
+  catch (error){
+    if (error.name == 'SequelizeUniqueConstraintError' ){
+      console.log('Такой фильм уже существует!');
+    }
+  }
+  }
 });
 sequelize.sync();
 }
-async function getSimilars() {
+async function checkID(id) {
+  
   
 }
+async function getSimilars() {
+  const newSimilar = await swaggerAPI.mediaSimilars({id: '301/'}, {similars: 'similars'});
+  console.log(newSimilar);
+  const firstSixMovies = newSimilar.items.slice(0, 6);
+  for (const item of firstSixMovies){
+    if (item.nameRu !== null){
+    await modelSimilar.create({
+      id_media: item.filmId || null,
+      title: item.nameRu,
+      poster: item.posterUrlPreview
+    });
+  }
+} 
+  sequelize.sync();
+}
+//getSimilars();
 getMovies();
 // getMovie();
-// (async () => {
-//   // Синхронизация моделей с базой данных без удаления существующих данных
-//   await sequelize.sync();
-
-//   // Проверка существования пользователя перед созданием отзыва
-//   const userId = 2; // Замените на существующий id_user
-
-//   try {
-//     // Создание отзыва с использованием существующего пользователя
-//     const newReview = await modelRewiew.create({
-//       id_user: userId, // Используем существующий id_user
-//       id_media: 1, // Пример значения id_media (можно заменить на реальное значение)
-//       rating_user: 4.5, // Пример рейтинга
-//       comment_text: "Отличный фильм!", // Пример текста комментария
-//     });
-
-//     console.log("Отзыв создан:", newReview.toJSON()); // Выводим созданный отзыв в консоль
-//   } catch (error) {
-//     console.error("Ошибка при создании отзыва:", error);
-//   }
-// })();

@@ -26,13 +26,13 @@ const modelFavorite = sequelize.define(
       //     // key: 'id_user'
       // }
     },
-    media_poster:{
-        type: DataTypes.STRING,
-        allowNull: false
+    poster:{
+      type: DataTypes.STRING,
+      allowNull: true
     },
-    media_rating:{
-        type: DataTypes.FLOAT,
-        allowNull: false
+    rating:{
+      type: DataTypes.FLOAT,
+      allowNull: true
     }
   },
   {
