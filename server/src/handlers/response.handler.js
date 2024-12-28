@@ -9,4 +9,9 @@ const badrequest = (res) => response(res, 400, {
 const goodrequest = (res, data) => responseWithData(res, 200, data);
 const created = (res, data) => responseWithData(res, 201, data);
 
-export default {badrequest,goodrequest,created};
+const notAuthorized = (res) => responseWithData(res, 401, {
+  status: 401,
+  message: "Не авторизован"
+});
+
+module.exports = {badrequest,goodrequest,created, notAuthorized};

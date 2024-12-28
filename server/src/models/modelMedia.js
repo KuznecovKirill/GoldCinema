@@ -66,4 +66,4 @@ modelMedia.prototype.toJSON = function() {
     await sequelize.sync({ alter: true });
   })();
 
-  module.exports = { modelMedia };
+module.exports = { modelMedia };
