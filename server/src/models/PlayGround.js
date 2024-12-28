@@ -17,6 +17,7 @@ async function addMovie(newMedia) {
     await modelMedia.create({
       id_media: newMedia.kinopoiskId,
       title: newMedia.nameRu,
+      mediaType: newMedia.type,
       country: newMedia.countries.map((c) => c.country).join(", "), //список фильмов
       genre: newMedia.genres.map((g) => g.genre).join(", "), //список жанров
       running_time: newMedia.filmLength,
@@ -36,15 +37,16 @@ async function addMovie(newMedia) {
 async function getMovies() {
   const newCollection = await swaggerAPI.mediaCollections({
     type: "TOP_POPULAR_ALL",
-    page: "1",
+    page: "3",
   });
   newCollection.items.forEach(async (item) => {
     if (item.nameRu !== null) {
-      console.log(item.nameRu);
+      //console.log(item.nameRu);
       try {
         await modelMedia.create({
           id_media: item.kinopoiskId,
           title: item.nameRu,
+          mediaType: item.type,
           country: item.countries.map((c) => c.country).join(", "),
           genre: item.genres.map((g) => g.genre).join(", "),
           running_time: item.filmLength || null,
@@ -76,7 +78,7 @@ async function getSimilars() {
   const firstSixMovies = newSimilar.items.slice(0, 6);
   for (const item of firstSixMovies) {
     if (item.nameRu !== null) {
-      const newMedia = await swaggerAPI.mediaByID({ id: item.filmId });
+      const newMedia = await swaggerAPI.mediaByID({ id: item.filmId }); // Добавление фильма в БД
       addMovie(newMedia);
       await modelSimilar.create({
         id_origin: 301,
@@ -88,6 +90,6 @@ async function getSimilars() {
   }
   sequelize.sync();
 }
-getSimilars();
-//getMovies();
+//getSimilars();
+getMovies();
 // getMovie();

@@ -13,6 +13,11 @@ const modelMedia = sequelize.define('Media', {
         type: DataTypes.STRING,
         allowNull: false
     },
+    mediaType:{
+        type: DataTypes.STRING,
+        allowNull: false
+
+    },
     country:{
         type: DataTypes.STRING,
         allowNull: false
@@ -58,7 +63,7 @@ modelMedia.prototype.toJSON = function() {
 };
 (async () => {
     // Синхронизация моделей с базой данных без удаления существующих данных
-    await sequelize.sync();
+    await sequelize.sync({ alter: true });
   })();
 
   module.exports = { modelMedia };
