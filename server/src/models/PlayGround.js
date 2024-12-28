@@ -91,7 +91,7 @@ async function getImages() {
 //Получение похожих проектов
 async function getSimilars() {
   const newSimilar = await swaggerAPI.mediaSimilars(
-    { id: "301/" },
+    { id: "464963/" },
     { similars: "similars" }
   );
   console.log(newSimilar);
@@ -101,7 +101,7 @@ async function getSimilars() {
       const newMedia = await swaggerAPI.mediaByID({ id: item.filmId }); // Добавление фильма в БД
       addMovie(newMedia);
       await modelSimilar.create({
-        id_origin: 301,
+        id_origin: 464963,
         id_media: item.filmId || null,
         title: item.nameRu,
         poster: item.posterUrlPreview,
@@ -110,10 +110,10 @@ async function getSimilars() {
   }
   sequelize.sync();
 }
-//getSimilars();
+getSimilars();
 //getMovies();
 // getMovie();
-getImages();
+//getImages();
 (async () => {
   // Синхронизация моделей с базой данных без удаления существующих данных
   await sequelize.sync({ alter: true });

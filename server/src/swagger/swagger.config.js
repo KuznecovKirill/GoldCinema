@@ -8,9 +8,9 @@ const getUrl = (version, object, endUrl, params ='') => {
   console.log(`${baseUrl}${version}${object}${endUrl}${params}`);
     return `${baseUrl}${version}${object}${endUrl}${params}`;
   }
-  else if (count == 1){
-    const {param} = params;
-    return `${baseUrl}${version}${object}${endUrl}${param}`;
+  else if (params[Object.keys(params)[0]] == 'similars'){
+    const {similars} = params;
+    return `${baseUrl}${version}${object}${endUrl}${similars}`;
   }
   else if (count == 2){
     const {type, page} = params;
