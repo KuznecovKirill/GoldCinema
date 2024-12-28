@@ -65,6 +65,8 @@ async function getMovies() {
   sequelize.sync();
 }
 async function checkID(id) {}
+
+//Получение похожих проектов
 async function getSimilars() {
   const newSimilar = await swaggerAPI.mediaSimilars(
     { id: "301/" },

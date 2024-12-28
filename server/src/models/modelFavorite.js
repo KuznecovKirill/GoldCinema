@@ -2,7 +2,7 @@ const { Sequelize, DataTypes } = require("sequelize");
 const { modelUser } = require("./modelUser");
 const sequelize = require("./database").sequelize;
 
-//Модель пользователя
+//Модель избранного
 const modelFavorite = sequelize.define(
   "Favorite",
   {
