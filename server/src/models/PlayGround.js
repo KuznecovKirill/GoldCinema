@@ -1,10 +1,9 @@
 const { Sequelize } = require("sequelize");
-const modelUser = require("./modelUser"); // Импортирт модели пользователя
-const { modelRewiew } = require("./modelRewiew");
-const swaggerUrl = require("../swagger/swagger.config");
+const modelUser = require("./modelUser"); // Импорт модели пользователя
 const { swaggerAPI } = require("../swagger/swagger.api");
 const { modelMedia } = require("./modelMedia");
 const { modelSimilar } = require("./modelSimilar");
+const { modelImages } = require("./modelImages");
 require("dotenv").config();
 
 const sequelize = require("./database").sequelize;
@@ -66,7 +65,28 @@ async function getMovies() {
   });
   sequelize.sync();
 }
-async function checkID(id) {}
+//Получение изображений медиа
+async function getImages() {
+  const newImage = await swaggerAPI.mediaImages(
+    { id: "464963/" },
+    { images: "images?", type: "SCREENSHOT", page: "1" }
+  );
+  console.log(newImage);
+  const firstSixImages = newImage.items.slice(0, 6);
+  for (const item of firstSixImages) {
+    try {
+      await modelImages.create({
+        id_media: 464963,
+        imageUrl: item.imageUrl,
+      });
+    } catch (error) {
+      if (error instanceof Sequelize.UnknownConstraintError) {
+        console.log("Отлов ошибки изображения!");
+      }
+    }
+  }
+  sequelize.sync();
+}
 
 //Получение похожих проектов
 async function getSimilars() {
@@ -91,5 +111,10 @@ async function getSimilars() {
   sequelize.sync();
 }
 //getSimilars();
-getMovies();
+//getMovies();
 // getMovie();
+getImages();
+(async () => {
+  // Синхронизация моделей с базой данных без удаления существующих данных
+  await sequelize.sync({ alter: true });
+})();

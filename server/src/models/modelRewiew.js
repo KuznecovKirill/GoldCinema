@@ -44,7 +44,11 @@ modelRewiew.prototype.toObject = function() {
 
 // Преобразование в JSON
 modelRewiew.prototype.toJSON = function() {
-    const values = { ...this.get() };; 
+    const values = { ...this.get() }; 
     return values;
 };
+(async () => {
+    // Синхронизация моделей с базой данных без удаления существующих данных
+    await sequelize.sync({ alter: true });
+  })();
 module.exports =  {modelRewiew};
