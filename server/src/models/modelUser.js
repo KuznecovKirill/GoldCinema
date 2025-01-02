@@ -37,9 +37,7 @@ const modelUser = sequelize.define(
 modelUser.prototype.setPassword = function (password) {
   this.passToken = crypto.randomBytes(16).toString("hex");
 
-  this.password = crypto
-    .pbkdf2Sync(password, this.passToken, 1000, 64, "sha512")
-    .toString("hex");
+  this.password = password;
   console.log(this.passToken);
 };
 
