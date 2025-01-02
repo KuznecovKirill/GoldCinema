@@ -5,8 +5,10 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const http = require('http');
+
 const userController = require('./src/controllers/userController');
 
+const mediaController = require('./src/controllers/mediaController');
 
 
 const app = express();
@@ -33,8 +35,19 @@ app.post('/', (req, res) => {
     res.send('POST запрос на корневом маршруте');
 });
 app.post("/signUp", userController.signUp);
-app.post("/signU");
+//app.post("/medias", mediaController.getMedias);
+app.post('/medias', (req, res) => {
+    const page = req.body.page; // Получаем значение page из тела запроса
+    const limit = req.body.limit || 10;
+    const newReq = {
+        query: { page, limit }, // Передаем параметры как query
+        body: req.body,
+    };
+    return mediaController.getMedias(newReq, res);
 
+    console.log(page);
+    res.send(`Страница: ${page}`);
+});
 //Подключение
 connection.connect(err => {
     if (err) {

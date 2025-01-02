@@ -24,11 +24,11 @@ const decode = (req) => {
   const user = async (req, res, next) => {
     const token = decode(req);
   
-    if (!token) return responseHandler.notAuthorized(res);
+    if (!token) return responseHandler.notauthorized(res);
   
     const userID = await userModel.findByPk(tokenDecoded.data); //Извлечение id
   
-    if (!userID) return responseHandler.notAuthorized(res); //
+    if (!userID) return responseHandler.notauthorized(res); //
   
     req.user = userID;
   
