@@ -35,19 +35,19 @@ app.post('/', (req, res) => {
     res.send('POST запрос на корневом маршруте');
 });
 app.post("/signUp", userController.signUp);
-//app.post("/medias", mediaController.getMedias);
-app.post('/medias', (req, res) => {
-    const page = req.body.page; // Получаем значение page из тела запроса
-    const limit = req.body.limit || 10;
-    const newReq = {
-        query: { page, limit }, // Передаем параметры как query
-        body: req.body,
-    };
-    return mediaController.getMedias(newReq, res);
+app.post("/medias", mediaController.getMedias);
+// app.post('/medias', (req, res) => {
+//     const page = req.body.page; // Получаем значение page из тела запроса
+//     const limit = req.body.limit || 10;
+//     const newReq = {
+//         query: { page, limit }, // Передаем параметры как query
+//         body: req.body,
+//     };
+//     return mediaController.getMedias(newReq, res);
 
-    console.log(page);
-    res.send(`Страница: ${page}`);
-});
+//     console.log(page);
+//     res.send(`Страница: ${page}`);
+// });
 //Подключение
 connection.connect(err => {
     if (err) {

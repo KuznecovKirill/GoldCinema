@@ -39,28 +39,6 @@ const getMediasFromAPI = async (req, res) => {
       sequelize.sync();
   };
   //Получение списка проектов
-  // const getMedias = async (res, req) => {
-  //   try {
-  //     const { page = 1, limit = 10 } = req.query; // Получаем номер страницы и лимит из запроса 
-  //       const offset = (page - 1) * limit; // Расчет смещения
-    
-  //       const medias = await modelMedia.findAndCountAll({
-  //         limit: parseInt(limit),
-  //         offset: parseInt(offset),
-  //         order: [['id_media', 'DESC']]
-  //       });
-  //       console.log(medias);
-  //       responseHandler.goodrequest(res, {
-  //         total: count,
-  //         page: parseInt(page),
-  //         limit: parseInt(limit),
-  //         medias: rows,
-  //       });
-  //     } catch (error) {
-  //       console.error(error);
-  //       responseHandler.error(res);
-  //     }
-  // };
   const getMedias = async (req, res) => {
     try {
       // Извлекаем параметры из объекта запроса
@@ -89,6 +67,6 @@ const getMediasFromAPI = async (req, res) => {
   module.exports = {getMedias};
   //curl -X GET http://localhost:8000/api/medias?page=1&limit=10
   //curl -X GET http://localhost:8000/medias?page=1&limit=10
-
+  //curl -X POST http://localhost:8000/medias -H "Content-Type: application/json" -d '{"page": 1}'
 
   
