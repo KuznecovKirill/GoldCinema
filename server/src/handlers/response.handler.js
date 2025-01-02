@@ -9,13 +9,17 @@ const badrequest = (res, message) => response(res, 400, {
 const goodrequest = (res, data) => response(res, 200, data);
 const created = (res, data) => response(res, 201, data);
 
-const notAuthorized = (res) => response(res, 401, {
+const notauthorized = (res) => response(res, 401, {
   status: 401,
   message: "Не авторизован"
+});
+const notfound = (res) => responseWithData(res, 404, {
+  status: 404,
+  message: "Resource not found"
 });
 const error = (res) => response(res, 500, {
   status: 500,
   message: "Ошибка 500"
 });
 
-module.exports = {badrequest,goodrequest,created,notAuthorized,error};
+module.exports = {badrequest,goodrequest,created,notauthorized,notfound,error};
