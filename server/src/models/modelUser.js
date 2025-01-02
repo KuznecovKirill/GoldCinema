@@ -14,10 +14,6 @@ const modelUser = sequelize.define('User', {
         type: DataTypes.STRING,
         allowNull: false
     },
-    displayName: {
-        type: DataTypes.STRING,
-        allowNull: false
-    },
     password: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -25,7 +21,7 @@ const modelUser = sequelize.define('User', {
     },
     salt: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
         select: false 
     }
 }, {
@@ -44,6 +40,7 @@ modelUser.prototype.setPassword = function(password) {
         64,
         "sha512"
     ).toString("hex");
+    console.log(this.salt);
 };
 
 // Метод для проверки пароля
@@ -72,7 +69,10 @@ modelUser.prototype.toJSON = function() {
     return values;
 };
 
-
+(async () => {
+    // Синхронизация моделей с базой данных без удаления существующих данных
+    await sequelize.sync({ alter: true });
+  })();
 // (async () => {
 //     await modelUser.sync(); // Синхронизация таблицы
 

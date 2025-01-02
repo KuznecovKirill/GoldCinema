@@ -4,14 +4,18 @@ const response = (res, code, data) => res.status(code).json(data);
 
 const badrequest = (res) => response(res, 400, {
     status: 400,
-    message: "Неверный запрос пользователя!"
+    message: "d"
   });
-const goodrequest = (res, data) => responseWithData(res, 200, data);
-const created = (res, data) => responseWithData(res, 201, data);
+const goodrequest = (res, data) => response(res, 200, data);
+const created = (res, data) => response(res, 201, data);
 
-const notAuthorized = (res) => responseWithData(res, 401, {
+const notAuthorized = (res) => response(res, 401, {
   status: 401,
   message: "Не авторизован"
 });
+const error = (res) => response(res, 500, {
+  status: 500,
+  message: "Ошибка 500"
+});
 
-module.exports = {badrequest,goodrequest,created, notAuthorized};
+module.exports = {badrequest,goodrequest,created,notAuthorized,error};

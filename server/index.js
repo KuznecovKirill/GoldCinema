@@ -1,12 +1,12 @@
-require('dotenv').config()
+require('dotenv').config();
 const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
+const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const http = require('http');
-const swaggerUrl = require('./src/swagger/swagger.config');
+const userController = require('./src/controllers/userController');
 
-const modelUser = require('./src/models/modelUser');
 
 
 const app = express();
@@ -14,6 +14,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
+app.use(bodyParser.json())
 
 const port = process.env.PORT;
 console.log(process.env.PORT);
@@ -27,35 +28,27 @@ const connection = mysql.createConnection({
     database: "Gold_Cinema",
     password: "",
 });
+
+app.post('/', (req, res) => {
+    res.send('POST запрос на корневом маршруте');
+});
+app.post("/signUp", userController.signUp);
+app.post("/signU");
+
 //Подключение
 connection.connect(err => {
     if (err) {
         return console.error('Ошибка подключения: ' + err.message);
     }
     console.log('Подключение к серверу MySQL успешно установлено');
+    console.log(`Server is running on http://localhost:${process.env.PORT}`);
     
     server.listen(port, () => {
         console.log(`Сервер слушает порт ${port}`);
     });
 });
 
-// //Получение списка популярных фильмов
-// async function getMovies() {
-//     let url = swaggerUrl.getUrl('v2.2/', 'films/','collections?type=TOP_POPULAR_ALL&page=1');
-//     console.log(url);
-//     const res = await fetch(url, {
-//         method: 'GET',
-//         headers: {
-//             "Content-Type": "application/json",
-//             "X-API-KEY": process.env.KEY,
-//         },
-//     });
-//     const respData = await res.json();
-//     console.log(respData);
 
-// }
-// getMovies();
+//connection.end();
 
-connection.end();
-//modelUser.createUser();
 
