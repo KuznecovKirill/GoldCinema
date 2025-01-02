@@ -2,9 +2,9 @@
 
 const response = (res, code, data) => res.status(code).json(data);
 
-const badrequest = (res) => response(res, 400, {
+const badrequest = (res, message) => response(res, 400, {
     status: 400,
-    message: "d"
+    message
   });
 const goodrequest = (res, data) => response(res, 200, data);
 const created = (res, data) => response(res, 201, data);

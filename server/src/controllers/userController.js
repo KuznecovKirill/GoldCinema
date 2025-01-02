@@ -8,11 +8,11 @@ const crypto = require('crypto');
 const signUp = async (req, res) => {
   try {
     const { us, pass } = req.body;
-    //   const checkUser = await modelUser.findOne({ where: { username: "newuser" } }); //поиск пользователя с таким именем
+    const checkUser = await modelUser.findOne({ where: { username: "newuser" } }); //поиск пользователя с таким именем
 
     //curl -X POST -H "Content-Type: application/json" -d '{"us": "newuser", "pass": "password123"}' http://localhost:8000/signUp
 
-    //   if (checkUser) return responseHandler.badrequest(res, "Такой пользователь уже зарегестрирован");
+    if (checkUser) return responseHandler.badrequest(res, "Такой пользователь уже зарегестрирован");
     const user = await modelUser.create({
       username: us,
       password: pass, // Предполагается, что метод setPassword будет обрабатывать хеширование пароля
