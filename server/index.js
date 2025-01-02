@@ -36,6 +36,7 @@ app.post('/', (req, res) => {
 });
 app.post("/signUp", userController.signUp);
 app.post("/medias", mediaController.getMedias);
+app.post('/genres', mediaController.getGenres);
 // app.post('/medias', (req, res) => {
 //     const page = req.body.page; // Получаем значение page из тела запроса
 //     const limit = req.body.limit || 10;
@@ -49,6 +50,7 @@ app.post("/medias", mediaController.getMedias);
 //     res.send(`Страница: ${page}`);
 // });
 //Подключение
+
 connection.connect(err => {
     if (err) {
         return console.error('Ошибка подключения: ' + err.message);
