@@ -50,6 +50,7 @@ router.post(
     requestHandler.validate,
     userController.updatePassword
   );
+
   router.get(
     "/info",
     tokenMiddleware.user,
@@ -60,5 +61,29 @@ router.post(
     "/favorites",
     tokenMiddleware.user,
     favoriteController.getFavoritesOfUser
+  );
+
+  router.post(
+    "/favorites",
+    tokenMiddleware.user,
+    body("mediaType")
+      .exists().withMessage("Тип медиа")
+      .custom(type => ["FILM", "MINI_SERIES","TV_SERIES","TV_SHOW"].includes(type)).withMessage("Ошибка типа данных"),
+    body("id_media")
+      .exists().withMessage("Требуется id медиа")
+      .isLength({ min: 1 }).withMessage("ID не может быть пустым"),
+    body("title")
+      .exists().withMessage("Название медиа"),
+    body("poster")
+      .exists().withMessage("Требуется постер медиа"),
+    body("rating")
+      .exists().withMessage("Требвуется рейтинг"),
+    requestHandler.validate,
+    favoriteController.addFavorite
+  );
+  router.delete(
+    "/favorites/:id_favorite",
+    tokenMiddleware.user,
+    favoriteController.removeFavorite
   );
  module.exports = {router};
