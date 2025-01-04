@@ -6,38 +6,6 @@ const sequelize = require("../models/database").sequelize;
 const { swaggerAPI } = require("../swagger/swagger.api");
 const tokenMiddleware = require("../middlewares/middleware.js");
 
-//Получение списка медиа из API и заполнение ими БД
-const getMediasFromAPI = async (req, res) => {
-  const newCollection = await swaggerAPI.mediaCollections({
-    type: "TOP_POPULAR_ALL",
-    page: "3",
-  });
-  newCollection.items.forEach(async (item) => {
-    if (item.nameRu !== null) {
-      try {
-        await modelMedia.create({
-          id_media: item.kinopoiskId,
-          title: item.nameRu,
-          mediaType: item.type,
-          country: item.countries.map((c) => c.country).join(", "),
-          genre: item.genres.map((g) => g.genre).join(", "),
-          running_time: item.filmLength || null,
-          rars: item.ratingAgeLimits
-            ? `${item.ratingAgeLimits.replace(/\D/g, "")}+`
-            : null,
-          rating: item.ratingImdb || null,
-          descrition: item.description || null,
-          poster: item.posterUrlPreview || null,
-        });
-      } catch (error) {
-        if (error.name == "SequelizeUniqueConstraintError") {
-          console.log("Такой фильм уже существует!");
-        }
-      }
-    }
-  });
-  sequelize.sync();
-};
 //Получение списка проектов
 const getMedias = async (req, res) => {
   try {
@@ -96,7 +64,34 @@ const getGenres = async (req, res) => {
     responseHandler.error(res);
   }
 };
-module.exports = { getMedias, getGenres };
+//Получение информации о проекте
+const getInfo = async (req, res) => {
+  try {
+    const { id_media } = req.body;
+
+    const media = await modelMedia.findByPk(id_media);
+
+    //const similar = await similarController... нкжно будет добавить контроллер simillar, чтобы получать похожие проекты
+    //Тоже самое для изображений
+
+
+    const tokenDecoded = tokenMiddleware.decode(req);
+
+    if (tokenDecoded) { //Проверка работы decode
+      const user = await modelUser.findByPk(tokenDecoded.data);
+
+    }
+
+    //Добавить получения отзывов о проекте
+
+    responseHandler.ok(res, media);
+  } catch (error) {
+    console.log(error);
+    responseHandler.error(res);
+  }
+};
+// Нужно будет добавить функцию для поиска
+module.exports = { getMedias, getGenres, getInfo };
 //curl -X GET http://localhost:8000/api/medias?page=1&limit=10
 //curl -X GET http://localhost:8000/medias?page=1&limit=10
 //curl -X POST http://localhost:8000/medias -H "Content-Type: application/json" -d '{"page": 1}'

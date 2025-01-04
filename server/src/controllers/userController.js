@@ -72,7 +72,7 @@ const updatePassword = async (req, res) => {
   try {
     const { password, newPassword } = req.body;
 
-    const user = await userModel.findById(req.user.id_user).select("id_user password passToken");
+    const user = await modelUser.findByPk(req.user.id_user).select("id_user password passToken");
 
     if (!user) return responseHandler.notauthorized(res);
 
