@@ -1,6 +1,7 @@
 const express = require('express');
 const userController = require('../controllers/userController');
 const { modelUser } = require('../models/modelUser');
+const requestHandler = require('../handlers/request.handler');
 
 const router = express.Router();
 
@@ -23,7 +24,17 @@ router.post(
         return true;
       }),
     requestHandler.validate,
-    modelUser.signUp
+    userController.signUp
+  );
+  router.post(
+    "/signin",
+    body("username")
+      .exists().withMessage("Имя пользователя"),
+    body("password")
+      .exists().withMessage("Пароль")
+      .isLength({ min: 8 }).withMessage("Пароль должен состоять миниму из 8 символов"),
+    requestHandler.validate,
+    userController.signIn
   );
   
   export default router;
