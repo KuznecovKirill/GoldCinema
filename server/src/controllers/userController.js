@@ -8,7 +8,6 @@ const crypto = require('crypto');
 const signUp = async (req, res) => {
   try {
     const { username, password } = req.body;
-    console.log(username);
     const checkUser = await modelUser.findOne({ where: {username: username} }); //поиск пользователя с таким именем
     //curl -X POST -H "Content-Type: application/json" -d '{"us": "newuser", "pass": "password123"}' http://localhost:8000/signUp
 
@@ -19,8 +18,6 @@ const signUp = async (req, res) => {
       passToken: crypto.randomBytes(16).toString("hex")
     });
     sequelize.sync();
-    console.log(username);
-
     const token = jsonwebtoken.sign(
       { data: user.id_user },
       process.env.TOKEN_SECRET,

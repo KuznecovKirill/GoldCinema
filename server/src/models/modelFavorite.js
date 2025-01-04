@@ -1,5 +1,6 @@
 const { DataTypes } = require("sequelize");
 const { modelUser } = require("./modelUser");
+const { modelMedia } = require("./modelMedia");
 const sequelize = require("./database").sequelize;
 
 //Модель избранного
@@ -19,45 +20,12 @@ const modelFavorite = sequelize.define(
         key: "id_user",
       },
     },
-    title: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    mediaType: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    country: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    year: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    genre: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    running_time: {
+    id_media: {
       type: DataTypes.INTEGER,
-      allowNull: true,
-    },
-    rars: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    rating: {
-      type: DataTypes.FLOAT,
-      allowNull: true,
-    },
-    descrition: {
-      type: DataTypes.TEXT,
-      allowNull: true,
-    },
-    poster: {
-      type: DataTypes.STRING,
-      allowNull: true,
+      references: {
+        model: modelMedia,
+        key: "id_media",
+      },
     },
   },
   {

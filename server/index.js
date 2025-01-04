@@ -10,6 +10,8 @@ const userController = require('./src/controllers/userController');
 
 const mediaController = require('./src/controllers/mediaController');
 
+const favoriteController = require('./src/controllers/favoriteController');
+
 //const PlayGround = require('./src/models/PlayGround');
 
 const app = express();
@@ -38,6 +40,7 @@ app.post('/', (req, res) => {
 app.post("/signUp", userController.signUp);
 app.post("/medias", mediaController.getMedias);
 app.post('/genres', mediaController.getGenres);
+app.post('/favorites', favoriteController.addFavorite);
 // app.post('/medias', (req, res) => {
 //     const page = req.body.page; // Получаем значение page из тела запроса
 //     const limit = req.body.limit || 10;
