@@ -1,7 +1,7 @@
 const express = require('express');
 const mediaController = require('../controllers/mediaController');
 
-const router = express.Router({ mergeParams: true });
+const router = express.Router();
 
 router.post("/medias", mediaController.getMedias);
 
