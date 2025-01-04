@@ -1,5 +1,6 @@
 const express = require('express');
 const userController = require('../controllers/userController');
+const favoriteController = require('../controllers/favoriteController');
 const { modelUser } = require('../models/modelUser');
 const requestHandler = require('../handlers/request.handler');
 const tokenMiddleware  = require('../middlewares/middleware');
@@ -49,5 +50,15 @@ router.post(
     requestHandler.validate,
     userController.updatePassword
   );
+  router.get(
+    "/info",
+    tokenMiddleware.user,
+    userController.getInfo
+  );
   
+  router.get(
+    "/favorites",
+    tokenMiddleware.user,
+    favoriteController.getFavoritesOfUser
+  );
  module.exports = {router};
