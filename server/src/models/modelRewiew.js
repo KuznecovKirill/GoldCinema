@@ -1,5 +1,6 @@
 const { Sequelize, DataTypes } = require("sequelize");
 const { modelUser } = require("./modelUser");
+const { modelMedia } = require("./modelMedia");
 const sequelize = require("./database").sequelize;
 
 //Модель отзыва
@@ -21,10 +22,10 @@ const modelRewiew = sequelize.define(
     },
     id_media: {
       type: DataTypes.INTEGER,
-      // references: {
-      //     // model: modelUser,
-      //     // key: 'id_user'
-      // }
+      references: {
+        model: modelMedia,
+        key: 'id_media'
+      }
     },
     rating_user: {
       type: DataTypes.FLOAT,
@@ -53,6 +54,6 @@ modelRewiew.prototype.toJSON = function () {
 };
 (async () => {
   // Синхронизация моделей с базой данных без удаления существующих данных
-  await sequelize.sync({ alter: true });
+  await sequelize.sync();
 })();
 module.exports = { modelRewiew };

@@ -1,7 +1,8 @@
-require("dotenv").config();
-const baseUrl = process.env.BASE_URL;
+require('dotenv').config();
+//const baseUrl = process.env.BASE_URL;
 
 const getUrl = (version, object, endUrl, params ='') => {
+  const baseUrl = "https://kinopoiskapiunofficial.tech/api/"
   console.log(params[Object.keys(params)[0]]);
   const count = Object.keys(params).length; //кол-во элементов у params
   if (count == 0){
@@ -13,6 +14,7 @@ const getUrl = (version, object, endUrl, params ='') => {
     return `${baseUrl}${version}${object}${endUrl}${similars}`;
   }
   else if (count == 2){
+    console.log(baseUrl);
     const {type, page} = params;
     return `${baseUrl}${version}${object}${endUrl}type=${type}&page=${page}`;
   }

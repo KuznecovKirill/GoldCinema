@@ -42,6 +42,6 @@ modelImages.prototype.toJSON = function () {
 };
 (async () => {
   // Синхронизация моделей с базой данных без удаления существующих данных
-  await sequelize.sync({ alter: true });
+  await sequelize.sync();
 })();
 module.exports = { modelImages };

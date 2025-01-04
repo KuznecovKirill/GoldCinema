@@ -18,6 +18,7 @@ async function addMovie(newMedia) {
       title: newMedia.nameRu,
       mediaType: newMedia.type,
       country: newMedia.countries.map((c) => c.country).join(", "), //список фильмов
+      year: newMedia.year,
       genre: newMedia.genres.map((g) => g.genre).join(", "), //список жанров
       running_time: newMedia.filmLength,
       rars: `${newMedia.ratingAgeLimits.replace(/\D/g, "")}+`, //удаление всех нечисловых символов и добавление плюса на конце
@@ -40,13 +41,14 @@ async function getMovies() {
   });
   newCollection.items.forEach(async (item) => {
     if (item.nameRu !== null) {
-      //console.log(item.nameRu);
+      // console.log(item.nameRu);
       try {
         await modelMedia.create({
           id_media: item.kinopoiskId,
           title: item.nameRu,
           mediaType: item.type,
           country: item.countries.map((c) => c.country).join(", "),
+          year: item.year,
           genre: item.genres.map((g) => g.genre).join(", "),
           running_time: item.filmLength || null,
           rars: item.ratingAgeLimits
@@ -68,7 +70,7 @@ async function getMovies() {
 //Получение изображений медиа
 async function getImages() {
   const newImage = await swaggerAPI.mediaImages(
-    { id: "464963/" },
+    { id: "957887/" },
     { images: "images?", type: "SCREENSHOT", page: "1" }
   );
   console.log(newImage);
@@ -91,7 +93,7 @@ async function getImages() {
 //Получение похожих проектов
 async function getSimilars() {
   const newSimilar = await swaggerAPI.mediaSimilars(
-    { id: "464963/" },
+    { id: "957887/" },
     { similars: "similars" }
   );
   console.log(newSimilar);
@@ -101,7 +103,7 @@ async function getSimilars() {
       const newMedia = await swaggerAPI.mediaByID({ id: item.filmId }); // Добавление фильма в БД
       addMovie(newMedia);
       await modelSimilar.create({
-        id_origin: 464963,
+        id_origin: 957887,
         id_media: item.filmId || null,
         title: item.nameRu,
         poster: item.posterUrlPreview,
@@ -110,11 +112,13 @@ async function getSimilars() {
   }
   sequelize.sync();
 }
+//getSimilars();
+getMovies();
 getSimilars();
-//getMovies();
 // getMovie();
 //getImages();
 (async () => {
   // Синхронизация моделей с базой данных без удаления существующих данных
   await sequelize.sync({ alter: true });
 })();
+module.exports = {getMovies};

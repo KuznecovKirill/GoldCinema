@@ -10,6 +10,7 @@ const userController = require('./src/controllers/userController');
 
 const mediaController = require('./src/controllers/mediaController');
 
+//const PlayGround = require('./src/models/PlayGround');
 
 const app = express();
 
@@ -62,7 +63,7 @@ connection.connect(err => {
         console.log(`Сервер слушает порт ${port}`);
     });
 });
-
+//PlayGround.getMovies();
 
 //connection.end();
 

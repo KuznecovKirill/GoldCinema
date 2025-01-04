@@ -22,8 +22,12 @@ const modelMedia = sequelize.define('Media', {
         type: DataTypes.STRING,
         allowNull: false
     },
+    year:{
+        type: DataTypes.STRING,
+        allowNull: true
+    },
     genre:{
-        type: DataTypes. STRING,
+        type: DataTypes.STRING,
         allowNull: false
     },
     running_time:{
@@ -63,7 +67,7 @@ modelMedia.prototype.toJSON = function() {
 };
 (async () => {
     // Синхронизация моделей с базой данных без удаления существующих данных
-    await sequelize.sync({ alter: true });
+    await sequelize.sync();
   })();
 
 module.exports = { modelMedia };

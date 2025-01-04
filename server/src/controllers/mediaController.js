@@ -65,6 +65,7 @@ const getMedias = async (req, res) => {
   }
 };
 //Получение жанров
+// curl -X POST "http://localhost:8000/genres" -H "Content-Type: application/json" -d '{"mediaType": "FILM"}'
 const getGenres = async (req, res) => {
   try {
     const mediaType = req.body.mediaType || "FILM";
