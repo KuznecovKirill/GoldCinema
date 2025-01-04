@@ -1,4 +1,4 @@
-const { Sequelize, DataTypes } = require("sequelize");
+const { DataTypes } = require("sequelize");
 const { modelUser } = require("./modelUser");
 const sequelize = require("./database").sequelize;
 
@@ -12,28 +12,53 @@ const modelFavorite = sequelize.define(
       primaryKey: true,
       allowNull: false,
     },
-    id_user: {
+    id_user:{
       type: DataTypes.INTEGER,
       references: {
         model: modelUser,
         key: "id_user",
       },
     },
-    id_media: {
-      type: DataTypes.INTEGER,
-      // references: {
-      //     // model: modelUser,
-      //     // key: 'id_user'
-      // }
-    },
-    poster:{
+    title: {
       type: DataTypes.STRING,
-      allowNull: true
+      allowNull: false,
     },
-    rating:{
+    mediaType: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    country: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    year: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    genre: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    running_time: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    rars: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    rating: {
       type: DataTypes.FLOAT,
-      allowNull: true
-    }
+      allowNull: true,
+    },
+    descrition: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    poster: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
   },
   {
     timestamps: false,
@@ -52,7 +77,7 @@ modelFavorite.prototype.toJSON = function () {
   return values;
 };
 (async () => {
-    // Синхронизация моделей с базой данных без удаления существующих данных
-    await sequelize.sync();
-  })();
-module.exports = {modelFavorite};
+  // Синхронизация моделей с базой данных без удаления существующих данных
+  await sequelize.sync();
+})();
+module.exports = { modelFavorite };

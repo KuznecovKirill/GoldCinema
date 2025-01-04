@@ -12,7 +12,7 @@ const decode = (req) => {
   
         return jsonwebtoken.verify(
           token,
-          process.env.MIDDLEWARE
+          process.env.TOKEN_SECRET
         );
       }
   
