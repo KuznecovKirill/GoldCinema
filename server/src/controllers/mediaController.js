@@ -1,9 +1,8 @@
-const { Sequelize } = require("sequelize");
+const { modelReview } = require("../models/modelReview.js");
 const { modelUser } = require("../models/modelUser");
 const { modelMedia } = require("../models/modelMedia.js");
 const responseHandler = require("../handlers/response.handler.js");
 const sequelize = require("../models/database").sequelize;
-const { swaggerAPI } = require("../swagger/swagger.api");
 const tokenMiddleware = require("../middlewares/middleware.js");
 
 //Получение списка проектов
@@ -76,15 +75,23 @@ const getInfo = async (req, res) => {
 
 
     const tokenDecoded = tokenMiddleware.decode(req);
-
+    let user = null;
     if (tokenDecoded) { //Проверка работы decode
-      const user = await modelUser.findByPk(tokenDecoded.data);
+      user = await modelUser.findByPk(tokenDecoded.data);
 
     }
-
     //Добавить получения отзывов о проекте
+    const reviews = await modelReview.findAll({
+      where: { id_media: id_media }, 
+      order: [['createdAt', 'DESC']] // Сортируем отзывы по дате создания (по убыванию)
+    });
 
-    responseHandler.ok(res, media);
+    responseHandler.goodrequest(res, {
+      media,
+      reviews,
+      user
+    });
+    responseHandler.goodrequest(res, media);
   } catch (error) {
     console.log(error);
     responseHandler.error(res);
