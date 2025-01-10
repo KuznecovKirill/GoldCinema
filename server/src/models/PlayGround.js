@@ -112,11 +112,29 @@ async function getSimilars() {
   }
   sequelize.sync();
 }
+async function getWords(id_media) {
+  const media = await modelMedia.findByPk(id_media);
+  const mediaJSON = media.toJSON();
+  console.log(mediaJSON);
+  const { title, descrition, genre } = mediaJSON;
+  const combinedText = `${title || ''} ${descrition || ''} ${genre || ''}`;
+  console.log(combinedText);
+  // Разделяем строку на слова с помощью регулярного выражения
+  const wordsArray = combinedText
+    .toLowerCase() // Приводим к нижнему регистру для унификации
+    .match(/[\p{L}\p{N}]+/gu) // Извлекаем все слова (последовательности букв)
+    .filter((word, index, self) => self.indexOf(word) === index); // Удаляем дубликаты
+  //const uniqueWords = wordsArray.filter((word, index, self) => word && self.indexOf(word) === index);
+  console.log(wordsArray);
+  return wordsArray;
+  
+}
 //getSimilars();
-getMovies();
-getSimilars();
+//getMovies();
+//getSimilars();
 // getMovie();
 //getImages();
+const p = getWords(5056);
 (async () => {
   // Синхронизация моделей с базой данных без удаления существующих данных
   await sequelize.sync({ alter: true });
