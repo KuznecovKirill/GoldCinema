@@ -1,13 +1,13 @@
-const { Sequelize, DataTypes } = require("sequelize");
+const { DataTypes } = require("sequelize");
 const { modelUser } = require("./modelUser");
 const { modelMedia } = require("./modelMedia");
 const sequelize = require("./database").sequelize;
 
 //Модель отзыва
-const modelRewiew = sequelize.define(
-  "Rewiew",
+const modelReview = sequelize.define(
+  "Review",
   {
-    id_rewiew: {
+    id_review: {
       type: DataTypes.INTEGER,
       autoIncrement: true,
       primaryKey: true,
@@ -42,13 +42,13 @@ const modelRewiew = sequelize.define(
   }
 );
 
-modelRewiew.prototype.toObject = function () {
+modelReview.prototype.toObject = function () {
   const values = { ...this.get() };
   return values;
 };
 
 // Преобразование в JSON
-modelRewiew.prototype.toJSON = function () {
+modelReview.prototype.toJSON = function () {
   const values = { ...this.get() };
   return values;
 };
@@ -56,4 +56,4 @@ modelRewiew.prototype.toJSON = function () {
   // Синхронизация моделей с базой данных без удаления существующих данных
   await sequelize.sync();
 })();
-module.exports = { modelRewiew };
+module.exports = { modelReview };

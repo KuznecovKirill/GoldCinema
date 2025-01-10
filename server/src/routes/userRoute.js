@@ -77,7 +77,7 @@ router.post(
     body("poster")
       .exists().withMessage("Требуется постер медиа"),
     body("rating")
-      .exists().withMessage("Требвуется рейтинг"),
+      .exists().withMessage("Требуется рейтинг"),
     requestHandler.validate,
     favoriteController.addFavorite
   );
