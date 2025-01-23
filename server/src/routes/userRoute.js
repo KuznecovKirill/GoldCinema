@@ -1,4 +1,5 @@
 const express = require('express');
+const {body} = require('express-validator');
 const userController = require('../controllers/userController');
 const favoriteController = require('../controllers/favoriteController');
 const { modelUser } = require('../models/modelUser');
@@ -86,4 +87,4 @@ router.post(
     tokenMiddleware.user,
     favoriteController.removeFavorite
   );
- module.exports = {router};
+ module.exports = router;

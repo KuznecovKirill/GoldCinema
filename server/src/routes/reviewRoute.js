@@ -1,5 +1,5 @@
 const express = require("express");
-const validator = require("express-validator");
+const {body} = require('express-validator');
 const reviewController = require("../controllers/reviewController");
 const tokenMiddleware = require("../middlewares/middleware");
 const requestHandler = require("../handlers/request.handler");
@@ -25,4 +25,4 @@ router.post(
   requestHandler.validate,
   reviewController.create
 );
-module.exports = {router};
+module.exports = router;

@@ -5,7 +5,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const http = require('http');
-const routes = require('./src/routes/routes.js');
+const routes = require('./src/routes/routes');
 
 const userController = require('./src/controllers/userController');
 
@@ -22,7 +22,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(bodyParser.json());
 
-app.use("/goldcinema/v0", routes);
+app.use("/api/v1", routes);
 
 const port = process.env.PORT;
 console.log(process.env.PORT);

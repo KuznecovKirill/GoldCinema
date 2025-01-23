@@ -10,4 +10,4 @@ router.post("/genres", mediaController.getGenres);
 router.get("/info/:id_media", mediaController.getInfo);
 
 
-module.exports = {router};
+module.exports = router;
