@@ -73,7 +73,7 @@ router.post(
       .exists().withMessage("Требуется id медиа")
       .isLength({ min: 1 }).withMessage("ID не может быть пустым"),
     body("title")
-      .exists().withMessage("Название медиа"),
+      .exists().withMessage("Требуется название медиа"),
     body("poster")
       .exists().withMessage("Требуется постер медиа"),
     body("rating")

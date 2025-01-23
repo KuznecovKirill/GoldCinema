@@ -1,6 +1,6 @@
 const express = require("express");
 const validator = require("express-validator");
-const reviewController = require("../controllers/rewiewController");
+const reviewController = require("../controllers/reviewController");
 const tokenMiddleware = require("../middlewares/middleware");
 const requestHandler = require("../handlers/request.handler");
 

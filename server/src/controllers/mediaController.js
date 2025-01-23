@@ -97,7 +97,34 @@ const getInfo = async (req, res) => {
     responseHandler.error(res);
   }
 };
-// Нужно будет добавить функцию для поиска
+
+// Функция для поиска медиа
+const search = async (req, res) => {
+  try {
+    const { mediaType } = req.body.mediaType;
+    const { query, page } = req.query;
+
+    // Выполняем поиск в базе данных
+    const results = await modelMedia.findAll({
+      where: {
+        type: mediaType === "people" ? "person" : mediaType,
+        title: {
+          [sequelize.Op.like]: `%${query}%` // Используем оператор LIKE для поиска по заголовку
+        }
+      },
+      limit: 10, // Ограничиваем количество результатов на странице
+      offset: (page - 1) * 10 // Вычисляем смещение для пагинации
+    });
+
+    responseHandler.goodrequest(res, results);
+  } catch (error) {
+    console.error(error);
+    responseHandler.error(res);
+  }
+};
+
+
+
 module.exports = { getMedias, getGenres, getInfo };
 //curl -X GET http://localhost:8000/api/medias?page=1&limit=10
 //curl -X GET http://localhost:8000/medias?page=1&limit=10
