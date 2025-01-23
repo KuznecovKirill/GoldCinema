@@ -22,7 +22,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(bodyParser.json());
 
-app.use("/api/v1", routes);
+app.use("/goldcinema/v1", routes);
 
 const port = process.env.PORT;
 console.log(process.env.PORT);

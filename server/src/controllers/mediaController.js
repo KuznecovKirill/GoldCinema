@@ -4,6 +4,7 @@ const { modelMedia } = require("../models/modelMedia.js");
 const responseHandler = require("../handlers/response.handler.js");
 const sequelize = require("../models/database").sequelize;
 const tokenMiddleware = require("../middlewares/middleware.js");
+const similarController = require('../controllers/similarController.js');
 
 //Получение списка проектов
 const getMedias = async (req, res) => {
@@ -69,7 +70,7 @@ const getInfo = async (req, res) => {
     const { id_media } = req.body;
 
     const media = await modelMedia.findByPk(id_media);
-
+    const similar = await similarController.getSimilarMedia(id_media); 
     //const similar = await similarController... нкжно будет добавить контроллер simillar, чтобы получать похожие проекты
     //Тоже самое для изображений
 
@@ -87,8 +88,9 @@ const getInfo = async (req, res) => {
     });
 
     responseHandler.goodrequest(res, {
-      media,
-      reviews,
+      media, //информация о проекте
+      similar, //информация о похожих проектах
+      reviews, //информация о обзорах
       user
     });
     responseHandler.goodrequest(res, media);
