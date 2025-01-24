@@ -3,14 +3,14 @@ import queryString from "query-string";
 
 const baseURL = "http://localhost:8000";
 
-const client = axios.create({
+const privateClient = axios.create({
     baseURL,
     paramsSerializer: {
         encode: params => queryString.stringify(params)
     }
 })
 
-client.interceptors.request(async config => {
+privateClient.interceptors.request(async config => {
     return {
         ...config,
         headers: {
@@ -19,10 +19,10 @@ client.interceptors.request(async config => {
         }
     }
 })
-client.interceptors.response.use((response) => {
+privateClient.interceptors.response.use((response) => {
     if (response && response.data) return response.data;
     return response;
   }, (error) => {
     throw error.response.data;
   });
-  export default client;
+  export default privateClient;
