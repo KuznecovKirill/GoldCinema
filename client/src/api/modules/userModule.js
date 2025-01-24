@@ -16,7 +16,6 @@ const userEndpoints = {
 const userModule = {
     signIn: async ({ username, password }) => {
       try {
-        console.log("Запрос");
         const response = await publicClient.post(
           userEndpoints.signIn,
           { username, password }
