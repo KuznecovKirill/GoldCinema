@@ -19,13 +19,15 @@ const modelReview = sequelize.define(
         model: modelUser,
         key: "id_user",
       },
+      allowNull: false,
     },
     id_media: {
       type: DataTypes.INTEGER,
       references: {
         model: modelMedia,
         key: 'id_media'
-      }
+      },
+      allowNull: false,
     },
     rating_user: {
       type: DataTypes.FLOAT,
