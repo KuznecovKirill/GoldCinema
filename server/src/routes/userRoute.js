@@ -29,7 +29,7 @@ router.post(
     userController.signUp
   );
   router.post(
-    "/signin",
+    "/signIn",
     body("username")
       .exists().withMessage("Имя пользователя"),
     body("password")
