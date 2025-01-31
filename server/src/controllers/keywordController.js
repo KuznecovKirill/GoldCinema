@@ -27,8 +27,7 @@ const addInfo = async (req, res) => {
     const { id_media } = req.body;
     const media = await modelMedia.findByPk(id_media);
     const combineText = `${media.title} ${media.genre.replace(/,\s*/g, ' ')} ${media.mediaType} ${media.country} ${media.descrition}`;
-    console.log(combineText);
-    const newText = processText(combineText).toString();
+    const newText = processText(combineText).join(' ');
     console.log(newText);
     const keywords = await modelKeyWord.create({
         id_media: id_media,
