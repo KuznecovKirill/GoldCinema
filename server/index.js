@@ -13,6 +13,8 @@ const mediaController = require('./src/controllers/mediaController');
 
 const favoriteController = require('./src/controllers/favoriteController');
 
+const keywordController = require('./src/controllers/keywordController');
+
 //const PlayGround = require('./src/models/PlayGround');
 
 const app = express();
@@ -43,6 +45,7 @@ app.post('/', (req, res) => {
 app.post("/signUp", userController.signUp);
 app.post("/medias", mediaController.getMedias);
 app.post('/genres', mediaController.getGenres);
+app.post('/keyword',keywordController.addInfo);
 app.post('/favorites', favoriteController.addFavorite); //curl -X POST -H "Content-Type: application/json" -d '{"id_user": "1", "id_media": "738499"}' http://localhost:8000/favorites
 // app.post('/medias', (req, res) => {
 //     const page = req.body.page; // Получаем значение page из тела запроса
