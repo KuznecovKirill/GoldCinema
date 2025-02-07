@@ -46,6 +46,7 @@ app.post("/signUp", userController.signUp);
 app.post("/medias", mediaController.getMedias);
 app.post('/genres', mediaController.getGenres);
 app.post('/keyword',keywordController.addInfo);
+app.post('/keyword/search', keywordController.search);
 app.post('/favorites', favoriteController.addFavorite); //curl -X POST -H "Content-Type: application/json" -d '{"id_user": "1", "id_media": "738499"}' http://localhost:8000/favorites
 // app.post('/medias', (req, res) => {
 //     const page = req.body.page; // Получаем значение page из тела запроса
