@@ -54,3 +54,5 @@ const user = [
         state: "password.update"
       }
 ]
+const menuConfigs = {main, user};
+export default menuConfigs;
