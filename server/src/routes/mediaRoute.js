@@ -9,5 +9,7 @@ router.post("/genres", mediaController.getGenres);
 
 router.get("/info/:id_media", mediaController.getInfo);
 
+router.get("/search", mediaController.search);
+
 
 module.exports = router;

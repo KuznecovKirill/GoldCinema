@@ -1,7 +1,7 @@
 import privateClient from "../client/private.client";
 
 const reviewEndpoints = {
-  ReviewsOfUser: "reviews",
+  listReviews: "reviews",
   create: "reviews",
   remove: ({ id_review }) => `reviews/${id_review}`
 };
@@ -34,7 +34,7 @@ const reviewModule = {
   },
   getReviewsOfUser: async () => {
     try {
-      const response = await privateClient.get(reviewEndpoints.ReviewsOfUser);
+      const response = await privateClient.get(reviewEndpoints.listReviews);
       return { response };
     } catch (err) { return { err }; }
   }

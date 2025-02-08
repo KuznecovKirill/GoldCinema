@@ -1,4 +1,5 @@
 import { modelMedia } from "../../../../server/src/models/modelMedia";
+import { search } from "../../../../server/src/routes/userRoute";
 
 const mediaType = {
     FILM: "FILM",
@@ -10,7 +11,8 @@ const mediaType = {
   const mediaCategory = {
     popular: "popular",
     top_rated: "rated",
-    similars: "similars"
+    similars: "similars",
+    search: "search"
   };
 
   const getMedia = async (type) => {
@@ -30,8 +32,8 @@ const mediaType = {
       throw error;
     }
   };
-  const backdropPath = (imgEndpoint) => imgEndpoint;
-  const posterPath = (imgEndpoint) => imgEndpoint;
+  const backdropPath = (media_id) => `https://kinopoiskapiunofficial.tech/images/posters/kp_small/${media_id}.jpg`;
+  const posterPath = (media_id) => `https://kinopoiskapiunofficial.tech/images/posters/kp_small/${media_id}.jpg`;
   const configs = {
     mediaType,
     mediaCategory,
