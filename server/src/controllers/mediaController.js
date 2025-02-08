@@ -1,11 +1,14 @@
 const { modelReview } = require("../models/modelReview.js");
 const { modelUser } = require("../models/modelUser");
 const { modelMedia } = require("../models/modelMedia.js");
-const {modelKeyWord} = require("../models/modelKeyWord.js");
+
 const responseHandler = require("../handlers/response.handler.js");
 const sequelize = require("../models/database").sequelize;
 const tokenMiddleware = require("../middlewares/middleware.js");
-const similarController = require('../controllers/similarController.js');
+const similarController = require("../controllers/similarController.js");
+const keywordController = require("../controllers/keywordController.js");
+const { where } = require("sequelize");
+const { Op } = require("sequelize");
 
 //Получение списка проектов
 const getMedias = async (req, res) => {
@@ -71,28 +74,27 @@ const getInfo = async (req, res) => {
     const { id_media } = req.body;
 
     const media = await modelMedia.findByPk(id_media);
-    const similar = await similarController.getSimilarMedia(id_media); 
+    const similar = await similarController.getSimilarMedia(id_media);
     //const similar = await similarController... нкжно будет добавить контроллер simillar, чтобы получать похожие проекты
     //Тоже самое для изображений
 
-
     const tokenDecoded = tokenMiddleware.decode(req);
     let user = null;
-    if (tokenDecoded) { //Проверка работы decode
+    if (tokenDecoded) {
+      //Проверка работы decode
       user = await modelUser.findByPk(tokenDecoded.data);
-
     }
     //Добавить получения отзывов о проекте
     const reviews = await modelReview.findAll({
-      where: { id_media: id_media }, 
-      order: [['createdAt', 'DESC']] // Сортируем отзывы по дате создания (по убыванию)
+      where: { id_media: id_media },
+      order: [["createdAt", "DESC"]], // Сортируем отзывы по дате создания (по убыванию)
     });
 
     responseHandler.goodrequest(res, {
       media, //информация о проекте
       similar, //информация о похожих проектах
       reviews, //информация о обзорах
-      user
+      user,
     });
     responseHandler.goodrequest(res, media);
   } catch (error) {
@@ -102,33 +104,42 @@ const getInfo = async (req, res) => {
 };
 
 // Функция для поиска медиа
+// curl -X POST "http://localhost:8000/media/search" -H "Content-Type: application/json" -d '{"userQuerry": "фильм про зеленого чувака, который крадёт Рождество и он злой"}'
 const search = async (req, res) => {
   try {
-    const { mediaType } = req.body.mediaType;
-    const { query, page } = req.query;
-
-    // Выполняем поиск в базе данных
-    const results = await modelMedia.findAll({
+    const { userQuerry } = req.body;
+    const searchResult = await keywordController.search(userQuerry);
+    console.log(searchResult);
+    const mediaIds = searchResult.map(item => item.id_media); //Извлечение id из списка результата
+    const mediaList = await modelMedia.findAll({
       where: {
-        type: mediaType === "people" ? "person" : mediaType,
-        title: {
-          [sequelize.Op.like]: `%${query}%` // Используем оператор LIKE для поиска по заголовку
-        }
+        id_media: {
+          [Op.in]: mediaIds,
+        },
       },
-      limit: 10, // Ограничиваем количество результатов на странице
-      offset: (page - 1) * 10 // Вычисляем смещение для пагинации
     });
+    // const { query, page } = req.query;
 
-    responseHandler.goodrequest(res, results);
+    // // Выполняем поиск в базе данных
+    // const results = await modelMedia.findAll({
+    //   where: {
+    //     type: mediaType === "people" ? "person" : mediaType,
+    //     title: {
+    //       [sequelize.Op.like]: `%${query}%`, // Используем оператор LIKE для поиска по заголовку
+    //     },
+    //   },
+    //   limit: 10, // Ограничиваем количество результатов на странице
+    //   offset: (page - 1) * 10, // Вычисляем смещение для пагинации
+    // });
+
+    responseHandler.goodrequest(res, mediaList);
   } catch (error) {
     console.error(error);
     responseHandler.error(res);
   }
 };
 
-
-
-module.exports = { getMedias, getGenres, getInfo };
+module.exports = { getMedias, getGenres, getInfo, search };
 //curl -X GET http://localhost:8000/api/medias?page=1&limit=10
 //curl -X GET http://localhost:8000/medias?page=1&limit=10
 //curl -X POST http://localhost:8000/medias -H "Content-Type: application/json" -d '{"page": 1}'

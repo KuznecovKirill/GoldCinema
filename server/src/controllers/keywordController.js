@@ -68,32 +68,9 @@ function calculateSimilarity(movie, queryTags) {
   return (intersection / queryTags.length) * 100;
 }
 
-//curl -X POST -H "Content-Type: application/json" -d '{"id_media": "466581"}' http://localhost:8000/keyword
-const addInfo = async (req, res) => {
+
+async function search(userQuerry){
   try {
-    const { id_media } = req.body;
-    const media = await modelMedia.findByPk(id_media);
-    const combineText = `${media.title} ${media.genre.replace(/,\s*/g, " ")} ${
-      media.mediaType
-    } ${media.country} ${media.descrition}`;
-    const newText = processText(combineText).join(" ");
-    console.log(newText);
-    const keywords = await modelKeyWord.create({
-      id_media: id_media,
-      keywords: newText,
-    });
-    sequelize.sync();
-    responseHandler.created(res, {
-      keywords,
-    });
-  } catch (error) {
-    console.error("Ошибка:", error);
-  }
-};
-//curl -X POST "http://localhost:8000/keyword/search" -H "Content-Type: application/json" -d '{"userQuerry": "фильм про зеленого чувака, который крадёт Рождество и он злой"}'
-const search = async (req, res) => {
-  try {
-    const { userQuerry } = req.body;
     const keywords = await modelKeyWord.findAll();
     const keywordsTags = keywords.map((keyword) => {
       return {
@@ -120,12 +97,78 @@ const search = async (req, res) => {
       id_media: keyword.id_media,
       score: keyword.score
     }));
-
-    responseHandler.goodrequest(res, {
-      searchResult: idMediaList,
-    });
+    return idMediaList;
   } catch (error) {
     console.error(error);
   }
+}
+
+
+
+//curl -X POST -H "Content-Type: application/json" -d '{"id_media": "466581"}' http://localhost:8000/keyword
+const addInfo = async (req, res) => {
+  try {
+    const { id_media } = req.body;
+    const media = await modelMedia.findByPk(id_media);
+    const combineText = `${media.title} ${media.genre.replace(/,\s*/g, " ")} ${
+      media.mediaType
+    } ${media.country} ${media.descrition}`;
+    const newText = processText(combineText).join(" ");
+    console.log(newText);
+    const keywords = await modelKeyWord.create({
+      id_media: id_media,
+      keywords: newText,
+    });
+    sequelize.sync();
+    responseHandler.created(res, {
+      keywords,
+    });
+  } catch (error) {
+    console.error("Ошибка:", error);
+  }
 };
+//curl -X POST "http://localhost:8000/keyword/search" -H "Content-Type: application/json" -d '{"userQuerry": "фильм про зеленого чувака, который крадёт Рождество и он злой"}'
+// const search = async (req, res) => {
+//   try {
+//     const { userQuerry } = req.body;
+//     const keywords = await modelKeyWord.findAll();
+//     const keywordsTags = keywords.map((keyword) => {
+//       return {
+//         ...keyword.get({ plain: true }), //Преобразование в JavaScript объект
+//         keywords: keyword.keywords ? keyword.keywords.split(" ") : [], // Разбиваем строку на массив слов, если keywords не null
+//       };
+//     });
+
+//     const queryTags = processText(userQuerry); // Запрос пользователя преобразуется
+//     const results = keywordsTags
+//       .map((keyword) => {
+//         const score = compareTags(queryTags, keyword.keywords); //Оценка соответствия
+//         return { ...keyword, score };
+//       })
+//       .filter((keyword) => keyword.score >= 10);
+//     results.sort((a, b) => b.score - a.score);
+
+//     console.log("Результаты поиска:");
+//     results.forEach((keyword) => {
+//       console.log(`- ${keyword.id_media} с соответствием ${keyword.score}%`);
+//     });
+//     //Подготовка к responseHandler
+//     const idMediaList = results.map(keyword => ({
+//       id_media: keyword.id_media,
+//       score: keyword.score
+//     }));
+
+//     responseHandler.goodrequest(res, {
+//       searchResult: idMediaList,
+//     });
+//     return idMediaList;
+//   } catch (error) {
+//     console.error(error);
+//   }
+// };
+
+
+
+
+
 module.exports = { addInfo, processText, search };
