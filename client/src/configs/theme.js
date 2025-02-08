@@ -1,14 +1,14 @@
 import { createTheme } from '@mui/material/styles';
 import { colors } from "@mui/material";
 
-export const themeMods = {
+export const themeModes = {
     dark: "dark",
     light: "light"
 };
 
 const themeConfigs = {
     custom: ({ mode }) => { //функция для определения темы приложения
-      const customPalette = mode === themeMods.dark ? { //если тёмная
+      const customPalette = mode === themeModes.dark ? { //если тёмная
         primary: {
           main: "#ff0000",
           contrastText: "#ffffff"

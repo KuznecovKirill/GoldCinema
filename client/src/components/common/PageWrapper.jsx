@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { useDispatch } from "react-redux";
 import { setAppState } from '../../redux/slices/appStateSlice';
 const PageWrapper = ({state, children}) => {
@@ -12,4 +12,4 @@ const PageWrapper = ({state, children}) => {
   );
 }
 
-export default PageWrapper
+export default PageWrapper;

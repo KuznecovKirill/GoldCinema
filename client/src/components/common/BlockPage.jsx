@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect, React } from 'react';
+import { useEffect} from 'react';
 import {setAuthModalOpen} from "../../redux/slices/authModalSlice";
 const BlockPage = ({children}) => {
     const dispatch = useDispatch();
