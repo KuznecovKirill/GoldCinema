@@ -1,6 +1,5 @@
 //Импорт иконок
 import HomeOutlinedIcon from "@mui/icons-material/Home"; //иконка домика
-import MovieIcon from "@mui/icons-material/SlideshowOutlined";
 import MovieOutlinedIcon from '@mui/icons-material/MovieOutlined';
 import LiveTvOutlined from "@mui/icons-material/LiveTvOutlined";
 import FavoriteBorderOutlined from "@mui/icons-material/FavoriteBorderOutlined";
