@@ -109,7 +109,10 @@ const search = async (req, res) => {
   try {
     const { userQuerry } = req.body;
     const searchResult = await keywordController.search(userQuerry);
-    console.log(searchResult);
+    const scoreMap = searchResult.reduce((acc, item) => {
+      acc[item.id_media] = item.score;
+      return acc;
+    }, {});
     const mediaIds = searchResult.map(item => item.id_media); //Извлечение id из списка результата
     const mediaList = await modelMedia.findAll({
       where: {
@@ -118,21 +121,15 @@ const search = async (req, res) => {
         },
       },
     });
-    // const { query, page } = req.query;
-
-    // // Выполняем поиск в базе данных
-    // const results = await modelMedia.findAll({
-    //   where: {
-    //     type: mediaType === "people" ? "person" : mediaType,
-    //     title: {
-    //       [sequelize.Op.like]: `%${query}%`, // Используем оператор LIKE для поиска по заголовку
-    //     },
-    //   },
-    //   limit: 10, // Ограничиваем количество результатов на странице
-    //   offset: (page - 1) * 10, // Вычисляем смещение для пагинации
-    // });
-
-    responseHandler.goodrequest(res, mediaList);
+    const mediaListWithScore = mediaList.map(media => {
+      const mediaJSON = media.toJSON(); // Преобразуем объект Sequelize в обычный JSON
+      return {
+        ...mediaJSON,
+        score: scoreMap[media.id_media] || 0, // Добавляем score, если он есть, иначе 0
+      };
+    });
+    mediaListWithScore.sort((a, b) => b.score - a.score);
+    responseHandler.goodrequest(res, mediaListWithScore);
   } catch (error) {
     console.error(error);
     responseHandler.error(res);
