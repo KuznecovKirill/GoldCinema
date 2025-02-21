@@ -7,7 +7,7 @@ import Logo from './Logo';
 
 export const GlobalLoading = () => {
     const { globalLoading } = useSelector((state) => state.globalLoading);
-    const [first, setfirst] = useState(true);
+    const [first, setfirst] = useState(false);
     useEffect(() => {
       if (globalLoading){
         setfirst(true)

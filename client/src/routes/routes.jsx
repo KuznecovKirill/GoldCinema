@@ -14,6 +14,6 @@ export const routesGen = {
     {
         path: "/:mediaType/:media_id",
         element: <MediaPage/>
-    }
+    },
   ];
   export default routes;
