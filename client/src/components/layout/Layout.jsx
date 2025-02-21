@@ -1,14 +1,14 @@
 //Основная структура
 import React from 'react'
 import {Box} from "@mui/material";
-import { useSelector } from "react-redux";
 import { Outlet } from "react-router-dom";
+import GlobalLoading from '../common/GlobalLoading';
 const Layout = () => {
-  const { user } = useSelector((state) => state.user);
   return (
     <>
+    <GlobalLoading />
       <Box display="flex" minHeight="100vh">
-        <Box
+        <Box 
           component="main"
           flexGrow={1}
           overflow="hidden"

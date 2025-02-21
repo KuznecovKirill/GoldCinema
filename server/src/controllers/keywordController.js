@@ -48,21 +48,34 @@ async function lemmatizeText(text) {
         });
     });
 }
-
-
 async function processText(text) {
-    let tokens = tokenizer.tokenize(text);
-    tokens = tokens.filter(token => !stopWords.includes(token.toLowerCase())); // Важно: toLowerCase()
-    try {
-        const lemmas = await lemmatizeText(text);
-        const filteredLemmas = lemmas.filter(lemma => lemma.length > 2);
-        console.log(filteredLemmas);
-        return filteredLemmas;
-    } catch (error) {
-        console.error("Ошибка в lemmatizeText:", error);
-        return []; // Важно: возвращаем пустой массив, чтобы не сломать дальнейшую обработку
-    }
+  let tokens = tokenizer.tokenize(text);
+  tokens = tokens.filter(token => !stopWords.includes(token.toLowerCase()));
+  try {
+      const lemmas = await lemmatizeText(text);
+      const filteredLemmas = lemmas.filter(lemma => lemma.length > 2 && !stopWords.includes(lemma.toLowerCase())); // Добавлена проверка на стоп-слова после лемматизации
+      console.log(filteredLemmas);
+      return filteredLemmas;
+  } catch (error) {
+      console.error("Ошибка в lemmatizeText:", error);
+      throw error; 
+  }
 }
+
+
+// async function processText(text) {
+//     let tokens = tokenizer.tokenize(text);
+//     tokens = tokens.filter(token => !stopWords.includes(token.toLowerCase())); // Важно: toLowerCase()
+//     try {
+//         const lemmas = await lemmatizeText(text);
+//         const filteredLemmas = lemmas.filter(lemma => lemma.length > 2);
+//         console.log(filteredLemmas);
+//         return filteredLemmas;
+//     } catch (error) {
+//         console.error("Ошибка в lemmatizeText:", error);
+//         return []; // Важно: возвращаем пустой массив, чтобы не сломать дальнейшую обработку
+//     }
+// }
 
 // Функция для вычисления TF-IDF векторов
 function calculateTfIdf(documents, query) {

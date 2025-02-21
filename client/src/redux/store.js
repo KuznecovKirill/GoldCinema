@@ -9,8 +9,8 @@ const store = configureStore({
     user: userSlice,
     authModal: authModalSlice,
     themeMode: themeModeSlice,
-    globalLoadingSlice: globalLoadingSlice,
-    appStateSlice: appStateSlice
+    globalLoading: globalLoadingSlice,
+    appState: appStateSlice
   }
 });
 
