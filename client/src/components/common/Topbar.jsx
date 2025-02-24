@@ -95,6 +95,12 @@ const Topbar = () => {
             {/* Главное меню */}
 
             {/* User */}
+            <Stack spacing={2} direction="row" alignItems="center">
+              {!user && <Button variant="contained" onClick={()=> dispatch(setAuthModalOpen(true))}>
+                Войти
+                </Button>}
+            </Stack>
+            {user && <UserMenu/>}
             <UserMenu/>
             {/* User */}
           </Toolbar>

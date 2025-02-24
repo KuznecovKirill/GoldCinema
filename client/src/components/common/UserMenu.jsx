@@ -9,7 +9,7 @@ import { Link } from 'react-router-dom';
 const UserMenu = () => {
   const { user } = useSelector((state) => state.user);
 
-  // const dispatch =  useDispatch();
+  const dispatch =  useDispatch();
 
   const [anchorEl, setAnchorEl] = useState(null);
 
@@ -45,7 +45,16 @@ const UserMenu = () => {
 
           </ListItemButton>
         ))}
-        
+        <ListItemButton
+        sx={{borderRadius: "10px"}}
+        onClick={() => dispatch(setUser(null))}
+        >
+          <ListItemIcon><LogoutOutlinedIcon/></ListItemIcon>
+          <ListItemText disableTypography primary={
+              <Typography textTransform="uppercase">Войти</Typography>
+            }/>
+
+        </ListItemButton>
       </Menu>
       </>
     )}

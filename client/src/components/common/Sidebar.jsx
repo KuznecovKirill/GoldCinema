@@ -1,6 +1,6 @@
 import React from 'react'
 
-const Sidebar = () => {
+const Sidebar = ({open, toggleSidebar}) => {
   return (
     <div>Sidebar</div>
   )
