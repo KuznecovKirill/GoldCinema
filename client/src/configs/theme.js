@@ -14,7 +14,7 @@ const themeConfigs = {
           contrastText: "#000000" //чёрный
         },
         secondary: {
-          main: "#f44336",
+          main: "#FFD736",
           contrastText: "#ffffff"
         },
         background: {

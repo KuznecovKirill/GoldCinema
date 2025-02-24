@@ -53,7 +53,7 @@ const Sidebar = ({open, toggleSidebar}) => {
 
       {user && (
         <>
-        <Typography variant="h6" marginBottom="20px">PERSONAL</Typography>
+        <Typography variant="h6" marginBottom="20px">Пользователь</Typography>
         {menuConfigs.user.map((item,index) => (
           <ListItemButton
           key={index}
