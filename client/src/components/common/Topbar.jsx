@@ -24,8 +24,8 @@ const ScrollAppBar = ({children, window}) => {
     })
     return cloneElement(children, {
         sx: {
-            color: trigger ? "text.primary" : themeModes === themeModes.dark ? "primary.contrastText" : "text.primary",
-            backgroundColor: trigger ? "background.paper" : themeMode === themeMode.dark ? "transparent" : "background.paper"
+            color: trigger ? "text.primary" : themeModes === themeModes.dark ? "primary.contrastText" : "text.primary", //для смены цвета при переходе на другую тему
+            backgroundColor: trigger ? "background.paper" : themeMode === themeMode.dark ? "transparent" : "background.paper" //для смены бекграунда
         }
     });
 }
@@ -74,7 +74,7 @@ const Topbar = () => {
                 <Button
                   key={index}
                   sx={{
-                    color: appState.includes(item.state) ? "primary.contrastText" : "inherit",
+                    color: appState.includes(item.state) ? "primary.contrastText" : "inherit", //цвет для ключевых слов в меню
                     mr: 2
                   }}
                   component={Link}
@@ -96,9 +96,10 @@ const Topbar = () => {
 
             {/* User */}
             <Stack spacing={2} direction="row" alignItems="center">
-              {!user && <Button variant="contained" onClick={()=> dispatch(setAuthModalOpen(true))}>
+              {!user &&  <Button variant="contained"  onClick={()=> dispatch(setAuthModalOpen(true))}> 
                 Войти
-                </Button>}
+                </Button>
+                }
             </Stack>
             {user && <UserMenu/>}
             <UserMenu/>

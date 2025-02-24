@@ -10,8 +10,8 @@ const themeConfigs = {
     custom: ({ mode }) => { //функция для определения темы приложения
       const customPalette = mode === themeModes.dark ? { //если тёмная
         primary: {
-          main: "#ff0000",
-          contrastText: "#ffffff"
+          main: "#FFD700", //золотой
+          contrastText: "#000000" //чёрный
         },
         secondary: {
           main: "#f44336",
@@ -23,16 +23,17 @@ const themeConfigs = {
         }
       } : { //иначе светлая
         primary: {
-          main: "#ff0000"
+          main: "#FFD700"
         },
         secondary: {
-          main: "#f44336"
+          main: "#FFD736"
         },
         background: {
           default: colors.grey["100"],
         }
       };
-  
+  //#f44336 -красный
+  //#ff0000 - самый красный
       // Возвращение объекта конфигурации
       return createTheme({
         palette: {
