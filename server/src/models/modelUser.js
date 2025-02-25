@@ -1,6 +1,7 @@
 const { Sequelize, DataTypes, Model } = require("sequelize");
 const sequelize = require("./database").sequelize;
 const crypto = require("crypto");
+const { modelRole } = require("./modelRole");
 
 //Модель пользователя
 const modelUser = sequelize.define(
@@ -26,6 +27,13 @@ const modelUser = sequelize.define(
       allowNull: true,
       select: false,
     },
+    id_role: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: modelRole,
+        key: "id_role",
+      },
+    }
   },
   {
     timestamps: false,
@@ -65,7 +73,7 @@ modelUser.prototype.toJSON = function () {
 
 (async () => {
   // Синхронизация моделей с базой данных без удаления существующих данных
-  await sequelize.sync();
+  await sequelize.sync({alter: true});
 })();
 // (async () => {
 //     await modelUser.sync(); // Синхронизация таблицы
