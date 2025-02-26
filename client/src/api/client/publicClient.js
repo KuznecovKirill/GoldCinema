@@ -10,7 +10,7 @@ const publicClient = axios.create({
     }
 })
 
-publicClient.interceptors.request(async config => {
+publicClient.interceptors.request.use(async config => {
     return {
         ...config,
         headers: {
@@ -19,9 +19,12 @@ publicClient.interceptors.request(async config => {
     }
 })
 publicClient.interceptors.response.use((response) => {
-    if (response && response.data) return response.data;
+    if (response?.data) return response.data;
     return response;
   }, (error) => {
     throw error.response.data;
   });
   export default publicClient;
+  //if (response?.data)
+
+  //response && response.data

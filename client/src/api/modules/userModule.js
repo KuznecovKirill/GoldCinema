@@ -1,5 +1,5 @@
 import privateClient from "../client/privateClient";
-import publicClient from "../client/public.client";
+import publicClient from "../client/publicClient";
 
 import "@fontsource/roboto/300.css";
 import "@fontsource/roboto/400.css";

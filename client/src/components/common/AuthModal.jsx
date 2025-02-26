@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { setAuthModalOpen } from '../../redux/slices/authModalSlice';
 import Logo from './Logo';
+import SignIn from './SignIn';
 
 const actionState = {
     signIn: "signIn",
@@ -20,7 +21,7 @@ const AuthModal = () => {
 
   const close = () => dispatch(setAuthModalOpen(false));
 
-
+  const switchAuthState = (state) => setAction(state);
   
   return (
     <Modal open={authModalOpen} onClose={close}>
@@ -37,6 +38,7 @@ const AuthModal = () => {
           <Box sx={{ textAlign: "center", marginBottom: "2rem" }}>
             <Logo />
             </Box>
+            {action === actionState.signIn && <SignIn switchAuthState={() => switchAuthState(actionState.signIn)} />}
           </Box>
       </Box>
 
