@@ -23,23 +23,6 @@ const modelRole = sequelize.define(
   }
 );
 
-// Метод для установки пароля
-modelRole.prototype.setPassword = function (password) {
-  this.passToken = crypto.randomBytes(16).toString("hex");
-
-  this.password = password;
-  console.log(this.passToken);
-};
-
-// Метод для проверки пароля
-modelRole.prototype.validPassword = function (password) {
-  const hash = crypto
-    .pbkdf2Sync(password, this.passToken, 1000, 64, "sha512")
-    .toString("hex");
-
-  return this.password === hash;
-};
-
 modelRole.prototype.toObject = function () {
   const values = { ...this.get() };
   delete values.id_user; // Исправлено на id_user
