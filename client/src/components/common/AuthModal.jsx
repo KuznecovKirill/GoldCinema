@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setAuthModalOpen } from '../../redux/slices/authModalSlice';
 import Logo from './Logo';
 import SignIn from './SignIn';
+import SignUp from './SignUp';
 
 const actionState = {
     signIn: "signIn",
@@ -39,6 +40,7 @@ const AuthModal = () => {
             <Logo />
             </Box>
             {action === actionState.signIn && <SignIn switchAuthState={() => switchAuthState(actionState.signIn)} />}
+            {action === actionState.signUp && <SignUp switchAuthState={() => switchAuthState(actionState.signUp)} />}
           </Box>
       </Box>
 

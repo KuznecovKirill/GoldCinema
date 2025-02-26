@@ -2,6 +2,7 @@ const { Sequelize, DataTypes, Model } = require("sequelize");
 const sequelize = require("./database").sequelize;
 const crypto = require("crypto");
 const { modelRole } = require("./modelRole");
+const bcrypt = require("bcrypt");
 
 //Модель пользователя
 const modelUser = sequelize.define(
@@ -42,20 +43,25 @@ const modelUser = sequelize.define(
 );
 
 // Метод для установки пароля
-modelUser.prototype.setPassword = function (password) {
-  this.passToken = crypto.randomBytes(16).toString("hex");
-
+modelUser.prototype.setPassword = async function (password) {
   this.password = password;
+
+  this.passToken = crypto.pbkdf2Sync(
+    password,
+    crypto.randomBytes(8).toString("hex"),
+    1000,
+    32,
+    "sha512"
+  ).toString("hex");
   console.log(this.passToken);
 };
 
 // Метод для проверки пароля
-modelUser.prototype.validPassword = function (password) {
+modelUser.prototype.validPassword = async function (password) {
   const hash = crypto
-    .pbkdf2Sync(password, this.passToken, 1000, 64, "sha512")
-    .toString("hex");
-
-  return this.password === hash;
+        .pbkdf2Sync(password, this.passToken.substring(0, 16), 1000, 32, "sha512")
+        .toString("hex");
+    return hash === this.passToken;
 };
 
 modelUser.prototype.toObject = function () {

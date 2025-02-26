@@ -8,7 +8,8 @@ import { setAuthModalOpen } from '../../redux/slices/authModalSlice';
 import { toast } from "react-toastify";
 import { Alert, Box, Button, Stack, TextField } from '@mui/material';
 import {LoadingButton} from "@mui/lab";
-const SignIn = ({ switchAuthState }) => {
+
+const SignUp = () => {
     const dispatch = useDispatch();
     const [isLoginRequest, setIsLoginRequest] = useState(false);
     const [errorMessage, setErrorMessage] = useState();
@@ -43,20 +44,9 @@ const SignIn = ({ switchAuthState }) => {
   return (
     <Box component="form" onSubmit={SignIn.handleSubmit}>
         <Stack spacing={3}>
-        <TextField 
-            type='username'
-            placeholder='Имя пользователя'
-            name='username'
-            fullWidth
-            value={SignIn.values.username}
-            onChange={SignIn.handleChange}
-            color="success"
-            error={SignIn.touched.username && SignIn.errors.username !== undefined}
-            helperText={SignIn.touched.username && SignIn.errors.username}
-            />
             <TextField 
             type='password'
-            placeholder='Пароль'
+            placeholder='password'
             name='password'
             fullWidth
             value={SignIn.values.password}
@@ -81,7 +71,7 @@ const SignIn = ({ switchAuthState }) => {
         sx={{ marginTop: 1 }}
         onClick={() => switchAuthState()}
       >
-        Регистрация
+        Вход
       </Button>
       {errorMessage && (
         <Box sx={{ marginTop: 2 }}>
@@ -89,7 +79,7 @@ const SignIn = ({ switchAuthState }) => {
         </Box>
       )}
     </Box>
-  )
+  );
 }
 
-export default SignIn
+export default SignUp

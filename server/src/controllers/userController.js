@@ -1,4 +1,5 @@
 const { modelUser } = require("../models/modelUser");
+const {modelRole} = require("../models/modelRole");
 const jsonwebtoken = require("jsonwebtoken");
 const responseHandler = require("../handlers/response.handler.js");
 const sequelize = require("../models/database").sequelize;
@@ -12,12 +13,18 @@ const signUp = async (req, res) => {
     //curl -X POST -H "Content-Type: application/json" -d '{"us": "newuser", "pass": "password123"}' http://localhost:8000/signUp
 
     if (checkUser) return responseHandler.badrequest(res, "Такой пользователь уже зарегестрирован");
-    const user = await modelUser.create({
-      username: username,
-      password: password,
-      passToken: crypto.randomBytes(16).toString("hex")
-    });
-    sequelize.sync();
+    const user = new modelUser();
+        user.username = username;
+        await user.setPassword(password);
+        user.id_role = 1; // По умолчанию роль "пользователь"
+    await user.save();
+    // const user = await modelUser.create({
+    //   username: username,
+    //   password: password,
+    //   passToken: crypto.randomBytes(16).toString("hex"),
+    //   id_role: 1
+    // });
+    // sequelize.sync();
     const token = jsonwebtoken.sign(
       { data: user.id_user },
       process.env.TOKEN_SECRET,
@@ -36,12 +43,14 @@ const signUp = async (req, res) => {
   }
 };
 //Вход
+//curl -X POST -H "Content-Type: application/json" -d '{"username": "новичок", "password": "password123"}' http://localhost:8000/signIn
 const signIn = async (req, res) => {
   try {
     const { username, password } = req.body;
-
-    const user = await modelUser.findOne({ where: {username: username} }).select("id_user username password passToken");
-
+    const user = await modelUser.findOne({ 
+      where: {username: username}, 
+      attributes: ['id_user', 'username', 'password', 'passToken', 'id_role'] });
+    console.log(user);
     if (!user) return responseHandler.badrequest(res, "Такого пользователя не существует!"); //Проверка пользователя
 
     if (!user.validPassword(password)) return responseHandler.badrequest(res, "Неверный пароль!");
@@ -54,7 +63,7 @@ const signIn = async (req, res) => {
 
     user.password = undefined;
     user.passToken = undefined;
-
+    console.log("Вход успешен");
     responseHandler.created(res, {
       token,
       ...user._doc,
