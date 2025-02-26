@@ -19,9 +19,9 @@ const SignIn = ({ switchAuthState }) => {
             password: ""
         },
         validationSchema: Yup.object({
-            username: Yup.string().min(6, "имя пользователя минимум из 6 символов")
+            username: Yup.string().min(6, "Имя пользователя минимум из 6 символов")
             .required("необходимо имя пользователя"),
-            password: Yup.string().min(6, "пароль минимум из 6 символов")
+            password: Yup.string().min(6, "Пароль минимум из 6 символов")
             .required("Необходим пароль")
 
         }),

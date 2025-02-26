@@ -7,7 +7,7 @@ const requestHandler = require('../handlers/request.handler');
 const tokenMiddleware  = require('../middlewares/middleware');
 const router = express.Router();
 
-router.post(
+router.post( //curl -X POST -H "Content-Type: application/json" -d '{"username": "новичок", "password": "password123"}' http://localhost:8000/goldcinema/v1/user/signUp
     "/signUp",
     body("username") //Имя пользователя
       .exists().withMessage("Имя пользователя")
@@ -28,7 +28,7 @@ router.post(
     requestHandler.validate,
     userController.signUp
   );
-  router.post(
+  router.post( //curl -X POST -H "Content-Type: application/json" -d '{"username": "новичок", "password": "password123"}' http://localhost:8000/goldcinema/v1/user/signIn
     "/signIn",
     body("username")
       .exists().withMessage("Имя пользователя"),

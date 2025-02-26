@@ -1,5 +1,5 @@
 //Валидация входяхищ запросов на основе Express.js
-const validationResult = require('express-validator');
+const {validationResult} = require('express-validator');
 
 //req - объект запроса, res - объект ответа, next - функция для передачи следующему middleware
 const validate = (req, res, next) => {

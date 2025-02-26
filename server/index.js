@@ -29,7 +29,7 @@ app.use("/goldcinema/v1", routes);
 const port = process.env.PORT;
 console.log(process.env.PORT);
 
-const server = http.createServer(app)
+const server = http.createServer(app);
 
 //Создание коннекта
 const connection = mysql.createConnection({
@@ -42,14 +42,14 @@ const connection = mysql.createConnection({
 app.post('/', (req, res) => {
     res.send('POST запрос на корневом маршруте');
 });
-app.post("/signUp", userController.signUp);
-app.post("/user/signIn", userController.signIn);
-app.post("/medias", mediaController.getMedias);
-app.post('/genres', mediaController.getGenres);
-app.post('/media/search', mediaController.search);
-app.post('/keyword',keywordController.addInfo);
-app.post('/keyword/search', keywordController.search);
-app.post('/favorites', favoriteController.addFavorite); //curl -X POST -H "Content-Type: application/json" -d '{"id_user": "1", "id_media": "738499"}' http://localhost:8000/favorites
+// app.post("/signUp", userController.signUp);
+// app.post("/user/signIn", userController.signIn); //curl -X POST -H "Content-Type: application/json" -d '{"username": "новичок", "password": "password123"}' http://localhost:8000/signIn
+// app.post("/medias", mediaController.getMedias);
+// app.post('/genres', mediaController.getGenres);
+// app.post('/media/search', mediaController.search);
+// app.post('/keyword',keywordController.addInfo);
+// app.post('/keyword/search', keywordController.search);
+// app.post('/favorites', favoriteController.addFavorite); //curl -X POST -H "Content-Type: application/json" -d '{"id_user": "1", "id_media": "738499"}' http://localhost:8000/favorites
 
 // app.post('/medias', (req, res) => {
 //     const page = req.body.page; // Получаем значение page из тела запроса
