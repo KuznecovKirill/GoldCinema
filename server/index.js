@@ -43,7 +43,7 @@ app.post('/', (req, res) => {
     res.send('POST запрос на корневом маршруте');
 });
 app.post("/signUp", userController.signUp);
-app.post("/signIn", userController.signIn);
+app.post("/user/signIn", userController.signIn);
 app.post("/medias", mediaController.getMedias);
 app.post('/genres', mediaController.getGenres);
 app.post('/media/search', mediaController.search);

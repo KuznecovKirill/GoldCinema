@@ -9,7 +9,7 @@ import { toast } from "react-toastify";
 import { Alert, Box, Button, Stack, TextField } from '@mui/material';
 import {LoadingButton} from "@mui/lab";
 
-const SignUp = () => {
+const SignUp = ({ switchAuthState }) => {
     const dispatch = useDispatch();
     const [isLoginRequest, setIsLoginRequest] = useState(false);
     const [errorMessage, setErrorMessage] = useState();

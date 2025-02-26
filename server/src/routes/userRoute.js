@@ -17,10 +17,10 @@ router.post(
       }),
     body("password") //
       .exists().withMessage("Пароль")
-      .isLength({ min: 8 }).withMessage("Пароль должен состоять минимум из 8 символов"),
+      .isLength({ min: 6 }).withMessage("Пароль должен состоять минимум из 6 символов"),
     body("confirmPassword")
       .exists().withMessage("Подтверждение пароля")
-      .isLength({ min: 8 }).withMessage("Пароль должен состоять минимум из 8 символов")
+      .isLength({ min: 6 }).withMessage("Пароль должен состоять минимум из 6 символов")
       .custom((value, { req }) => {
         if (value !== req.body.password) throw new Error("Пароль не совпадает");
         return true;
@@ -34,7 +34,7 @@ router.post(
       .exists().withMessage("Имя пользователя"),
     body("password")
       .exists().withMessage("Пароль")
-      .isLength({ min: 8 }).withMessage("Пароль должен состоять минимум из 8 символов"),
+      .isLength({ min: 6 }).withMessage("Пароль должен состоять минимум из 6 символов"),
     requestHandler.validate,
     userController.signIn
   );
@@ -44,10 +44,10 @@ router.post(
     tokenMiddleware.user,
     body("password")
       .exists().withMessage("Пароль")
-      .isLength({ min: 8 }).withMessage("Пароль должен состоять минимум из 8 символов"),
+      .isLength({ min: 6 }).withMessage("Пароль должен состоять минимум из 6 символов"),
     body("newPassword")
       .exists().withMessage("Новый пароль")
-      .isLength({ min: 8 }).withMessage("Пароль должен состоять минимум из 8 символов"),
+      .isLength({ min: 6 }).withMessage("Пароль должен состоять минимум из 6 символов"),
     requestHandler.validate,
     userController.updatePassword
   );
