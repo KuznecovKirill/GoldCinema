@@ -39,8 +39,8 @@ const AuthModal = () => {
           <Box sx={{ textAlign: "center", marginBottom: "2rem" }}>
             <Logo />
             </Box>
-            {action === actionState.signIn && <SignIn switchAuthState={() => switchAuthState(actionState.signIn)} />}
-            {/* {action === actionState.signUp && <SignUp switchAuthState={() => switchAuthState(actionState.signUp)} />} */}
+            {action === actionState.signIn && <SignIn switchAuthState={() => switchAuthState(actionState.signUp)} />}
+            {action === actionState.signUp && <SignUp switchAuthState={() => switchAuthState(actionState.signIn)} />}
           </Box>
       </Box>
 
