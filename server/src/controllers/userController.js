@@ -8,15 +8,21 @@ const crypto = require('crypto');
 //Регистрация
 const signUp = async (req, res) => {
   try {
-    const { username, password } = req.body;
+    const { username, password, role } = req.body;
     const checkUser = await modelUser.findOne({ where: {username: username} }); //поиск пользователя с таким именем
+
     //curl -X POST -H "Content-Type: application/json" -d '{"us": "newuser", "pass": "password123"}' http://localhost:8000/signUp
 
     if (checkUser) return responseHandler.badrequest(res, "Такой пользователь уже зарегестрирован");
     const user = new modelUser();
         user.username = username;
         await user.setPassword(password);
-        user.id_role = 1; // По умолчанию роль "пользователь"
+        
+        if (role == "Пользователь")
+          user.id_role = 1
+        else
+        user.id_role = 2;
+
     await user.save();
     // const user = await modelUser.create({
     //   username: username,

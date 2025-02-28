@@ -6,7 +6,15 @@ import userModule from "../../api/modules/userModule";
 import { setUser } from "../../redux/slices/userSlice";
 import { setAuthModalOpen } from "../../redux/slices/authModalSlice";
 import { toast } from "react-toastify";
-import { Alert, Box, Button, Stack, TextField } from "@mui/material";
+import {
+  Alert,
+  Box,
+  Button,
+  MenuItem,
+  Select,
+  Stack,
+  TextField,
+} from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 
 const SignUp = ({ switchAuthState }) => {
@@ -19,6 +27,7 @@ const SignUp = ({ switchAuthState }) => {
       username: "",
       password: "",
       confirmPassword: "",
+      role: "",
     },
     validationSchema: Yup.object({
       username: Yup.string()
@@ -29,7 +38,7 @@ const SignUp = ({ switchAuthState }) => {
         .required("Необходим пароль"),
       confirmPassword: Yup.string()
         .oneOf([Yup.ref("password")], "Неправильное подтверждение пароля")
-        .min(8, "Пароль минимум из 6 символов")
+        .min(6, "Пароль минимум из 6 символов")
         .required("Необходимо подтвержить пароль"),
     }),
     onSubmit: async (values) => {
@@ -85,10 +94,30 @@ const SignUp = ({ switchAuthState }) => {
           onChange={SignIn.handleChange}
           color="success"
           error={
-            SignIn.touched.confirmPassword && SignIn.errors.confirmPassword !== undefined
+            SignIn.touched.confirmPassword &&
+            SignIn.errors.confirmPassword !== undefined
           }
-          helperText={SignIn.touched.confirmPassword && SignIn.errors.confirmPassword}
+          helperText={
+            SignIn.touched.confirmPassword && SignIn.errors.confirmPassword
+          }
         />
+        <Select
+          name="role"
+          fullWidth
+          value={SignIn.values.role}
+          onChange={SignIn.handleChange}
+          error={SignIn.touched.role && SignIn.errors.role !== undefined}
+          displayEmpty // Отображает пустое значение
+        >
+          <MenuItem value="" disabled>
+            <em>Выберите роль</em>
+          </MenuItem>
+          <MenuItem value="user">Пользователь</MenuItem>
+          <MenuItem value="admin">Администратор</MenuItem>
+        </Select>
+        {SignIn.touched.role && SignIn.errors.role && (
+          <Box sx={{ color: "error.main" }}>{SignIn.errors.role}</Box>
+        )}
       </Stack>
       <LoadingButton
         type="submit"

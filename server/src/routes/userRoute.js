@@ -7,7 +7,7 @@ const requestHandler = require('../handlers/request.handler');
 const tokenMiddleware  = require('../middlewares/middleware');
 const router = express.Router();
 
-router.post( //curl -X POST -H "Content-Type: application/json" -d '{"username": "новичок", "password": "password123"}' http://localhost:8000/goldcinema/v1/user/signUp
+router.post( //curl -X POST -H "Content-Type: application/json" -d '{"username": "новичок1", "password": "password123", "confirmPassword": "password123", "role": "Администратор"}' http://localhost:8000/user/signUp
     "/signUp",
     body("username") //Имя пользователя
       .exists().withMessage("Имя пользователя")
@@ -15,7 +15,7 @@ router.post( //curl -X POST -H "Content-Type: application/json" -d '{"username":
         const user = await modelUser.findOne({ where: { username: value } });
         if (user) return Promise.reject(new Error("Такое имя пользователя уже есть"));
       }),
-    body("password") //
+    body("password") // Пароль
       .exists().withMessage("Пароль")
       .isLength({ min: 6 }).withMessage("Пароль должен состоять минимум из 6 символов"),
     body("confirmPassword")
@@ -25,6 +25,9 @@ router.post( //curl -X POST -H "Content-Type: application/json" -d '{"username":
         if (value !== req.body.password) throw new Error("Пароль не совпадает");
         return true;
       }),
+    body("role") // Роль
+      .exists().withMessage("Роль")
+      .isIn(["Пользователь", "Администратор"]).withMessage("Допустимы только роли 'Пользователь' или 'Администратор'"),
     requestHandler.validate,
     userController.signUp
   );
