@@ -35,19 +35,19 @@ const main = [
 ];
 const user = [
     {
-        display: "favorites",
+        display: "Избранное",
         path: "/favorites",
         icon: <FavoriteBorderOutlined />,
         state: "favorite"
       },
       {
-        display: "reviews",
+        display: "Обзоры",
         path: "/reviews",
         icon: <ReviewIcon />,
         state: "reviews"
       },
       {
-        display: "password update",
+        display: "Изменить пароль",
         path: "/password-update",
         icon: <LockResetOutlinedIcon />,
         state: "password.update"

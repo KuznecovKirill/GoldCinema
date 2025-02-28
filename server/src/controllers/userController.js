@@ -17,7 +17,7 @@ const signUp = async (req, res) => {
     const user = new modelUser();
         user.username = username;
         await user.setPassword(password);
-        
+
         if (role == "Пользователь")
           user.id_role = 1
         else
@@ -49,7 +49,7 @@ const signUp = async (req, res) => {
   }
 };
 //Вход
-//curl -X POST -H "Content-Type: application/json" -d '{"username": "новичок", "password": "password123"}' http://localhost:8000/signIn
+//curl -X POST -H "Content-Type: application/json" -d '{"username": "kirill", "password": "password123"}' http://localhost:8000/user/signIn
 const signIn = async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -72,7 +72,8 @@ const signIn = async (req, res) => {
     console.log("Вход успешен");
     responseHandler.created(res, {
       token,
-      ...user._doc,
+      ...user.dataValues,
+      // ...user._doc,
       id: user.id_user
     });
   } catch {

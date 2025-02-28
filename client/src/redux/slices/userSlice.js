@@ -13,6 +13,7 @@ export const userSlice = createSlice({
       } else if (action.payload.token) localStorage.setItem("token", action.payload.token);
 
       state.user = action.payload;
+      console.log("setUser payload", action.payload);
     },
     setListFavorites: (state, action) => {
       state.listFavorites = action.payload;

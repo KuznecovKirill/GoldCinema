@@ -31,7 +31,7 @@ router.post( //curl -X POST -H "Content-Type: application/json" -d '{"username":
     requestHandler.validate,
     userController.signUp
   );
-  router.post( //curl -X POST -H "Content-Type: application/json" -d '{"username": "новичок", "password": "password123"}' http://localhost:8000/goldcinema/v1/user/signIn
+  router.post( //curl -X POST -H "Content-Type: application/json" -d '{"username": "kirill", "password": "password123"}' http://localhost:8000/user/signIn
     "/signIn",
     body("username")
       .exists().withMessage("Имя пользователя"),

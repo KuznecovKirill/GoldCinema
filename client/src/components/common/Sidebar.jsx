@@ -32,7 +32,7 @@ const Sidebar = ({open, toggleSidebar}) => {
       </Stack>
     </Toolbar>
     <List sx={{paddingX: "30px"}}>
-      <Typography variant="h5" marginBottom="20px">Меню</Typography>
+      <Typography variant="h6" marginBottom="20px">Меню</Typography>
       {menuConfigs.main.map((item,index) => (
         <ListItemButton
         key={index}
@@ -75,7 +75,7 @@ const Sidebar = ({open, toggleSidebar}) => {
         </>)}
 
 
-        <Typography variant="h5" marginBottom="20px">Тема</Typography>
+        <Typography variant="h6" marginBottom="20px">Тема</Typography>
         <ListItemButton onClick={onSwitchTheme}>
           <ListItemIcon>
             {themeMode === themeModes.dark && <DarkModeOutlinedIcon />}

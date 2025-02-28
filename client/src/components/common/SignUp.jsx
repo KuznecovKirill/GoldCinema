@@ -112,8 +112,8 @@ const SignUp = ({ switchAuthState }) => {
           <MenuItem value="" disabled>
             <em>Выберите роль</em>
           </MenuItem>
-          <MenuItem value="user">Пользователь</MenuItem>
-          <MenuItem value="admin">Администратор</MenuItem>
+          <MenuItem value="Пользователь">Пользователь</MenuItem>
+          <MenuItem value="Администратор">Администратор</MenuItem>
         </Select>
         {SignIn.touched.role && SignIn.errors.role && (
           <Box sx={{ color: "error.main" }}>{SignIn.errors.role}</Box>

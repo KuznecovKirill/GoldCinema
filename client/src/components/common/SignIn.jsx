@@ -28,7 +28,7 @@ const SignIn = ({ switchAuthState }) => {
         onSubmit: async values => {
             setErrorMessage(undefined);
             setIsLoginRequest(true);
-            const {response, err} = await userModule.signUp(values);
+            const {response, err} = await userModule.signIn(values);
             setIsLoginRequest(false);
 
             if (response) {

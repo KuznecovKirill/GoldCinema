@@ -26,7 +26,7 @@ const Container = ({header, children }) => {
                         backgroundColor: "primary.main"
                     }
                 }}>
-                    <Typography variant='h5' fontWeight="700">
+                    <Typography variant='h6' fontWeight="700">
                         {header}
                     </Typography>
                 </Box>

@@ -14,7 +14,7 @@ const userEndpoints = {
   };
 
 const userModule = {
-    signUp: async ({ username, password }) => {
+    signIn: async ({ username, password }) => {
       try {
         console.log("Post-запрос: SignIn");
         const response = await publicClient.post(
@@ -24,11 +24,12 @@ const userModule = {
         return { response };
       } catch (err) { console.log("err"); return { err }; }
     },
-    signUp: async ({ username, password, confirmPassword}) => {
+    signUp: async ({ username, password, confirmPassword, role}) => {
       try {
+        console.log(role);
         const response = await publicClient.post(
           userEndpoints.signUp,
-          { username, password, confirmPassword }
+          { username, password, confirmPassword, role }
         );
         return { response };
       } catch (err) { return { err }; }
