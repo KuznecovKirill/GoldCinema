@@ -102,7 +102,7 @@ const Topbar = () => {
                 }
             </Stack>
             {user && <UserMenu/>}
-            <UserMenu/>
+            
             {/* User */}
           </Toolbar>
         </AppBar>
