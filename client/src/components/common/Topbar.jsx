@@ -30,20 +30,18 @@ const ScrollAppBar = ({children, window}) => {
     });
 }
 const Topbar = () => {
-    const {user} = useSelector((state) => state.user)
-    const {appState} = useSelector((state) => state.appState)
-    const {themeMode} = useSelector((state) => state.themeMode)
+    const {user} = useSelector((state) => state.user);
+    const {appState} = useSelector((state) => state.appState);
+    const {themeMode} = useSelector((state) => state.themeMode);
 
-    const [sidebarOpen, setSidebarOpen] = useState(false)
+    const [sidebarOpen, setSidebarOpen] = useState(false);
 
     const dispatch = useDispatch();
     const onSwithTheme = () => {
         const theme = themeMode === themeModes.dark ? themeModes.light : themeModes.dark;
         dispatch(setThemeMode(theme));
       };
-      const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
-
-    
+    const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
   return (
     <>
