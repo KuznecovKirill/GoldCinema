@@ -14,7 +14,7 @@ const UserMenu = () => {
   const [anchorEl, setAnchorEl] = useState(null);
 
   const toggleMenu = (e) => setAnchorEl(e.currentTarget);
-  console.log("UserMenu user", user);
+  console.log("пользователь взаимодействует с меню");
   return (
     <>
     {user && (

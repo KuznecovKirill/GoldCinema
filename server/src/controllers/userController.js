@@ -104,7 +104,6 @@ const updatePassword = async (req, res) => {
 const getInfo = async (req, res) => {
   try {
     const user = await modelUser.findById(req.user.id_user);
-
     if (!user) return responseHandler.notfound(res);
 
     responseHandler.goodrequest(res, user);
@@ -113,3 +112,4 @@ const getInfo = async (req, res) => {
   }
 };
 module.exports = { signUp, signIn, updatePassword, getInfo };
+

@@ -26,7 +26,7 @@ const decode = (req) => {
   
     if (!token) return responseHandler.notauthorized(res);
   
-    const userID = await modelUser.findByPk(tokenDecoded.data); //Извлечение id
+    const userID = await modelUser.findByPk(token.data); //Извлечение id
   
     if (!userID) return responseHandler.notauthorized(res); //
   
