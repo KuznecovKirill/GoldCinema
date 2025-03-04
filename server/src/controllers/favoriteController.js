@@ -50,12 +50,12 @@ const getFavoritesOfUser = async (req, res) => {
   try {
     const favorites = await modelFavorite.findAll({
         where: { id_user: req.user.id_user },
-        order: [["createdAt", "DESC"]], // Сортировка по дате создания
+        order: [["id_favorite", "DESC"]], // Сортировка по дате создания
       });
       console.log(req.user.id_user);
     responseHandler.goodrequest(res, favorites);
-  } catch {
-    console.error('Ошибка при получении избранного:', error);
+  } catch (err){
+    console.error('Ошибка при получении избранного:');
     responseHandler.error(res);
   }
 };
