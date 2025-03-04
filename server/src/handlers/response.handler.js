@@ -12,9 +12,9 @@ const notauthorized = (res) => response(res, 401, {
   status: 401,
   message: "Не авторизован"
 });
-const notfound = (res) => responseWithData(res, 404, {
+const notfound = (res) => response(res, 404, {
   status: 404,
-  message: "Resource not found"
+  message: "Не найден"
 });
 const error = (res) => response(res, 500, {
   status: 500,

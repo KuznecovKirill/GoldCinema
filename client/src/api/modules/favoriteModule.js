@@ -15,14 +15,12 @@ const favoriteEndpoints = {
       } catch (err) { return { err }; }
     },
     add: async ({
-        id_user,
         id_media,
     }) => {
       try {
         const response = await privateClient.post(
           favoriteEndpoints.add,
           {
-            id_user,
             id_media
           }
         );

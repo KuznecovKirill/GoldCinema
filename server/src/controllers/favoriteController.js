@@ -3,14 +3,18 @@ const { modelFavorite } = require("../models/modelFavorite.js");
 const sequelize = require("../models/database").sequelize;
 //Добавить медиа в избранное
 //curl -X POST -H "Content-Type: application/json" -d '{"id_user": "1", "id_media": "738499"}' http://localhost:8000/favorites
-const addFavorite = async (req, res) => {
+const addFavorite = async (req, res) => { //curl -X POST http://localhost:8000/user/favorites -H 'Content-Type: application/json' -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjozOSwiaWF0IjoxNzQxMTAxNDAzLCJleHAiOjE3NDExODc4MDN9.nCbaDsorTlYh3kPr3RMs-fbOGERvhC4rNlHRgUNjbfU' -d '{"id_media": "104927"}'
   try {
-    const {id_user, id_media} = req.body;
+    const id_user = req.user.id_user;
+    const {id_media} = req.body;
     const isFavorite = await modelFavorite.findOne({
-      where: { id_user: id_user, id_media: id_media },
+      where: { id_user: req.user.id_user, id_media: id_media },
     });
     console.log(id_media);
-    if (isFavorite) return responseHandler.goodrequest(res, isFavorite);
+    if (isFavorite){ 
+      console.log("Медиа уже в избранном!");
+      return responseHandler.goodrequest(res, isFavorite);
+    }
 
     const favorite = await modelFavorite.create({
       id_user: id_user,
@@ -48,9 +52,10 @@ const getFavoritesOfUser = async (req, res) => {
         where: { id_user: req.user.id_user },
         order: [["createdAt", "DESC"]], // Сортировка по дате создания
       });
-
+      console.log(req.user.id_user);
     responseHandler.goodrequest(res, favorites);
   } catch {
+    console.error('Ошибка при получении избранного:', error);
     responseHandler.error(res);
   }
 };
