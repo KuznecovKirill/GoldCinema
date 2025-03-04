@@ -127,10 +127,10 @@ const SignUp = ({ switchAuthState }) => {
         sx={{ marginTop: 4 }}
         loading={isLoginRequest}
       >
-        Регистрация
+        Зарегистрироваться
       </LoadingButton>
       <Button fullWidth sx={{ marginTop: 1 }} onClick={() => switchAuthState()}>
-        Регистрация
+        Вход
       </Button>
       {errorMessage && (
         <Box sx={{ marginTop: 2 }}>

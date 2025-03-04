@@ -6,6 +6,9 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import routes from "./routes/routes";
 import { useSelector } from "react-redux";
 
+import "react-toastify/dist/ReactToastify.css";
+import "swiper/css";
+
 import PageWrapper from "./components/common/PageWrapper";
 import Layout from "./components/layout/Layout";
 const App = () => {

@@ -3,7 +3,7 @@ import { search } from "../../../../server/src/routes/userRoute";
 
 const mediaType = {
     FILM: "FILM",
-    tv: "TV_SERIES",
+    TV: "TV_SERIES",
     TV_SHOW: "TV_SHOW",
     MINI_SERIES: "MINI_SERIES"
   };
