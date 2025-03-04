@@ -41,7 +41,7 @@ const removeFavorite = async (req, res) => {
     responseHandler.error(res);
   }
 };
-
+//Получение списка избранного у пользователя
 const getFavoritesOfUser = async (req, res) => {
   try {
     const favorites = await modelFavorite.findAll({
