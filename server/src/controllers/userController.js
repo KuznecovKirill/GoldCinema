@@ -103,7 +103,7 @@ const updatePassword = async (req, res) => {
 //Получение информации о пользователе
 const getInfo = async (req, res) => {
   try {
-    const user = await modelUser.findById(req.user.id_user);
+    const user = await modelUser.findByPk(req.user.id_user);
     if (!user) return responseHandler.notfound(res);
 
     responseHandler.goodrequest(res, user);
