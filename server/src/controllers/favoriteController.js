@@ -10,7 +10,7 @@ const addFavorite = async (req, res) => { //curl -X POST http://localhost:8000/u
     const isFavorite = await modelFavorite.findOne({
       where: { id_user: req.user.id_user, id_media: id_media },
     });
-    console.log(id_media);
+    
     if (isFavorite){ 
       console.log("Медиа уже в избранном!");
       return responseHandler.goodrequest(res, isFavorite);
@@ -52,7 +52,6 @@ const getFavoritesOfUser = async (req, res) => {
         where: { id_user: req.user.id_user },
         order: [["id_favorite", "DESC"]], // Сортировка по дате создания
       });
-      console.log(req.user.id_user);
     responseHandler.goodrequest(res, favorites);
   } catch (err){
     console.error('Ошибка при получении избранного:');
