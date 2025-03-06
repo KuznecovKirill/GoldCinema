@@ -53,7 +53,7 @@ const getReviewsOfUser = async (req, res) => {
       where: {
         id_user: req.user.id,
       },
-      order: [["createdAt", "DESC"]], // Сортировка по дате создания в порядке убывания
+      order: [["id_review", "DESC"]], // Сортировка по дате создания в порядке убывания
     });
 
     responseHandler.goodrequest(res, reviews); // Отправляем успешный ответ с отзывами

@@ -7,7 +7,7 @@ const reviewRoute = require('./reviewRoute');
 const router = express.Router();
 
 router.use("/user", userRoute);
-router.use("/:mediaType", mediaRoute);
+router.use("/medias", mediaRoute);
 router.use("/reviews", reviewRoute);
 
 

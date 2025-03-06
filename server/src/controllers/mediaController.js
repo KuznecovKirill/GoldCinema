@@ -11,11 +11,11 @@ const { where } = require("sequelize");
 const { Op } = require("sequelize");
 
 //Получение списка проектов
-const getMedias = async (req, res) => {
+const getMedias = async (req, res) => { //curl GET "http://localhost:8000/medias/medias?mediaType=FILM&page=1&limit=10"
   try {
     // Извлекаем параметры из объекта запроса
-    const page = parseInt(req.body.page) || 1;
-    const limit = parseInt(req.body.limit) || 10;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit; //Расчёт смещения
 
     // Запрос к базе данных
@@ -36,11 +36,30 @@ const getMedias = async (req, res) => {
     responseHandler.error(res);
   }
 };
-//Получение жанров
-// curl -X POST "http://localhost:8000/genres" -H "Content-Type: application/json" -d '{"mediaType": "FILM"}'
-const getGenres = async (req, res) => {
+
+//
+const getMediasByType = async (req, res) => {
   try {
-    const mediaType = req.body.mediaType || "FILM";
+    const mediaType = req.query.mediaType || "FILM";
+
+    const medias = await modelMedia.findAll({
+      where: { mediaType: mediaType }, //Поиск по mediaType
+      order: [["id_media", "DESC"]],
+    });
+    console.log("Медиа получены успешно");
+
+    return responseHandler.goodrequest(res, medias); // Отправляем ответ с найденными жанрами
+  } catch (error) {
+    console.error(error);
+    responseHandler.error(res);
+  }
+};
+//Получение жанров
+// curl GET "http://localhost:8000/medias/genres?mediaType=FILM"  
+const getGenres = async (req, res) => { 
+  try {
+    const mediaType = req.query.mediaType || "FILM";
+    console.log(mediaType);
 
     const medias = await modelMedia.findAll({
       where: { mediaType: mediaType }, //Поиск по mediaType
@@ -87,7 +106,7 @@ const getInfo = async (req, res) => {
     //Добавить получения отзывов о проекте
     const reviews = await modelReview.findAll({
       where: { id_media: id_media },
-      order: [["createdAt", "DESC"]], // Сортируем отзывы по дате создания (по убыванию)
+      order: [["id_review", "DESC"]], // Сортируем отзывы по дате создания (по убыванию)
     });
 
     responseHandler.goodrequest(res, {
@@ -136,7 +155,7 @@ const search = async (req, res) => {
   }
 };
 
-module.exports = { getMedias, getGenres, getInfo, search };
+module.exports = { getMedias, getGenres, getMediasByType, getInfo, search };
 //curl -X GET http://localhost:8000/api/medias?page=1&limit=10
 //curl -X GET http://localhost:8000/medias?page=1&limit=10
 //curl -X POST http://localhost:8000/medias -H "Content-Type: application/json" -d '{"page": 1}'
