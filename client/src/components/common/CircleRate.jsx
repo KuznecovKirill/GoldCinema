@@ -1,14 +1,14 @@
 import { Box, CircularProgress, Typography } from '@mui/material'
 import React from 'react'
 
-const CircleRate = ({value: rate}) => {
+const CircleRate = ({value}) => {
   return (
     <Box sx={{
         position: "relative",
         display: "inline-block",
         width: "max-content"
     }}>
-        <CircularProgress variant='determinate' value={rate * 10} color='success' size={40}/>
+        <CircularProgress variant='determinate' value={value * 10} color='success' size={40}/>
         <Box sx={{
             position: "absolute",
             top: 0,
@@ -25,7 +25,7 @@ const CircleRate = ({value: rate}) => {
             fontWeight="700"
             sx={{marginTop: "5px"}}
             >
-                {Math.floor(rate * 10) / 10}
+                {Math.floor(value * 10) / 10}
             </Typography>
         </Box>
     </Box>
