@@ -47,7 +47,7 @@ const modelMedia = sequelize.define(
       type: DataTypes.TEXT,
       allowNull: true,
     },
-    poster: {
+    cover: {
       type: DataTypes.STRING,
       allowNull: true,
     },
@@ -81,6 +81,7 @@ modelMedia.prototype.getWords = (function (media) {
 
 })(async () => {
   // Синхронизация моделей с базой данных без удаления существующих данных
+  //await sequelize.sync({ alter: true });
   await sequelize.sync();
 });
 

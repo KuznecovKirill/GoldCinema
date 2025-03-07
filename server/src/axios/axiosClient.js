@@ -1,11 +1,15 @@
+const path = require('path');
+require('dotenv').config({
+  path: path.join(__dirname, '../../.env'),
+});
 const axios = require("axios");
-const { modelMedia } = require("../models/modelMedia");
 
-require('dotenv').config();
+
 
 const get = async (url) => {
     // Выполнение GET-запроса
     console.log(url);
+    console.log(process.env);
     const conn = await fetch(url, {
         method: 'GET',
         headers: {

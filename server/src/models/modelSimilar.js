@@ -30,7 +30,7 @@ const modelSimilar = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    poster: {
+    cover: {
       type: DataTypes.STRING,
       allowNull: true,
     },
@@ -54,6 +54,7 @@ modelSimilar.prototype.toJSON = function () {
 (async () => {
   // Синхронизация моделей с базой данных без удаления существующих данных
   //await sequelize.sync();
+  //await sequelize.sync({ alter: true });
   await sequelize.sync();
 })();
 module.exports = { modelSimilar };

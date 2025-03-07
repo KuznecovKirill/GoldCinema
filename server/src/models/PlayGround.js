@@ -3,7 +3,7 @@ const modelUser = require("./modelUser"); // Импорт модели поль�
 const { swaggerAPI } = require("../swagger/swagger.api");
 const { modelMedia } = require("./modelMedia");
 const { modelSimilar } = require("./modelSimilar");
-const { modelImages } = require("./modelImages");
+const { modelImage } = require("./modelImage");
 require("dotenv").config();
 
 const sequelize = require("./database").sequelize;
@@ -22,9 +22,9 @@ async function addMovie(newMedia) {
       genre: newMedia.genres.map((g) => g.genre).join(", "), //список жанров
       running_time: newMedia.filmLength,
       rars: `${newMedia.ratingAgeLimits.replace(/\D/g, "")}+`, //удаление всех нечисловых символов и добавление плюса на конце
-      rating: newMedia.ratingImdb,
-      descrition: newMedia.description,
-      poster: newMedia.posterUrlPreview,
+      rating: newMedia.ratingImdb || null,
+      descrition: newMedia.description || null,
+      poster: newMedia.coverUrl || null,
     });
   } catch (error) {
     if (error.name == "SequelizeUniqueConstraintError") {
@@ -37,8 +37,9 @@ async function addMovie(newMedia) {
 async function getMovies() {
   const newCollection = await swaggerAPI.mediaCollections({
     type: "TOP_POPULAR_ALL",
-    page: "3",
+    page: "1",
   });
+  console.log(newCollection);
   newCollection.items.forEach(async (item) => {
     if (item.nameRu !== null) {
       // console.log(item.nameRu);
@@ -56,8 +57,9 @@ async function getMovies() {
             : null,
           rating: item.ratingImdb || null,
           descrition: item.description || null,
-          poster: item.posterUrlPreview || null,
+          cover: item.coverUrl || item.posterUrl,
         });
+        console.log("медиа добавлен!");
       } catch (error) {
         if (error.name == "SequelizeUniqueConstraintError") {
           console.log("Такой фильм уже существует!");
@@ -77,7 +79,7 @@ async function getImages() {
   const firstSixImages = newImage.items.slice(0, 6);
   for (const item of firstSixImages) {
     try {
-      await modelImages.create({
+      await modelImage.create({
         id_media: 464963,
         imageUrl: item.imageUrl,
       });
@@ -106,7 +108,7 @@ async function getSimilars() {
         id_origin: 957887,
         id_media: item.filmId || null,
         title: item.nameRu,
-        poster: item.posterUrlPreview,
+        cover: item.coverUrl,
       });
     }
   }
@@ -130,13 +132,13 @@ async function getWords(id_media) {
   
 }
 //getSimilars();
-//getMovies();
+getMovies();
 //getSimilars();
 // getMovie();
 //getImages();
-const p = getWords(5056);
+//const p = getWords(5056);
 (async () => {
   // Синхронизация моделей с базой данных без удаления существующих данных
-  await sequelize.sync({ alter: true });
+  await sequelize.sync();
 })();
 module.exports = {getMovies};
