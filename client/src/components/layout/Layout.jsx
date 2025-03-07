@@ -18,6 +18,7 @@ const Layout = () => {
   const dispatch = useDispatch();
   const {user} = useSelector((state) => state.user);
 
+  //Для информации о пользователе
   useEffect(() => {
     const authUser = async () => {
       const { response, err } = await userModule.getInfo();
@@ -29,17 +30,18 @@ const Layout = () => {
     authUser();
   }, [dispatch]);
 
-  // useEffect(() => {
-  //   const getFavorites = async () => {
-  //     const { response, err } = await favoriteModule.getList();
+  //Потом также для избранного
+  useEffect(() => {
+    const getFavorites = async () => {
+      const { response, err } = await favoriteModule.getList();
 
-  //     if (response) dispatch(setListFavorites(response));
-  //     if (err) toast.error(err.message);
-  //   };
+      if (response) dispatch(setListFavorites(response));
+      if (err) toast.error(err.message);
+    };
 
-  //   if (user) getFavorites();
-  //   if (!user) dispatch(setListFavorites([]));
-  // }, [user, dispatch]);
+    if (user) getFavorites();
+    if (!user) dispatch(setListFavorites([]));
+  }, [user, dispatch]);
 
 
   return (

@@ -1,7 +1,8 @@
 //Файл для проверки авторизированных пользователей
 const jsonwebtoken = require('jsonwebtoken');
 const { modelUser } = require('../models/modelUser');
-const {responseHandler} = require('../handlers/response.handler');
+// const {responseHandler} = require('../handlers/response.handler');
+const responseHandler = require('../handlers/response.handler');
 
 const decode = (req) => {
     try {
@@ -23,8 +24,10 @@ const decode = (req) => {
   };
   const user = async (req, res, next) => {
     const token = decode(req);
-  
-    if (!token) return responseHandler.notauthorized(res);
+    if (!token) {
+      console.log("нет токена!"); 
+      return responseHandler.notauthorized(res);
+    }
   
     const userID = await modelUser.findByPk(token.data); //Извлечение id
   
