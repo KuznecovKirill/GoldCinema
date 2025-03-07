@@ -85,12 +85,12 @@ const MainSlide = ({ mediaType }) => {
       <Swiper
         grabCursor={true}
         loop={true}
-        modules={[Autoplay]}
+        // modules={[Autoplay]}
         style={{ width: "100%", height: "max-content" }}
-        autoplay={{
-          delay: 3000,
-          disableOnInteraction: false,
-        }}
+        // autoplay={{
+        //   delay: 3000,
+        //   disableOnInteraction: false,
+        // }}
       >
         {medias.map((med, index) => (
           <SwiperSlide key={index}>
@@ -113,40 +113,52 @@ const MainSlide = ({ mediaType }) => {
                 backgroundImage: `url(${med.cover})`,
               }}
             />
-            {/* Затемнение по бокам*/}
-            {/* <Box sx={{ 
+            <Box sx={{ 
                     width: "100%",
                     height: "100%",
                     position: "absolute",
                     top: 0,
                     left: 0,
                     ...uiConfigs.style.horizontalGradientBgImage[theme.palette.mode]
-                    }} />  */}
-
+                    }} /> 
             <Box
               sx={{
+                width: "100%",
                 height: "100%",
-                display: "flex",
-                alignItems: "center",
-                paddingX: "30px",
-                color: "text.primary",
-                width: { sm: "unset", md: "30%", lg: "40%" },
+                position: "absolute",
+                top: 0,
+                left: 0,
+                paddingX: { sm: "10px", md: "5rem", lg: "10rem" },
               }}
             >
-              <Stack spacing={4} direction="column">
-                {/* Название медиа*/}
-                <Typography
-                  variant="h4"
-                  fontSize={{ xs: "2rem", md: "2rem", lg: "4rem" }}
-                  fontWeight="700"
-                  sx={{
-                    ...uiConfigs.style.typoLines(2, "left"),
-                  }}
-                >
-                  {med.title}
-                </Typography>
-                {/* Название медиа */}
-              </Stack>
+              <Box
+                sx={{
+                  height: "100%",
+                  display: "flex",
+                  alignItems: "center",
+                  paddingX: "30px",
+                  color: "text.primary",
+                  width: { sm: "unset", md: "50%", lg: "60%" },
+                  paddingLeft: { sm: "20px", md: "5px", lg: "0px" }
+                }}
+              >
+                <Stack spacing={4} direction="column">
+                  {/* Название медиа*/}
+                  <Typography
+                    variant="h2"
+                    fontSize={{ xs: "2rem", md: "2.5rem", lg: "3rem" }}
+                    fontWeight="800"
+                    sx={{ //Само название
+                      ...uiConfigs.style.typoLines(2, "left"),
+                      maxWidth: '100%',
+                      overflowWrap: 'break-word'
+                    }}
+                  >
+                    {med.title}
+                  </Typography>
+                  {/* Название медиа */}
+                </Stack>
+              </Box>
             </Box>
           </SwiperSlide>
         ))}
