@@ -8,6 +8,8 @@ import { useSelector } from "react-redux";
 
 import "react-toastify/dist/ReactToastify.css";
 import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
 
 import PageWrapper from "./components/common/PageWrapper";
 import Layout from "./components/layout/Layout";
