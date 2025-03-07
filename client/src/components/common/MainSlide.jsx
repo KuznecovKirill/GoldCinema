@@ -33,7 +33,6 @@ const MainSlide = ({mediaType}) => {
             limit: 10
           });
           if (response){ 
-            console.log(response.medias);
             setMedias(response.medias);
           }
           if (err) toast.error(err.message);
@@ -75,25 +74,16 @@ const MainSlide = ({mediaType}) => {
             <Swiper 
             grabCursor={true}
             loop={true}
-            // modules={[Autoplay]}
+            modules={[Autoplay]}
             style={{width: "100%", height: "max-content"}}
-            // autoplay={{
-            //   delay: 3000,
-            //   disableOnInteraction: false
-            // }}
+            autoplay={{
+              delay: 3000,
+              disableOnInteraction: false
+            }}
             >
               {medias.map((med, index) => (
                 <SwiperSlide key={index}>
                   <Box sx={{
-                  //   height: { // Используем фиксированную высоту
-                  //     xs: '200px',
-                  //     sm: '300px',
-                  //     md: '400px',
-                  //     lg: '500px'
-                  // },
-                  // backgroundPosition: "center", // Выравниваем изображение по центру
-                  // backgroundSize: "contain", // Изменяем размер изображения, сохраняя пропорции
-                  // backgroundRepeat: "no-repeat", // Предотвращаем повторение изображения
                     paddingTop: {
                       xs: "110%",
                       sm: "70%",
