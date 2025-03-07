@@ -56,6 +56,7 @@ const MainSlide = ({mediaType}) => {
     }, [mediaType, dispatch]);
     
     return (
+      //Затемнение по вертекали
         <Box sx={{
             position: "relative",
             color: "primary.contrastText",
@@ -85,12 +86,13 @@ const MainSlide = ({mediaType}) => {
                 <SwiperSlide key={index}>
                   <Box sx={{
                     paddingTop: {
-                      xs: "110%",
+                      xs: "120%",
                       sm: "70%",
-                      md: "50%",
+                      md: "60%",
                       lg: "35%",
                       '@media (min-width: 1200px)': { 
-                        paddingTop: '40%',},
+                        paddingTop: '40%',
+                    },
                     },
                     overflow: 'hidden',
                     backgroundPosition: "top",
@@ -98,9 +100,18 @@ const MainSlide = ({mediaType}) => {
                     backgroundRepeat: "no-repeat",
                     // backgroundImage: `url(${configs.backdropPath(med.id_media)})`,
                     backgroundImage: `url(${med.cover})`,
-                  }}>
+                  }}/>
+                  {/* Затемнение по бокам*/}
+                  <Box sx={{ 
+                    width: "100%",
+                    height: "100%",
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    ...uiConfigs.style.horizontalGradientBgImage[theme.palette.mode]
+                    }} />                 
 
-                  </Box>
+                  
 
                 </SwiperSlide>
               ))}
