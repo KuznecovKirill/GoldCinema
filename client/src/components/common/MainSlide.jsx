@@ -49,7 +49,7 @@ const MainSlide = ({ mediaType }) => {
     const getGenres = async () => {
       dispatch(setGlobalLoading(true));
       const { response, err } = await genreModule.getList({ mediaType });
-
+      console.log(response);
       if (response) {
         setGenres(response.genres);
         getMedias();
@@ -113,14 +113,18 @@ const MainSlide = ({ mediaType }) => {
                 backgroundImage: `url(${med.cover})`,
               }}
             />
-            <Box sx={{ 
-                    width: "100%",
-                    height: "100%",
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    ...uiConfigs.style.horizontalGradientBgImage[theme.palette.mode]
-                    }} /> 
+            <Box
+              sx={{
+                width: "100%",
+                height: "100%",
+                position: "absolute",
+                top: 0,
+                left: 0,
+                ...uiConfigs.style.horizontalGradientBgImage[
+                  theme.palette.mode
+                ],
+              }}
+            />
             <Box
               sx={{
                 width: "100%",
@@ -139,7 +143,7 @@ const MainSlide = ({ mediaType }) => {
                   paddingX: "30px",
                   color: "text.primary",
                   width: { sm: "unset", md: "50%", lg: "60%" },
-                  paddingLeft: { sm: "20px", md: "5px", lg: "0px" }
+                  paddingLeft: { sm: "20px", md: "5px", lg: "0px" },
                 }}
               >
                 <Stack spacing={4} direction="column">
@@ -148,20 +152,55 @@ const MainSlide = ({ mediaType }) => {
                     variant="h2"
                     fontSize={{ xs: "2rem", md: "2.5rem", lg: "3rem" }}
                     fontWeight="800"
-                    sx={{ //Само название
+                    sx={{
+                      //Само название
                       ...uiConfigs.style.typoLines(2, "left"),
-                      maxWidth: '100%',
-                      overflowWrap: 'break-word'
+                      maxWidth: "100%",
+                      overflowWrap: "break-word",
                     }}
                   >
                     {med.title}
                   </Typography>
                   {/* Название медиа */}
 
-                  <Stack direction="row" spacing={1}>
+                  <Stack direction="row" spacing={1} alignItems="center">
                     {/* Рейтинг */}
-                    <CircleRate value={med.rating}/>
+                    <CircleRate value={med.rating} />
+
+                    <Divider orientation="vertical" />
+                    {/* Жанры*/}
+                    <Stack direction="row" spacing={1}>
+                      {med.genre
+                        .split(", ")
+                        .slice(0, 3)
+                        .map((genre, index) => (
+                          <Chip
+                            variant="filled"
+                            color="primary"
+                            key={index}
+                            label={genre}
+                            sx={{
+                              fontSize: "1rem",
+                              height: "30px", // Фиксированная высота для Chip
+                              padding: "5px 12px",
+                            }}
+                          />
+                        ))}
+                    </Stack>
+                    {/* Жанры */}
+                    
                   </Stack>
+                  {/* Описание*/}
+                  <Typography
+                      variant="body1"
+                      sx={{
+                        ...uiConfigs.style.typoLines(3),
+                      }}
+                    >
+                      {med.descrition}
+                    </Typography>
+                    {/* Описание */}
+                    
                 </Stack>
               </Box>
             </Box>
