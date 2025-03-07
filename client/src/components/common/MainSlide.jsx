@@ -19,7 +19,7 @@ import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 
 import { setGlobalLoading } from "../../redux/slices/globalLoadingSlice";
-import { routeGen } from "../../routes/routes";
+import { routesGen } from "../../routes/routes";
 import uiConfigs from "../../configs/UI";
 import CircleRate from "./CircleRate";
 import configs from "../../api/configs/configs";
@@ -200,7 +200,18 @@ const MainSlide = ({ mediaType }) => {
                       {med.descrition}
                     </Typography>
                     {/* Описание */}
-                    
+                     {/* Кнопка */}
+                  <Button
+                    variant="contained"
+                    size="large"
+                    // startIcon={<PlayArrowIcon />}
+                    component={Link}
+                    to={routesGen.mediaInfo(mediaType, med.id_media)}
+                    sx={{ width: "max-content" }}
+                  >
+                    Смотреть подробнее
+                  </Button>
+                  {/* Кнопка */}
                 </Stack>
               </Box>
             </Box>
