@@ -157,6 +157,11 @@ const MainSlide = ({ mediaType }) => {
                     {med.title}
                   </Typography>
                   {/* Название медиа */}
+
+                  <Stack direction="row" spacing={1}>
+                    {/* Рейтинг */}
+                    <CircleRate value={med.rating}/>
+                  </Stack>
                 </Stack>
               </Box>
             </Box>
