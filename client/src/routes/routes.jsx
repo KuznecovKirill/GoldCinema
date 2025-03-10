@@ -15,5 +15,10 @@ export const routesGen = {
         path: "/:mediaType/:media_id",
         element: <MediaPage/>
     },
+    { 
+      path: "/search",
+      state: "search"
+
+    }
   ];
   export default routes;
