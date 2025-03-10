@@ -22,7 +22,7 @@ router.post(
     mediaController.addMedia
 ); //Добавление медиа
 
-router.get("/Type/:mediaType", mediaController.getMediasByType); //для получения типа медиа
+router.get("/Type", mediaController.getMediasByType); //для получения типа медиа
 
 router.get("/info/:id_media", mediaController.getInfo); //для получения подробной информации
 

@@ -4,6 +4,7 @@ import publicClient from "../client/publicClient";
 
 const mediaEndpoints = {
   medias: ({ mediaType, page, limit }) => `/medias/medias?mediaType=${mediaType}&page=${page}&limit=${limit}`,
+  mediasByType: ({mediaType}) => `/Type?mediaType=${mediaType}`, //curl GET "http://localhost:8000/medias/Type?mediaType=TV_SERIES" 
   info: ({id_media}) => `/info/${id_media}`,
   search: ({ mediaType, query, page }) => `${mediaType}/search?query=${query}&page=${page}`
 };
@@ -13,6 +14,14 @@ const mediaModule = {
     try {
       const response = await publicClient.get(
         mediaEndpoints.medias({ mediaType, page, limit })
+      );
+      return { response };
+    } catch (err) { return { err }; }
+  },
+  getMediasByType: async ({ mediaType }) => {
+    try {
+      const response = await publicClient.get(
+        mediaEndpoints.mediasByType({ mediaType })
       );
       return { response };
     } catch (err) { return { err }; }
