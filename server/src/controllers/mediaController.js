@@ -52,14 +52,32 @@ const addMedia = async (req, res) => {
         rars: `${newMedia.ratingAgeLimits.replace(/\D/g, "")}+`, //удаление всех нечисловых символов и добавление плюса на конце
         rating: newMedia.ratingImdb || null,
         descrition: newMedia.description || null,
-        poster: newMedia.coverUrl || null,
+        cover: newMedia.coverUrl || newMedia.posterUrl,
+      });
+      responseHandler.goodrequest(res, {
+        id_media: newMedia.kinopoiskId,
+        title: newMedia.nameRu,
+        mediaType: newMedia.type,
+        country: newMedia.countries.map((c) => c.country).join(", "), //список фильмов
+        year: newMedia.year,
+        genre: newMedia.genres.map((g) => g.genre).join(", "), //список жанров
+        running_time: newMedia.filmLength,
+        rars: `${newMedia.ratingAgeLimits.replace(/\D/g, "")}+`, //удаление всех нечисловых символов и добавление плюса на конце
+        rating: newMedia.ratingImdb || null,
+        descrition: newMedia.description || null,
+        cover: newMedia.coverUrl || newMedia.posterUrl,
       });
     } catch (error) {
       if (error.name == "SequelizeUniqueConstraintError") {
         console.log("Такой фильм уже существует!");
+        responseHandler.error(res);
       }
     }
     sequelize.sync();
+};
+
+const setTopMedia = async (req, res) => {
+
 }
 const getMediasByType = async (req, res) => {
   try {
