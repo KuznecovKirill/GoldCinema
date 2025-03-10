@@ -2,7 +2,7 @@
 
 const mediaType = {
     FILM: "FILM",
-    TV: "TV_SERIES",
+    TV_SERIES: "TV_SERIES",
     TV_SHOW: "TV_SHOW",
     MINI_SERIES: "MINI_SERIES"
   };

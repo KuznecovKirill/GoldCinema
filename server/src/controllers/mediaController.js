@@ -14,12 +14,14 @@ const { swaggerAPI } = require("../swagger/swagger.api");
 const getMedias = async (req, res) => { //curl GET "http://localhost:8000/medias/medias?mediaType=FILM&page=1&limit=10"
   try {
     // Извлекаем параметры из объекта запроса
+    const mediaType = req.query.mediaType;
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit; //Расчёт смещения
 
     // Запрос к базе данных
     const { count, rows } = await modelMedia.findAndCountAll({
+      where: { mediaType: mediaType },
       limit: limit, // Устанавливаем лимит
       offset: offset, // Устанавливаем смещение
       order: [["id_media", "DESC"]], // Сортировка по id_media по убыванию
