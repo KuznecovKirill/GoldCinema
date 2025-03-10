@@ -10,7 +10,7 @@ const sequelize = require("./database").sequelize;
 
 //Получение фильма по ID
 async function addMovie(newMedia) {
-  // const newMedia = await swaggerAPI.mediaByID({ id: 301 });
+  const newMedia = await swaggerAPI.mediaByID({ id: 301 });
   console.log(newMedia);
   try {
     await modelMedia.create({
@@ -132,7 +132,7 @@ async function getWords(id_media) {
   
 }
 //getSimilars();
-getMovies();
+//getMovies();
 //getSimilars();
 // getMovie();
 //getImages();

@@ -9,7 +9,7 @@ const similarController = require("../controllers/similarController.js");
 const keywordController = require("../controllers/keywordController.js");
 const { where } = require("sequelize");
 const { Op } = require("sequelize");
-
+const { swaggerAPI } = require("../swagger/swagger.api");
 //Получение списка проектов
 const getMedias = async (req, res) => { //curl GET "http://localhost:8000/medias/medias?mediaType=FILM&page=1&limit=10"
   try {
@@ -36,8 +36,31 @@ const getMedias = async (req, res) => { //curl GET "http://localhost:8000/medias
     responseHandler.error(res);
   }
 };
-
-//
+//Добавление медиа по id
+const addMedia = async (req, res) => {
+  const {id_media} = req.body;
+  const newMedia = await swaggerAPI.mediaByID({ id: id_media });
+  try {
+      await modelMedia.create({
+        id_media: newMedia.kinopoiskId,
+        title: newMedia.nameRu,
+        mediaType: newMedia.type,
+        country: newMedia.countries.map((c) => c.country).join(", "), //список фильмов
+        year: newMedia.year,
+        genre: newMedia.genres.map((g) => g.genre).join(", "), //список жанров
+        running_time: newMedia.filmLength,
+        rars: `${newMedia.ratingAgeLimits.replace(/\D/g, "")}+`, //удаление всех нечисловых символов и добавление плюса на конце
+        rating: newMedia.ratingImdb || null,
+        descrition: newMedia.description || null,
+        poster: newMedia.coverUrl || null,
+      });
+    } catch (error) {
+      if (error.name == "SequelizeUniqueConstraintError") {
+        console.log("Такой фильм уже существует!");
+      }
+    }
+    sequelize.sync();
+}
 const getMediasByType = async (req, res) => {
   try {
     const mediaType = req.query.mediaType || "FILM";
@@ -155,7 +178,7 @@ const search = async (req, res) => {
   }
 };
 
-module.exports = { getMedias, getGenres, getMediasByType, getInfo, search };
+module.exports = { getMedias, addMedia, getGenres, getMediasByType, getInfo, search };
 //curl -X GET http://localhost:8000/api/medias?page=1&limit=10
 //curl -X GET http://localhost:8000/medias?page=1&limit=10
 //curl -X POST http://localhost:8000/medias -H "Content-Type: application/json" -d '{"page": 1}'
