@@ -24,7 +24,7 @@ router.post(
 
 router.get("/Type", mediaController.getMediasByType); //для получения типа медиа
 
-router.get("/info/:id_media", mediaController.getInfo); //для получения подробной информации
+router.get("/info", mediaController.getInfo); //для получения подробной информации
 
 router.get("/search", mediaController.search); //для поиска
 

@@ -131,13 +131,13 @@ const getGenres = async (req, res) => {
   }
 };
 //Получение информации о проекте
-const getInfo = async (req, res) => {
+const getInfo = async (req, res) => { //curl GET "http://localhost:8000/medias/info?id_media=1392743"  
   try {
-    const { id_media } = req.body;
-
+    const id_media  = req.query.id_media;
+    console.log(id_media);
     const media = await modelMedia.findByPk(id_media);
-    const similar = await similarController.getSimilarMedia(id_media);
-    //const similar = await similarController... нкжно будет добавить контроллер simillar, чтобы получать похожие проекты
+    //const similar = await similarController.getSimilarMedia(id_media);
+
     //Тоже самое для изображений
 
     const tokenDecoded = tokenMiddleware.decode(req);
@@ -154,7 +154,7 @@ const getInfo = async (req, res) => {
 
     responseHandler.goodrequest(res, {
       media, //информация о проекте
-      similar, //информация о похожих проектах
+      //similar, //информация о похожих проектах
       reviews, //информация о обзорах
       user,
     });

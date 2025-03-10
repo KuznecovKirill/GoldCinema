@@ -16,7 +16,7 @@ const getSimilarMedia = async (id_media) => {
         required: true // Это обеспечит получение только тех записей, которые имеют связанные медиа
       }]
     });
-  
+    console.log(similarEntries);
     return similarEntries.map(entry => entry.similarMedia);
   };
 
