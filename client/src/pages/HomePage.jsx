@@ -8,12 +8,12 @@ import MediaSlide from '../components/common/MediaSlide';
 const HomePage = () => {
   return (
     <>
-    <MainSlide mediaType={configs.mediaType.FILM}/>
-    <Box marginTop="-4rem" sx={{...UI.style.mainContent }}>
+    <MainSlide mediaType={configs.mediaType.FILM} mediaCategory={configs.mediaCategory.popular}/>
+    {/* <Box marginTop="-4rem" sx={{...UI.style.mainContent }}>
       <Container header="popular Movie">
         <MediaSlide mediaType={configs.mediaType.FILM} mediaCategory={configs.mediaCategory.popular} />
       </Container>
-    </Box>
+    </Box> */}
     </>
   )
 }

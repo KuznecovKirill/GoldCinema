@@ -5,9 +5,10 @@ const requestHandler = require('../handlers/request.handler');
 const {body} = require('express-validator');
 const router = express.Router();
 
-router.get("/medias", mediaController.getMedias); //для получения списка медиа
-
-router.get("/genres", mediaController.getGenres); //для получения жанров
+//router.get("/medias", mediaController.getMedias); //для получения списка медиа по типу
+router.get("/:mediaType/:mediaCategory", mediaController.getMedias); //для получения списка медиа по типу
+router.get("/allMedias", mediaController.getAllMedias); // для получения списка всех медиа
+router.get("/genres/:mediaType", mediaController.getGenres); //для получения жанров
 
 router.post(
   "/addMedia",

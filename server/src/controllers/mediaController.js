@@ -15,7 +15,7 @@ const getMedias = async (req, res) => {
   //curl GET "http://localhost:8000/medias/medias?mediaType=FILM&page=1&limit=10"
   try {
     // Извлекаем параметры из объекта запроса
-    const mediaType = req.query.mediaType;
+    const mediaType = req.params.mediaType;
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit; //Расчёт смещения
@@ -39,6 +39,17 @@ const getMedias = async (req, res) => {
     responseHandler.error(res);
   }
 };
+//Получить все медиа
+const getAllMedias = async (req, res) => {
+  try {
+    const medias = await modelMedia.findAll();
+
+    responseHandler.goodrequest(res, medias);
+  } catch (error) {
+    console.error(error);
+    responseHandler.error(res);
+  }
+}
 //Для добавления медиа
 const modelMediaCreate = async (newMedia) => {
   try {
@@ -190,13 +201,12 @@ const getMediasByType = async (req, res) => {
 // curl GET "http://localhost:8000/medias/genres?mediaType=FILM"
 const getGenres = async (req, res) => {
   try {
-    const mediaType = req.query.mediaType || "FILM";
+    const mediaType = req.params.mediaType || "FILM";
     console.log(mediaType);
 
     const medias = await modelMedia.findAll({
       where: { mediaType: mediaType }, //Поиск по mediaType
     });
-    console.log("Медиа получены успешно");
     const genresSet = new Set(); // Set используется для уникальности жанров
 
     medias.forEach((media) => {
@@ -290,6 +300,7 @@ const search = async (req, res) => {
 
 module.exports = {
   getMedias,
+  getAllMedias,
   addMedia,
   getGenres,
   getMediasByType,

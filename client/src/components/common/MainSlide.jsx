@@ -27,7 +27,7 @@ import configs from "../../api/configs/configs";
 
 import genreModule from "../../api/modules/genreModule";
 import mediaModule from "../../api/modules/mediaModule";
-const MainSlide = ({ mediaType }) => {
+const MainSlide = ({ mediaType, mediaCategory }) => {
   const theme = useTheme();
   const dispatch = useDispatch();
 
@@ -38,6 +38,7 @@ const MainSlide = ({ mediaType }) => {
     const getMedias = async () => {
       const { response, err } = await mediaModule.getMedias({
         mediaType,
+        mediaCategory,
         page: 1,
         limit: 10,
       });
@@ -62,7 +63,7 @@ const MainSlide = ({ mediaType }) => {
     };
 
     getGenres();
-  }, [mediaType, dispatch]);
+  }, [mediaType, mediaCategory, dispatch]);
 
   return (
     //Затемнение по вертекали

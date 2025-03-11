@@ -1,8 +1,8 @@
 import React from 'react'
 import publicClient from '../client/publicClient';
 const genreEndpoints = {
-    list: ({ mediaType }) => `/medias/genres`,
-    listByType: ({mediaType}) => `/medias/genres/${mediaType}`
+    list: ({ mediaType }) => `/medias/genres/${mediaType}`,
+    //listByType: ({mediaType}) => `/medias/genres/${mediaType}`
   };
   
   const genreModule = {
