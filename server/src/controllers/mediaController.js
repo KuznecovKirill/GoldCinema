@@ -86,7 +86,7 @@ const setPopularMovie = async (req, res) => {
     type: "TOP_POPULAR_MOVIES",
     page: 1,
   });
-
+  console.log(topMedias.items.length);
   const addedMedias = []; // Массив для добавленных медиа
   const errors = [];
 
@@ -114,10 +114,11 @@ const setPopularMovie = async (req, res) => {
       }
     })
   );
-  if (errors.length > 0) {
+  if (addedMedias.length == 0){
     console.log("Ошибки:", errors);
-    responseHandler.error(res, "Произошли ошибки при добавлении медиа");
-  } else {
+    responseHandler.error(res, "Медиа не добавлены!");
+  }
+  else{
     responseHandler.goodrequest(res, addedMedias);
   }
 
