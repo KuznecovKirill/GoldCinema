@@ -50,7 +50,7 @@ const modelMediaCreate = async (newMedia) => {
       year: newMedia.year,
       genre: newMedia.genres.map((g) => g.genre).join(", "), //список жанров
       running_time: newMedia.filmLength,
-      rars: `${newMedia.ratingAgeLimits.replace(/\D/g, "")}+`, //удаление всех нечисловых символов и добавление плюса на конце
+      rars: newMedia.ratingAgeLimits ? `${newMedia.ratingAgeLimits.replace(/\D/g, "")}+` : null, //удаление всех нечисловых символов и добавление плюса на конце
       rating: newMedia.ratingImdb || null,
       descrition: newMedia.description || null,
       cover: newMedia.coverUrl || newMedia.posterUrl,
@@ -59,77 +59,86 @@ const modelMediaCreate = async (newMedia) => {
     return result;
   } catch (error) {
     if (error.name == "SequelizeUniqueConstraintError") {
-      console.log("Такой фильм уже существует!");
-      responseHandler.error(res);
+      return { error: "Такой фильм уже существует!" };
     } else {
       console.error("Ошибка при создании медиа:", error);
-      return null; // Возвращаем null в случае других ошибок
+      return { error: "Ошибка при создании медиа" }; // Возвращаем null в случае других ошибок
     }
   }
- 
 };
 //Добавление медиа по id
-const addMedia = async (req, res) => {
+const addMedia = async (req, res) => { //curl -X POST "http://localhost:8000/medias/addMedia" -H "Content-Type: application/json" -d '{"id_media": "828"}'
   const { id_media } = req.body;
   const newMedia = await swaggerAPI.mediaByID({ id: id_media });
-  try {
-
+  // try {
     const result = await modelMediaCreate(newMedia);
-    console.log(result);
-    
-    responseHandler.goodrequest(res, result);
-  } catch (error) {
-    if (error.name == "SequelizeUniqueConstraintError") {
-      console.log("Такой фильм уже существует!");
-      responseHandler.error(res);
-    }
-  }
 
+    responseHandler.goodrequest(res, result);
+  // } catch (error) {
+  //   if (error.name == "SequelizeUniqueConstraintError") {
+  //     console.log("Такой фильм уже существует!");
+  //     responseHandler.error(res);
+  //   }
+  // }
 };
-      // id_media: newMedia.kinopoiskId,
-      // title: newMedia.nameRu,
-      // mediaType: newMedia.type,
-      // country: newMedia.countries.map((c) => c.country).join(", "), //список фильмов
-      // year: newMedia.year,
-      // genre: newMedia.genres.map((g) => g.genre).join(", "), //список жанров
-      // running_time: newMedia.filmLength,
-      // rars: `${newMedia.ratingAgeLimits.replace(/\D/g, "")}+`, //удаление всех нечисловых символов и добавление плюса на конце
-      // rating: newMedia.ratingImdb || null,
-      // descrition: newMedia.description || null,
-      // cover: newMedia.coverUrl || newMedia.posterUrl,
 const setPopularMovie = async (req, res) => {
   const topMedias = await swaggerAPI.mediaCollections({
     type: "TOP_POPULAR_MOVIES",
     page: 1,
   });
-  topMedias.items.forEach(async (item) => {
-    if (item.nameRu !== null) {
-      try {
-        await modelMedia.create({
-          id_media: item.kinopoiskId,
-          title: item.nameRu,
-          mediaType: item.type,
-          country: item.countries.map((c) => c.country).join(", "),
-          year: item.year,
-          genre: item.genres.map((g) => g.genre).join(", "),
-          running_time: item.filmLength || null,
-          rars: item.ratingAgeLimits
-            ? `${item.ratingAgeLimits.replace(/\D/g, "")}+`
-            : null,
-          rating: item.ratingImdb || null,
-          descrition: item.description || null,
-          cover: item.coverUrl || item.posterUrl,
-        });
-        console.log("Популярный фильм добавлен!");
-      } catch (error) {
-        if (error.name == "SequelizeUniqueConstraintError") {
-          console.log("Такой фильм уже существует!");
+
+  const addedMedias = []; // Массив для добавленных медиа
+  const errors = [];
+
+  //Promise.all, чтобы дождаться завершения всех асинхронных операций
+  await Promise.all(
+    topMedias.items.map(async (item) => {
+      if (item.nameRu !== null) {
+        try {
+          const result = await modelMediaCreate(item);
+          if (result && result.error) {
+            errors.push(result.error);
+          } 
+          else if (result){
+            console.log("Популярный фильм добавлен!");
+            addedMedias.push(result);
+          }
+          else {
+            console.log("Фильм не был добавлен");
+          }
+        } catch (error) {
+          console.error("Произошла неожиданная ошибка:", error);
+          errors.push("Произошла неожиданная ошибка");
+
         }
       }
-    }
-  });
-  sequelize.sync();
+    })
+  );
+  if (errors.length > 0) {
+    console.log("Ошибки:", errors);
+    responseHandler.error(res, "Произошли ошибки при добавлении медиа");
+  } else {
+    responseHandler.goodrequest(res, addedMedias);
+  }
+
 };
+  // await modelMedia.create({
+  //   id_media: item.kinopoiskId,
+  //   title: item.nameRu,
+  //   mediaType: item.type,
+  //   country: item.countries.map((c) => c.country).join(", "),
+  //   year: item.year,
+  //   genre: item.genres.map((g) => g.genre).join(", "),
+  //   running_time: item.filmLength || null,
+  //   rars: item.ratingAgeLimits
+  //     ? `${item.ratingAgeLimits.replace(/\D/g, "")}+`
+  //     : null,
+  //   rating: item.ratingImdb || null,
+  //   descrition: item.description || null,
+  //   cover: item.coverUrl || item.posterUrl,
+  // });
+
+  //sequelize.sync();
 const getMediasByType = async (req, res) => {
   try {
     const mediaType = req.query.mediaType || "FILM";
@@ -254,6 +263,7 @@ module.exports = {
   getGenres,
   getMediasByType,
   getInfo,
+  setPopularMovie,
   search,
 };
 //curl -X GET http://localhost:8000/api/medias?page=1&limit=10

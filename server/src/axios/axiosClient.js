@@ -9,7 +9,7 @@ const axios = require("axios");
 const get = async (url) => {
     // Выполнение GET-запроса
     console.log(url);
-    console.log(process.env);
+    // console.log(process.env);
     const conn = await fetch(url, {
         method: 'GET',
         headers: {

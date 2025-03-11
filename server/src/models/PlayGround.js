@@ -34,10 +34,10 @@ async function addMovie(newMedia) {
   sequelize.sync();
 }
 //Получение списка фильмов
-async function getMovies() {
+async function getCollection(type, page) {
   const newCollection = await swaggerAPI.mediaCollections({
-    type: "TOP_POPULAR_ALL",
-    page: "1",
+    type: type,
+    page: page,
   });
   console.log(newCollection);
   newCollection.items.forEach(async (item) => {
@@ -141,4 +141,4 @@ async function getWords(id_media) {
   // Синхронизация моделей с базой данных без удаления существующих данных
   await sequelize.sync();
 })();
-module.exports = {getMovies};
+module.exports = {getMovies: getCollection};

@@ -259,3 +259,12 @@ const addInfo = async (req, res) => {
   }
 };
 module.exports = { addInfo, processText, calculateTfIdf, search };
+
+
+          // if (error.name == "SequelizeUniqueConstraintError") {
+          //   console.log("Такой фильм уже существует!");
+          //   responseHandler.error(res);
+          // } else {
+          //   console.error("Ошибка при добавлении фильма:", error);
+          //   responseHandler.error(res);
+          // }
