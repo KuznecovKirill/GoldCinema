@@ -87,7 +87,7 @@ const addMedia = async (req, res) => {
 const setPopularMovie = async (req, res) => {
   const topMedias = await swaggerAPI.mediaCollections({
     type: "TOP_POPULAR_MOVIES",
-    page: 1,
+    page: 3,
   });
   console.log(topMedias.items.length);
   const addedMedias = []; // Массив для добавленных медиа
@@ -133,31 +133,62 @@ const setPopularMovie = async (req, res) => {
 
 
    // Добавление в PopularMovie первых 10 добавленных фильмов
-   const popularMoviesToAdd = addedMedias.slice(0, 10);
+   //const popularMoviesToAdd = addedMedias.slice(0, 10);
    try {
+    // Получение текущих записей из PopularMovie
+    const currentPopularMovies = await modelPopularMovie.findAll();
+    const currentIds = currentPopularMovies.map((movie) => movie.id_media);
+
+    // Берутся первые 10 id из популярных фильмов для добавления
+    const newIds = addedMedias.map((media) => media.id_media).slice(0, 10);
+
+    // Остаются только те записи, которые есть в новом списке
+    const idsToKeep = currentIds.filter((id) => newIds.includes(id));
+
+    // Определяются id, которых ещё нет в текущих записях
+    const idsToUpdate = newIds.filter((id) => !idsToKeep.includes(id));
+
+    //Обновляются записи, которых нет в newIds
+    await Promise.all(
+      currentPopularMovies.map(async (media, index) => {
+        if (index < idsToUpdate.length) {
+          const newId = idsToUpdate[index];
+          await media.update({ id_media: newId });
+          console.log(`Фильм с id ${media.id_media} обновлен на ${newId}`);
+        }
+      })
+    );
+     // Теперь добавляются новые
      await Promise.all(
-       popularMoviesToAdd.map(async (media) => {
-         // Проверяем, есть ли уже запись в PopularMovie
-         const existingPopularMovie = await modelPopularMovie.findOne({
-           where: { id_media: media.id_media },
-         });
+      idsToAdd.map(async (id) => {
+        await modelPopularMovie.create({ id_media: id });
+        console.log(`Фильм с id ${id} добавлен в PopularMovie`);
+      })
+    );
+
+    //  await Promise.all(
+    //    currentPopularMovies.map(async (media) => {
+    //      // Проверяем, есть ли уже запись в PopularMovie
+    //      const existingPopularMovie = await modelPopularMovie.findOne({
+    //        where: { id_media: media.id_media },
+    //      });
  
-         if (!existingPopularMovie) {
-           // Если нет, то добавляем
-           await modelPopularMovie.create({
-             id_media: media.id_media, 
-           });
-           console.log(
-             `Фильм с id ${media.id_media} добавлен в PopularMovie`
-           );
-         } else {
-          //Иначе он уже есть
-           console.log(
-             `Фильм с id ${media.id_media} уже есть в PopularMovie`
-           );
-         }
-       })
-     );
+    //      if (!existingPopularMovie) {
+    //        // Если нет, то добавляем
+    //        await modelPopularMovie.create({
+    //          id_media: media.id_media, 
+    //        });
+    //        console.log(
+    //          `Фильм с id ${media.id_media} добавлен в PopularMovie`
+    //        );
+    //      } else {
+    //       //Иначе он уже есть
+    //        console.log(
+    //          `Фильм с id ${media.id_media} уже есть в PopularMovie`
+    //        );
+    //      }
+    //    })
+    //  );
    } catch (error) {
      console.error("Ошибка при добавлении в PopularMovie:", error);
      errors.push("Ошибка при добавлении в PopularMovie");
