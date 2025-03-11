@@ -1,5 +1,6 @@
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import {
+  Badge,
   Box,
   Button,
   Chip,
@@ -188,19 +189,33 @@ const MainSlide = ({ mediaType }) => {
                         ))}
                     </Stack>
                     {/* Жанры */}
-                    
+                    {/* Возрастной рейтинг */}
+                    {med.rars && (
+                      <Chip
+                        variant="filled"
+                        color="error" // Используйте другой цвет, например, "error"
+                        label={med.rars}
+                        sx={{
+                          fontSize: "1rem",
+                          height: "30px", // Фиксированная высота для Chip
+                          padding: "5px 12px",
+                          marginLeft: "10px", // Добавить отступ для разделения от жанров
+                        }}
+                      />
+                    )}
+                    {/* Возрастной рейтинг */}
                   </Stack>
                   {/* Описание*/}
                   <Typography
-                      variant="body1"
-                      sx={{
-                        ...uiConfigs.style.typoLines(3),
-                      }}
-                    >
-                      {med.descrition}
-                    </Typography>
-                    {/* Описание */}
-                     {/* Кнопка */}
+                    variant="body1"
+                    sx={{
+                      ...uiConfigs.style.typoLines(3),
+                    }}
+                  >
+                    {med.descrition}
+                  </Typography>
+                  {/* Описание */}
+                  {/* Кнопка */}
                   <Button
                     variant="contained"
                     size="large"
