@@ -10,10 +10,10 @@ const mediaEndpoints = {
 };
 
 const mediaModule = {
-  getMedias: async ({ mediaType, page, limit }) => {
+  getMedias: async ({ mediaType, mediaCategory, page, limit }) => {
     try {
       const response = await publicClient.get(
-        mediaEndpoints.medias({ mediaType, page, limit })
+        mediaEndpoints.medias({ mediaType,mediaCategory, page, limit })
       );
       return { response };
     } catch (err) { return { err }; }

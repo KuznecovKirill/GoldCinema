@@ -10,12 +10,14 @@ const MediaSlide = ({mediaType, mediaCategory}) => {
           const { response, err } = await mediaModule.getMedias({
             mediaType,
             mediaCategory,
-            page: 1
+            page: 1,
+            limit: 10
           });
           if (response) setMedias(response.results);
           if (err) toast.error(err.message);
         };
         getMedias();
+        console.log(medias);
     }, [mediaType, mediaCategory]);
     return (
         <AutoSwiper>
