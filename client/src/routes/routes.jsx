@@ -12,7 +12,7 @@ export const routesGen = {
         state: "home"
     },
     {
-        path: "/:mediaType/:media_id",
+        path: "/:mediaType/:id_media",
         element: <MediaPage/>
     },
     { 

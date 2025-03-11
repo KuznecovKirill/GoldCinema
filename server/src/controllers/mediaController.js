@@ -230,6 +230,7 @@ const getGenres = async (req, res) => {
 const getInfo = async (req, res) => {
   //curl GET "http://localhost:8000/medias/info?id_media=1392743"
   try {
+    console.log("getInfo");
     const id_media = req.params.id_media;
     console.log(id_media);
     const media = await modelMedia.findByPk(id_media);

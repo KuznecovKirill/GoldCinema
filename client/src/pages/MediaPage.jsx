@@ -8,8 +8,8 @@ import { setAuthModalOpen } from '../redux/slices/authModalSlice';
 
 import mediaModule from "../api/modules/mediaModule";
 const MediaPage = () => {
-  const {mediaType, mediaId} = useParams();
-
+  const {mediaType, id_media} = useParams();
+  console.log(id_media);
   const {list, listFavorites} = useSelector((state) => state.user);
 
   const [media, setMedia] = useState();
@@ -22,7 +22,8 @@ const MediaPage = () => {
     window.scrollTo(0,0);
     const getMedia = async() => {
       dispatch(setGlobalLoading(true));
-      const {response, err} = await mediaModule.getInfo({mediaId});
+      
+      const {response, err} = await mediaModule.getInfo({id_media});
       dispatch(setGlobalLoading(false));
 
       if (response){
@@ -34,7 +35,7 @@ const MediaPage = () => {
     };
 
     getMedia();
-  }, [mediaType, mediaId, dispatch]);
+  }, [mediaType, id_media, dispatch]);
 
   //Добавить клик на избранное
   //Добавить клик на избранное для удаления
