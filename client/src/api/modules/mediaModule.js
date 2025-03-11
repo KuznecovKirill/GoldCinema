@@ -6,7 +6,7 @@ const mediaEndpoints = {
   allMedias: () => `/medias/allMedias`, //curl GET "http://localhost:8000/medias/allMedias" 
   medias: ({ mediaType, mediaCategory, page, limit }) => `/medias/${mediaType}/${mediaCategory}?&page=${page}&limit=${limit}`,
   mediasByType: ({mediaType}) => `/Type?mediaType=${mediaType}`, //curl GET "http://localhost:8000/medias/Type?mediaType=TV_SERIES" 
-  info: ({id_media}) => `/info/?id_media=${id_media}`,
+  info: ({id_media}) => `/info/${id_media}`,
   search: ({ mediaType, query, page }) => `${mediaType}/search?query=${query}&page=${page}`
 };
 

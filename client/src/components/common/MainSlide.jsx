@@ -51,9 +51,8 @@ const MainSlide = ({ mediaType, mediaCategory }) => {
     const getGenres = async () => {
       dispatch(setGlobalLoading(true));
       const { response, err } = await genreModule.getList({ mediaType });
-      console.log(response);
       if (response) {
-        setGenres(response.genres);
+        setGenres(response);
         getMedias();
       }
       if (err) {

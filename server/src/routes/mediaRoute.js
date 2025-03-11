@@ -8,7 +8,7 @@ const router = express.Router();
 //router.get("/medias", mediaController.getMedias); //для получения списка медиа по типу
 router.get("/:mediaType/:mediaCategory", mediaController.getMedias); //для получения списка медиа по типу
 router.get("/allMedias", mediaController.getAllMedias); // для получения списка всех медиа
-router.get("/genres/:mediaType", mediaController.getGenres); //для получения жанров
+router.get("/genres", mediaController.getGenres); //для получения жанров
 
 router.post(
   "/addMedia",
@@ -25,7 +25,7 @@ router.post(
 router.get("/popularMovies", mediaController.setPopularMovie);
 router.get("/Type", mediaController.getMediasByType); //для получения типа медиа
 
-router.get("/info", mediaController.getInfo); //для получения подробной информации
+router.get("/info/:id_media", mediaController.getInfo); //для получения подробной информации
 
 router.get("/search", mediaController.search); //для поиска
 

@@ -16,10 +16,10 @@ const getMedias = async (req, res) => {
   try {
     // Извлекаем параметры из объекта запроса
     const mediaType = req.params.mediaType;
+    const mediaCategory = req.params.mediaCategory;
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit; //Расчёт смещения
-
     // Запрос к базе данных
     const { count, rows } = await modelMedia.findAndCountAll({
       where: { mediaType: mediaType },
@@ -201,9 +201,7 @@ const getMediasByType = async (req, res) => {
 // curl GET "http://localhost:8000/medias/genres?mediaType=FILM"
 const getGenres = async (req, res) => {
   try {
-    const mediaType = req.params.mediaType || "FILM";
-    console.log(mediaType);
-
+    const mediaType = req.query.mediaType || "TV_SERIES";
     const medias = await modelMedia.findAll({
       where: { mediaType: mediaType }, //Поиск по mediaType
     });
@@ -218,7 +216,6 @@ const getGenres = async (req, res) => {
     });
 
     const genres = Array.from(genresSet); // Преобразование Set в массив
-
     if (genres.length === 0) {
       return responseHandler.notfound(res);
     }
@@ -233,7 +230,7 @@ const getGenres = async (req, res) => {
 const getInfo = async (req, res) => {
   //curl GET "http://localhost:8000/medias/info?id_media=1392743"
   try {
-    const id_media = req.query.id_media;
+    const id_media = req.params.id_media;
     console.log(id_media);
     const media = await modelMedia.findByPk(id_media);
     //const similar = await similarController.getSimilarMedia(id_media);

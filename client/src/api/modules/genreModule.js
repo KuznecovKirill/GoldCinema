@@ -1,7 +1,7 @@
 import React from 'react'
 import publicClient from '../client/publicClient';
 const genreEndpoints = {
-    list: ({ mediaType }) => `/medias/genres/${mediaType}`,
+    list: ({ mediaType }) => `/medias/genres?mediaType=${mediaType}`,
     //listByType: ({mediaType}) => `/medias/genres/${mediaType}`
   };
   
@@ -9,7 +9,6 @@ const genreEndpoints = {
     getList: async ({ mediaType }) => {
       try {
         const response = await publicClient.get(genreEndpoints.list({ mediaType }));
-  
         return { response };
       } catch (err) { return { err }; }
     }
