@@ -77,14 +77,9 @@ const addMedia = async (req, res) => {
   const result = await modelMediaCreate(newMedia);
 
   responseHandler.goodrequest(res, result);
-  // } catch (error) {
-  //   if (error.name == "SequelizeUniqueConstraintError") {
-  //     console.log("Такой фильм уже существует!");
-  //     responseHandler.error(res);
-  //   }
-  // }
 };
-const setPopularMovie = async (req, res) => {
+//Установка списка популярных фильмов
+const setPopularMovie = async (req, res) => { //curl GET "http://localhost:8000/medias/popularMovies" 
   const topMedias = await swaggerAPI.mediaCollections({
     type: "TOP_POPULAR_MOVIES",
     page: 3,
@@ -130,8 +125,6 @@ const setPopularMovie = async (req, res) => {
       }
     })
   );
-
-
    // Добавление в PopularMovie первых 10 добавленных фильмов
    //const popularMoviesToAdd = addedMedias.slice(0, 10);
    try {
@@ -165,36 +158,10 @@ const setPopularMovie = async (req, res) => {
         console.log(`Фильм с id ${id} добавлен в PopularMovie`);
       })
     );
-
-    //  await Promise.all(
-    //    currentPopularMovies.map(async (media) => {
-    //      // Проверяем, есть ли уже запись в PopularMovie
-    //      const existingPopularMovie = await modelPopularMovie.findOne({
-    //        where: { id_media: media.id_media },
-    //      });
- 
-    //      if (!existingPopularMovie) {
-    //        // Если нет, то добавляем
-    //        await modelPopularMovie.create({
-    //          id_media: media.id_media, 
-    //        });
-    //        console.log(
-    //          `Фильм с id ${media.id_media} добавлен в PopularMovie`
-    //        );
-    //      } else {
-    //       //Иначе он уже есть
-    //        console.log(
-    //          `Фильм с id ${media.id_media} уже есть в PopularMovie`
-    //        );
-    //      }
-    //    })
-    //  );
    } catch (error) {
      console.error("Ошибка при добавлении в PopularMovie:", error);
      errors.push("Ошибка при добавлении в PopularMovie");
    }
- 
-
   if (addedMedias.length == 0) {
     console.log("Ошибки:", errors);
     responseHandler.error(res, "Медиа не добавлены!");
@@ -202,23 +169,7 @@ const setPopularMovie = async (req, res) => {
     responseHandler.goodrequest(res, addedMedias);
   }
 };
-// await modelMedia.create({
-//   id_media: item.kinopoiskId,
-//   title: item.nameRu,
-//   mediaType: item.type,
-//   country: item.countries.map((c) => c.country).join(", "),
-//   year: item.year,
-//   genre: item.genres.map((g) => g.genre).join(", "),
-//   running_time: item.filmLength || null,
-//   rars: item.ratingAgeLimits
-//     ? `${item.ratingAgeLimits.replace(/\D/g, "")}+`
-//     : null,
-//   rating: item.ratingImdb || null,
-//   descrition: item.description || null,
-//   cover: item.coverUrl || item.posterUrl,
-// });
 
-//sequelize.sync();
 const getMediasByType = async (req, res) => {
   try {
     const mediaType = req.query.mediaType || "FILM";
