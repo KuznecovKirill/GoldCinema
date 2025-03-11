@@ -1,7 +1,7 @@
 const { modelReview } = require("../models/modelReview.js");
 const { modelUser } = require("../models/modelUser");
 const { modelMedia } = require("../models/modelMedia.js");
-
+const { modelPopularMovie } = require("../models/modelPopularMovie");
 const responseHandler = require("../handlers/response.handler.js");
 const sequelize = require("../models/database").sequelize;
 const tokenMiddleware = require("../middlewares/middleware.js");
@@ -50,7 +50,9 @@ const modelMediaCreate = async (newMedia) => {
       year: newMedia.year,
       genre: newMedia.genres.map((g) => g.genre).join(", "), //список жанров
       running_time: newMedia.filmLength,
-      rars: newMedia.ratingAgeLimits ? `${newMedia.ratingAgeLimits.replace(/\D/g, "")}+` : null, //удаление всех нечисловых символов и добавление плюса на конце
+      rars: newMedia.ratingAgeLimits
+        ? `${newMedia.ratingAgeLimits.replace(/\D/g, "")}+`
+        : null, //удаление всех нечисловых символов и добавление плюса на конце
       rating: newMedia.ratingImdb || null,
       descrition: newMedia.description || null,
       cover: newMedia.coverUrl || newMedia.posterUrl,
@@ -67,13 +69,14 @@ const modelMediaCreate = async (newMedia) => {
   }
 };
 //Добавление медиа по id
-const addMedia = async (req, res) => { //curl -X POST "http://localhost:8000/medias/addMedia" -H "Content-Type: application/json" -d '{"id_media": "828"}'
+const addMedia = async (req, res) => {
+  //curl -X POST "http://localhost:8000/medias/addMedia" -H "Content-Type: application/json" -d '{"id_media": "828"}'
   const { id_media } = req.body;
   const newMedia = await swaggerAPI.mediaByID({ id: id_media });
   // try {
-    const result = await modelMediaCreate(newMedia);
+  const result = await modelMediaCreate(newMedia);
 
-    responseHandler.goodrequest(res, result);
+  responseHandler.goodrequest(res, result);
   // } catch (error) {
   //   if (error.name == "SequelizeUniqueConstraintError") {
   //     console.log("Такой фильм уже существует!");
@@ -89,57 +92,102 @@ const setPopularMovie = async (req, res) => {
   console.log(topMedias.items.length);
   const addedMedias = []; // Массив для добавленных медиа
   const errors = [];
-
   //Promise.all, чтобы дождаться завершения всех асинхронных операций
   await Promise.all(
     topMedias.items.map(async (item) => {
       if (item.nameRu !== null) {
         try {
-          const result = await modelMediaCreate(item);
+          //Создание медиа
+          let result = await modelMediaCreate(item);
+          // Возникла ошибка
           if (result && result.error) {
-            errors.push(result.error);
-          } 
-          else if (result){
+            
+            if (!result.error.includes("Такой фильм уже существует!")) {
+              errors.push(result.error);
+            } else {
+              // Если фильм уже существует, то его нужно найти в базе данных
+              const existingMedia = await modelMedia.findOne({
+                where: { id_media: item.kinopoiskId },
+              });
+              if (existingMedia) {
+                result = existingMedia;
+                console.log(
+                  "Фильм уже существует, поэтому используется текущая запись"
+                );
+              }
+            }
+          }
+          if (result && !result.error) {
             console.log("Популярный фильм добавлен!");
             addedMedias.push(result);
-          }
-          else {
+          } else {
             console.log("Фильм не был добавлен");
           }
         } catch (error) {
           console.error("Произошла неожиданная ошибка:", error);
           errors.push("Произошла неожиданная ошибка");
-
         }
       }
     })
   );
-  if (addedMedias.length == 0){
+
+
+   // Добавление в PopularMovie первых 10 добавленных фильмов
+   const popularMoviesToAdd = addedMedias.slice(0, 10);
+   try {
+     await Promise.all(
+       popularMoviesToAdd.map(async (media) => {
+         // Проверяем, есть ли уже запись в PopularMovie
+         const existingPopularMovie = await modelPopularMovie.findOne({
+           where: { id_media: media.id_media },
+         });
+ 
+         if (!existingPopularMovie) {
+           // Если нет, то добавляем
+           await modelPopularMovie.create({
+             id_media: media.id_media, 
+           });
+           console.log(
+             `Фильм с id ${media.id_media} добавлен в PopularMovie`
+           );
+         } else {
+          //Иначе он уже есть
+           console.log(
+             `Фильм с id ${media.id_media} уже есть в PopularMovie`
+           );
+         }
+       })
+     );
+   } catch (error) {
+     console.error("Ошибка при добавлении в PopularMovie:", error);
+     errors.push("Ошибка при добавлении в PopularMovie");
+   }
+ 
+
+  if (addedMedias.length == 0) {
     console.log("Ошибки:", errors);
     responseHandler.error(res, "Медиа не добавлены!");
-  }
-  else{
+  } else {
     responseHandler.goodrequest(res, addedMedias);
   }
-
 };
-  // await modelMedia.create({
-  //   id_media: item.kinopoiskId,
-  //   title: item.nameRu,
-  //   mediaType: item.type,
-  //   country: item.countries.map((c) => c.country).join(", "),
-  //   year: item.year,
-  //   genre: item.genres.map((g) => g.genre).join(", "),
-  //   running_time: item.filmLength || null,
-  //   rars: item.ratingAgeLimits
-  //     ? `${item.ratingAgeLimits.replace(/\D/g, "")}+`
-  //     : null,
-  //   rating: item.ratingImdb || null,
-  //   descrition: item.description || null,
-  //   cover: item.coverUrl || item.posterUrl,
-  // });
+// await modelMedia.create({
+//   id_media: item.kinopoiskId,
+//   title: item.nameRu,
+//   mediaType: item.type,
+//   country: item.countries.map((c) => c.country).join(", "),
+//   year: item.year,
+//   genre: item.genres.map((g) => g.genre).join(", "),
+//   running_time: item.filmLength || null,
+//   rars: item.ratingAgeLimits
+//     ? `${item.ratingAgeLimits.replace(/\D/g, "")}+`
+//     : null,
+//   rating: item.ratingImdb || null,
+//   descrition: item.description || null,
+//   cover: item.coverUrl || item.posterUrl,
+// });
 
-  //sequelize.sync();
+//sequelize.sync();
 const getMediasByType = async (req, res) => {
   try {
     const mediaType = req.query.mediaType || "FILM";
