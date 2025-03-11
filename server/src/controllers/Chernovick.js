@@ -268,3 +268,30 @@ module.exports = { addInfo, processText, calculateTfIdf, search };
           //   console.error("Ошибка при добавлении фильма:", error);
           //   responseHandler.error(res);
           // }
+
+
+
+            // //Promise.all, чтобы дождаться завершения всех асинхронных операций
+  // await Promise.all(
+  //   topMedias.items.map(async (item) => {
+  //     if (item.nameRu !== null) {
+  //       try {
+  //         const result = await modelMediaCreate(item);
+  //         if (result && result.error) {
+  //           errors.push(result.error);
+  //         }
+  //         else if (result){
+  //           console.log("Популярный фильм добавлен!");
+  //           addedMedias.push(result);
+  //         }
+  //         else {
+  //           console.log("Фильм не был добавлен");
+  //         }
+  //       } catch (error) {
+  //         console.error("Произошла неожиданная ошибка:", error);
+  //         errors.push("Произошла неожиданная ошибка");
+
+  //       }
+  //     }
+  //   })
+  // );
