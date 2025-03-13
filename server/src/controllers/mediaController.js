@@ -20,13 +20,33 @@ const getMedias = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit; //Расчёт смещения
+
+    let count;
+    let rows;
+
     // Запрос к базе данных
-    const { count, rows } = await modelMedia.findAndCountAll({
-      where: { mediaType: mediaType },
-      limit: limit, // Устанавливаем лимит
-      offset: offset, // Устанавливаем смещение
-      order: [["id_media", "DESC"]], // Сортировка по id_media по убыванию
-    });
+    // Если нужно получить список популярных
+    if (mediaCategory == "popular") {
+      const popularId = await modelPopularMovie.findAll({
+        attributes: ["id_media"],
+      }); //список id популярных фильмов
+      const popularIdList = popularId.map((item) => item.id_media); //Преобразование в массив
+      ({ count, rows } = await modelMedia.findAndCountAll({
+        where: { id_media: popularIdList, mediaType: mediaType },
+        limit: limit, // Устанавливаем лимит
+        offset: offset, // Устанавливаем смещение
+        order: [["id_media", "DESC"]], // Сортировка по id_media по убыванию
+      }));
+    }
+    //Просто список по mediaType 
+    else {
+      ({ count, rows } = await modelMedia.findAndCountAll({
+        where: { mediaType: mediaType },
+        limit: limit, 
+        offset: offset, 
+        order: [["id_media", "DESC"]], 
+      }));
+    }
 
     responseHandler.goodrequest(res, {
       total: count, // Общее количество записей
@@ -49,7 +69,7 @@ const getAllMedias = async (req, res) => {
     console.error(error);
     responseHandler.error(res);
   }
-}
+};
 //Для добавления медиа
 const modelMediaCreate = async (newMedia) => {
   try {
@@ -90,7 +110,8 @@ const addMedia = async (req, res) => {
   responseHandler.goodrequest(res, result);
 };
 //Установка списка популярных фильмов
-const setPopularMovie = async (req, res) => { //curl GET "http://localhost:8000/medias/popularMovies" 
+const setPopularMovie = async (req, res) => {
+  //curl GET "http://localhost:8000/medias/popularMovies"
   const topMedias = await swaggerAPI.mediaCollections({
     type: "TOP_POPULAR_MOVIES",
     page: 3,
@@ -107,7 +128,6 @@ const setPopularMovie = async (req, res) => { //curl GET "http://localhost:8000/
           let result = await modelMediaCreate(item);
           // Возникла ошибка
           if (result && result.error) {
-            
             if (!result.error.includes("Такой фильм уже существует!")) {
               errors.push(result.error);
             } else {
@@ -136,9 +156,9 @@ const setPopularMovie = async (req, res) => { //curl GET "http://localhost:8000/
       }
     })
   );
-   // Добавление в PopularMovie первых 10 добавленных фильмов
-   //const popularMoviesToAdd = addedMedias.slice(0, 10);
-   try {
+  // Добавление в PopularMovie первых 10 добавленных фильмов
+  //const popularMoviesToAdd = addedMedias.slice(0, 10);
+  try {
     // Получение текущих записей из PopularMovie
     const currentPopularMovies = await modelPopularMovie.findAll();
     const currentIds = currentPopularMovies.map((movie) => movie.id_media);
@@ -162,17 +182,17 @@ const setPopularMovie = async (req, res) => { //curl GET "http://localhost:8000/
         }
       })
     );
-     // Теперь добавляются новые
-     await Promise.all(
+    // Теперь добавляются новые
+    await Promise.all(
       idsToAdd.map(async (id) => {
         await modelPopularMovie.create({ id_media: id });
         console.log(`Фильм с id ${id} добавлен в PopularMovie`);
       })
     );
-   } catch (error) {
-     console.error("Ошибка при добавлении в PopularMovie:", error);
-     errors.push("Ошибка при добавлении в PopularMovie");
-   }
+  } catch (error) {
+    console.error("Ошибка при добавлении в PopularMovie:", error);
+    errors.push("Ошибка при добавлении в PopularMovie");
+  }
   if (addedMedias.length == 0) {
     console.log("Ошибки:", errors);
     responseHandler.error(res, "Медиа не добавлены!");
