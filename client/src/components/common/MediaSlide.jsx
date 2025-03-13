@@ -13,7 +13,8 @@ const MediaSlide = ({mediaType, mediaCategory}) => {
             page: 1,
             limit: 10
           });
-          if (response) setMedias(response.results);
+          console.log(response);
+          if (response) setMedias(response.medias);
           if (err) toast.error(err.message);
         };
         getMedias();

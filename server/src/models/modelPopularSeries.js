@@ -1,11 +1,11 @@
 const { Sequelize, DataTypes } = require("sequelize");
 const sequelize = require("./database").sequelize;
 const { modelMedia } = require("./modelMedia");
-//Модель для популярных фильмов
-const modelPopularMovie = sequelize.define(
-  "PopularMovie",
+//Модель для популярных сериалов
+const modelPopularSeries = sequelize.define(
+  "PopularSeries",
   {
-    id_popular_movie: {
+    id_popular_series: {
       type: DataTypes.INTEGER,
       autoIncrement: true,
       primaryKey: true,
@@ -25,20 +25,20 @@ const modelPopularMovie = sequelize.define(
   }
 );
 
-modelPopularMovie.prototype.toObject = function () {
+modelPopularSeries.prototype.toObject = function () {
   const values = { ...this.get() };
   return values;
 };
 
 // Преобразование в JSON
-modelPopularMovie.prototype.toJSON = function () {
+modelPopularSeries.prototype.toJSON = function () {
   const values = { ...this.get() };
   return values;
 };
 
 async () => {
-  await sequelize.sync({ alter: true });
-  //await sequelize.sync();
+  //await sequelize.sync({ alter: true });
+  await sequelize.sync();
 };
 
-module.exports = { modelPopularMovie };
+module.exports = { modelPopularSeries };

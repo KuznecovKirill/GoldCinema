@@ -7,6 +7,8 @@ const sequelize = new Sequelize("Gold_Cinema", "root", "", {
     port: "3306"
   });
 
+
+
 try {
   sequelize.authenticate()
   console.log('Соединение с БД было успешно установлено')

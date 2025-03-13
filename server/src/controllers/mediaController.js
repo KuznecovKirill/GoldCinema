@@ -2,6 +2,8 @@ const { modelReview } = require("../models/modelReview.js");
 const { modelUser } = require("../models/modelUser");
 const { modelMedia } = require("../models/modelMedia.js");
 const { modelPopularMovie } = require("../models/modelPopularMovie");
+const { modelPopularSeries } = require("../models/modelPopularSeries");
+
 const responseHandler = require("../handlers/response.handler.js");
 const sequelize = require("../models/database").sequelize;
 const tokenMiddleware = require("../middlewares/middleware.js");
@@ -10,6 +12,37 @@ const keywordController = require("../controllers/keywordController.js");
 const { where } = require("sequelize");
 const { Op } = require("sequelize");
 const { swaggerAPI } = require("../swagger/swagger.api");
+
+//Для добавления медиа
+const modelMediaCreate = async (newMedia) => {
+  try {
+    const result = await modelMedia.create({
+      id_media: newMedia.kinopoiskId,
+      title: newMedia.nameRu,
+      mediaType: newMedia.type,
+      country: newMedia.countries.map((c) => c.country).join(", "), //список фильмов
+      year: newMedia.year,
+      genre: newMedia.genres.map((g) => g.genre).join(", "), //список жанров
+      running_time: newMedia.filmLength,
+      rars: newMedia.ratingAgeLimits
+        ? `${newMedia.ratingAgeLimits.replace(/\D/g, "")}+`
+        : null, //удаление всех нечисловых символов и добавление плюса на конце
+      rating: newMedia.ratingImdb || null,
+      descrition: newMedia.description || null,
+      cover: newMedia.coverUrl || newMedia.posterUrl,
+    });
+    sequelize.sync();
+    return result;
+  } catch (error) {
+    if (error.name == "SequelizeUniqueConstraintError") {
+      return { error: "Такое медиа уже существует!" };
+    } else {
+      console.error("Ошибка при создании медиа:", error);
+      return { error: "Ошибка при создании медиа" }; // Возвращаем null в случае других ошибок
+    }
+  }
+};
+
 //Получение списка проектов
 const getMedias = async (req, res) => {
   //curl GET "http://localhost:8000/medias/medias?mediaType=FILM&page=1&limit=10"
@@ -38,13 +71,13 @@ const getMedias = async (req, res) => {
         order: [["id_media", "DESC"]], // Сортировка по id_media по убыванию
       }));
     }
-    //Просто список по mediaType 
+    //Просто список по mediaType
     else {
       ({ count, rows } = await modelMedia.findAndCountAll({
         where: { mediaType: mediaType },
-        limit: limit, 
-        offset: offset, 
-        order: [["id_media", "DESC"]], 
+        limit: limit,
+        offset: offset,
+        order: [["id_media", "DESC"]],
       }));
     }
 
@@ -70,35 +103,7 @@ const getAllMedias = async (req, res) => {
     responseHandler.error(res);
   }
 };
-//Для добавления медиа
-const modelMediaCreate = async (newMedia) => {
-  try {
-    const result = await modelMedia.create({
-      id_media: newMedia.kinopoiskId,
-      title: newMedia.nameRu,
-      mediaType: newMedia.type,
-      country: newMedia.countries.map((c) => c.country).join(", "), //список фильмов
-      year: newMedia.year,
-      genre: newMedia.genres.map((g) => g.genre).join(", "), //список жанров
-      running_time: newMedia.filmLength,
-      rars: newMedia.ratingAgeLimits
-        ? `${newMedia.ratingAgeLimits.replace(/\D/g, "")}+`
-        : null, //удаление всех нечисловых символов и добавление плюса на конце
-      rating: newMedia.ratingImdb || null,
-      descrition: newMedia.description || null,
-      cover: newMedia.coverUrl || newMedia.posterUrl,
-    });
-    sequelize.sync();
-    return result;
-  } catch (error) {
-    if (error.name == "SequelizeUniqueConstraintError") {
-      return { error: "Такой фильм уже существует!" };
-    } else {
-      console.error("Ошибка при создании медиа:", error);
-      return { error: "Ошибка при создании медиа" }; // Возвращаем null в случае других ошибок
-    }
-  }
-};
+
 //Добавление медиа по id
 const addMedia = async (req, res) => {
   //curl -X POST "http://localhost:8000/medias/addMedia" -H "Content-Type: application/json" -d '{"id_media": "828"}'
@@ -109,97 +114,139 @@ const addMedia = async (req, res) => {
 
   responseHandler.goodrequest(res, result);
 };
-//Установка списка популярных фильмов
-const setPopularMovie = async (req, res) => {
-  //curl GET "http://localhost:8000/medias/popularMovies"
-  const topMedias = await swaggerAPI.mediaCollections({
-    type: "TOP_POPULAR_MOVIES",
-    page: 3,
+//Установка популярных медиа
+const setPopularMedia = async (
+  req,
+  res,
+  mediaCollectionType, // "TOP_POPULAR_MOVIES" или "TOP_POPULAR_SERIES"
+  popularModel, // modelPopularMovie или modelPopularSeries
+  mediaTypeLabel // "фильм" или "сериал"
+) => {
+  const popularMedias = await swaggerAPI.mediaCollections({
+    type: mediaCollectionType,
+    page: 1,
   });
-  console.log(topMedias.items.length);
-  const addedMedias = []; // Массив для добавленных медиа
+
+  const addedMedias = [];
   const errors = [];
-  //Promise.all, чтобы дождаться завершения всех асинхронных операций
+
+  // Обработка каждого элемента
   await Promise.all(
-    topMedias.items.map(async (item) => {
-      if (item.nameRu !== null) {
-        try {
-          //Создание медиа
-          let result = await modelMediaCreate(item);
-          // Возникла ошибка
-          if (result && result.error) {
-            if (!result.error.includes("Такой фильм уже существует!")) {
-              errors.push(result.error);
-            } else {
-              // Если фильм уже существует, то его нужно найти в базе данных
-              const existingMedia = await modelMedia.findOne({
-                where: { id_media: item.kinopoiskId },
-              });
-              if (existingMedia) {
-                result = existingMedia;
-                console.log(
-                  "Фильм уже существует, поэтому используется текущая запись"
-                );
-              }
+    popularMedias.items.slice(0, 10).map(async (item) => {
+      // Обрабатываем только первые 10 элементов
+      if (item.nameRu == null) return;
+
+      try {
+        let result = await modelMediaCreate(item);
+        if (result && result.error) {
+          if (!result.error.includes("Такое медиа уже существует!")) {
+            errors.push(result.error);
+          } else {
+            const existingMedia = await modelMedia.findOne({
+              where: { id_media: item.kinopoiskId },
+            });
+            if (existingMedia) {
+              result = existingMedia;
+              console.log(
+                "Медиа уже существует, поэтому используется текущая запись"
+              );
             }
           }
-          if (result && !result.error) {
-            console.log("Популярный фильм добавлен!");
-            addedMedias.push(result);
-          } else {
-            console.log("Фильм не был добавлен");
-          }
-        } catch (error) {
-          console.error("Произошла неожиданная ошибка:", error);
-          errors.push("Произошла неожиданная ошибка");
         }
+        if (result && !result.error) {
+          console.log("Популярное медиа добавлено!");
+          addedMedias.push(result);
+        } else {
+          console.log("Медиа не был добавлен");
+        }
+      } catch (error) {
+        errors.push(`Ошибка: ${error}`);
       }
     })
   );
-  // Добавление в PopularMovie первых 10 добавленных фильмов
-  //const popularMoviesToAdd = addedMedias.slice(0, 10);
+
   try {
-    // Получение текущих записей из PopularMovie
-    const currentPopularMovies = await modelPopularMovie.findAll();
-    const currentIds = currentPopularMovies.map((movie) => movie.id_media);
+    // Получение текущих популярных медиа
+    const currentPopular = await popularModel.findAll();
+    const currentIds = currentPopular.map((media) => media.id_media);
 
     // Берутся первые 10 id из популярных фильмов для добавления
     const newIds = addedMedias.map((media) => media.id_media).slice(0, 10);
 
     // Остаются только те записи, которые есть в новом списке
     const idsToKeep = currentIds.filter((id) => newIds.includes(id));
-
     // Определяются id, которых ещё нет в текущих записях
     const idsToUpdate = newIds.filter((id) => !idsToKeep.includes(id));
+    // id, которых нет в текущих, но их нужно добавить
+    const idsToAdd = newIds.filter((id) => !currentIds.includes(id));
 
+    popularModel.findAll().then( async(medias) => {
+      if (medias.length === 0) {
+        console.log("Таблица пустая. Нужно заполнить.")
+        await Promise.all(
+          idsToAdd.map(async (id) => {
+            await popularModel.create({ id_media: id });
+            console.log(`Фильм с id ${id} добавлен в PopularMovie`);
+          })
+        );
+      } 
+      else{
+        await Promise.all(
+          currentPopular.map(async (media, index) => {
+            if (index < idsToUpdate.length) {
+              const newId = idsToUpdate[index];
+              await media.update({ id_media: newId });
+              console.log(`Медиа с id ${media.id_media} обновлен на ${newId}`);
+            }
+          })
+        );
+      }
+    });
     //Обновляются записи, которых нет в newIds
-    await Promise.all(
-      currentPopularMovies.map(async (media, index) => {
-        if (index < idsToUpdate.length) {
-          const newId = idsToUpdate[index];
-          await media.update({ id_media: newId });
-          console.log(`Фильм с id ${media.id_media} обновлен на ${newId}`);
-        }
-      })
-    );
-    // Теперь добавляются новые
-    await Promise.all(
-      idsToAdd.map(async (id) => {
-        await modelPopularMovie.create({ id_media: id });
-        console.log(`Фильм с id ${id} добавлен в PopularMovie`);
-      })
-    );
+
+    // // Теперь добавляются новые
+    // await Promise.all(
+    //   idsToAdd.map(async (id) => {
+    //     await popularModel.create({ id_media: id });
+    //     console.log(`Фильм с id ${id} добавлен в PopularMovie`);
+    //   })
+    // );
+
+    if (addedMedias.length == 0) {
+      console.log("Ошибки:", errors);
+      responseHandler.error(res, "Медиа не добавлены!");
+    } else {
+      responseHandler.goodrequest(res, {
+        message: `Обновлено ${idsToUpdate.length} ${mediaTypeLabel}ов`,
+        ids: idsToUpdate,
+      });
+    }
   } catch (error) {
-    console.error("Ошибка при добавлении в PopularMovie:", error);
-    errors.push("Ошибка при добавлении в PopularMovie");
-  }
-  if (addedMedias.length == 0) {
-    console.log("Ошибки:", errors);
-    responseHandler.error(res, "Медиа не добавлены!");
-  } else {
-    responseHandler.goodrequest(res, addedMedias);
+    console.error(`Ошибка обновления ${mediaTypeLabel}ов:`, error);
+    errors.push(`Ошибка обновления ${mediaTypeLabel}ов:`);
   }
 };
+
+// // Отдельные обработчики для роутов
+// exports.setPopularMovie = (req, res) => {
+//   setPopularMedia(
+//     req,
+//     res,
+//     "TOP_POPULAR_MOVIES",
+//     db.modelPopularMovie,
+//     "FILM"
+//   );
+// };
+
+// exports.setPopularSeries = (req, res) => {
+//   setPopularMedia(
+//     req,
+//     res,
+//     "POPULAR_SERIES",
+//     db.modelPopularSeries,
+//     "TV_SERIES"
+//   );
+// };
 
 const getMediasByType = async (req, res) => {
   try {
@@ -323,8 +370,20 @@ module.exports = {
   getGenres,
   getMediasByType,
   getInfo,
-  setPopularMovie,
+  setPopularMedia,
   search,
+  setPopularMovie: (req, res) => {
+    setPopularMedia(req, res, "TOP_POPULAR_MOVIES", modelPopularMovie, "FILM");
+  },
+  setPopularSeries: (req, res) => {
+    setPopularMedia(
+      req,
+      res,
+      "POPULAR_SERIES",
+      modelPopularSeries,
+      "TV_SERIES"
+    );
+  },
 };
 //curl -X GET http://localhost:8000/api/medias?page=1&limit=10
 //curl -X GET http://localhost:8000/medias?page=1&limit=10

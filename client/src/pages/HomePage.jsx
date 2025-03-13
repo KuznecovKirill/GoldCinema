@@ -9,11 +9,16 @@ const HomePage = () => {
   return (
     <>
     <MainSlide mediaType={configs.mediaType.FILM} mediaCategory={configs.mediaCategory.popular}/>
-    {/* <Box marginTop="-4rem" sx={{...UI.style.mainContent }}>
-      <Container header="popular Movie">
+    <Box marginTop="-4rem" sx={{...UI.style.mainContent }}>
+      <Container header="Популярные фильмы">
         <MediaSlide mediaType={configs.mediaType.FILM} mediaCategory={configs.mediaCategory.popular} />
       </Container>
-    </Box> */}
+    </Box>
+    <Box marginTop="-4rem" sx={{...UI.style.mainContent }}>
+      <Container header="Популярные сериалы">
+        <MediaSlide mediaType={configs.mediaType.TV_SERIES} mediaCategory={configs.mediaCategory.popular} />
+      </Container>
+    </Box>
     </>
   )
 }
