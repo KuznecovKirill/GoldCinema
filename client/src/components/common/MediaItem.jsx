@@ -14,13 +14,15 @@ const MediaItem = ({ media, mediaType }) => {
   const { listFavorites } = useSelector((state) => state.user);
   const [title, setTitle] = useState("");
   const [posterPath, setPosterPath] = useState("");
+  const [year, setYear] = useState(null);
   const [rating, setRating] = useState(null);
   useEffect(() => {
     setTitle(media.title);
 
     setPosterPath(configs.posterPath(media.id_media));
+    setYear(media.year);
 
-    setRating(media.rating || media.rating);
+    setRating(media.rating);
   }, [media, mediaType]);
 
   return (
@@ -47,7 +49,7 @@ const MediaItem = ({ media, mediaType }) => {
                 }}
               />
             )}
-            <Box className="media-backDrop" sx={{
+            <Box className="media-back-drop" sx={{
               opacity: { xs: 1, md: 0 },
               transition: "all 0.3s ease",
               width: "100%",
@@ -59,7 +61,7 @@ const MediaItem = ({ media, mediaType }) => {
             }} />
             {/* Кнопка просмотра */}
             <Button
-              className="media-playButton"
+              className="media-play-btn"
               variant="contained"
               startIcon={<PlayArrowIcon />}
               sx={{
@@ -88,6 +90,7 @@ const MediaItem = ({ media, mediaType }) => {
             >
               <Stack spacing={{ xs: 1, md: 2 }} sx={{ color: "white" }}>
                 {rating && <CircleRate value={rating} />}
+                <Typography>{year}</Typography>
 
                 {/* Можно будет добавить жанры */}
 
