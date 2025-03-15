@@ -51,7 +51,7 @@ const getMedias = async (req, res) => {
     const mediaType = req.params.mediaType;
     const mediaCategory = req.params.mediaCategory;
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
+    const limit = parseInt(req.query.limit) || 40;
     const offset = (page - 1) * limit; //Расчёт смещения
 
     let count;

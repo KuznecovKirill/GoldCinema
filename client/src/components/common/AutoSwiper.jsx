@@ -1,8 +1,9 @@
+//адаптивный слайдер
 import { Box } from '@mui/material'
 import React from 'react'
 import {Swiper} from "swiper/react"
 
-const AutoSwiper = ({value}) => {
+const AutoSwiper = ({children}) => {
   return (
     <Box sx={{
         "& .swiper-slide": {
@@ -16,7 +17,7 @@ const AutoSwiper = ({value}) => {
     }}>
         <Swiper slidesPerView="auto" grabCursor={true} style={{width: "100%", height: "max-content"}}
         >
-            {value}
+            {children}
         </Swiper>
     </Box>
   )
