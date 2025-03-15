@@ -59,10 +59,22 @@ const getMedias = async (req, res) => {
 
     // Запрос к базе данных
     // Если нужно получить список популярных
-    if (mediaCategory == "popular") {
+    if (mediaCategory == "popular" && mediaType == "FILM") {
       const popularId = await modelPopularMovie.findAll({
         attributes: ["id_media"],
       }); //список id популярных фильмов
+      const popularIdList = popularId.map((item) => item.id_media); //Преобразование в массив
+      ({ count, rows } = await modelMedia.findAndCountAll({
+        where: { id_media: popularIdList, mediaType: mediaType },
+        limit: limit, // Устанавливаем лимит
+        offset: offset, // Устанавливаем смещение
+        order: [["id_media", "DESC"]], // Сортировка по id_media по убыванию
+      }));
+    }
+    else if (mediaCategory == "popular" && mediaType == "TV_SERIES") {
+      const popularId = await modelPopularSeries.findAll({
+        attributes: ["id_media"],
+      }); //список id популярных сериалов
       const popularIdList = popularId.map((item) => item.id_media); //Преобразование в массив
       ({ count, rows } = await modelMedia.findAndCountAll({
         where: { id_media: popularIdList, mediaType: mediaType },
@@ -86,6 +98,7 @@ const getMedias = async (req, res) => {
       page: page, // Текущая страница
       limit: limit, // Лимит на странице
       medias: rows, // Массив медиа-контента
+      mediaType: mediaType
     });
   } catch (error) {
     console.error(error);
@@ -202,15 +215,6 @@ const setPopularMedia = async (
         );
       }
     });
-    //Обновляются записи, которых нет в newIds
-
-    // // Теперь добавляются новые
-    // await Promise.all(
-    //   idsToAdd.map(async (id) => {
-    //     await popularModel.create({ id_media: id });
-    //     console.log(`Фильм с id ${id} добавлен в PopularMovie`);
-    //   })
-    // );
 
     if (addedMedias.length == 0) {
       console.log("Ошибки:", errors);
