@@ -3,7 +3,7 @@ const { modelUser } = require("../models/modelUser");
 const { modelMedia } = require("../models/modelMedia.js");
 const { modelPopularMovie } = require("../models/modelPopularMovie");
 const { modelPopularSeries } = require("../models/modelPopularSeries");
-
+const {modelFavorite} = require("../models/modelFavorite");
 const responseHandler = require("../handlers/response.handler.js");
 const sequelize = require("../models/database").sequelize;
 const tokenMiddleware = require("../middlewares/middleware.js");
@@ -311,9 +311,18 @@ const getInfo = async (req, res) => {
 
     const tokenDecoded = tokenMiddleware.decode(req);
     let user = null;
+    let isFavorite = false;
     if (tokenDecoded) {
       //Проверка работы decode
       user = await modelUser.findByPk(tokenDecoded.data);
+
+      if (user) {
+        const isFav = await modelFavorite.findOne({ where: { // Явно указываем условие поиска
+          id_user: user.id_user, // Проверьте название поля в БД
+          id_media: parseInt(id_media) // Преобразуем строку в число
+        } });
+        isFavorite = isFav !== null;
+      }
     }
     //Добавить получения отзывов о проекте
     const reviews = await modelReview.findAll({
@@ -326,11 +335,13 @@ const getInfo = async (req, res) => {
       //similar, //информация о похожих проектах
       reviews, //информация о обзорах
       user,
+      isFavorite,
     });
-    responseHandler.goodrequest(res, media);
+    // responseHandler.goodrequest(res, media);
   } catch (error) {
     console.log(error);
     responseHandler.error(res);
+    return;
   }
 };
 
