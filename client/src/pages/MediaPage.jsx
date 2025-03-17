@@ -159,9 +159,9 @@ const MediaPage = () => {
                 {/* Рейтинг */}
                 <Divider orientation="vertical" />
                 {/* Жанры */}
-                {genres.map((genre, index) => (
+                {genres[0]?.split(", ").map((genre, index) => (
                   <Chip
-                    label={genre.name}
+                    label={genre}
                     variant="filled"
                     color="primary"
                     key={index}
