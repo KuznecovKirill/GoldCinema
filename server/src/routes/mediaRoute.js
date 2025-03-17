@@ -6,7 +6,7 @@ const {body} = require('express-validator');
 const router = express.Router();
 
 //router.get("/medias", mediaController.getMedias); //для получения списка медиа по типу
-router.get("/:mediaType/:mediaCategory", mediaController.getMedias); //для получения списка медиа по типу
+
 router.get("/allMedias", mediaController.getAllMedias); // для получения списка всех медиа
 router.get("/genres", mediaController.getGenres); //для получения жанров
 
@@ -30,5 +30,7 @@ router.get("/Type", mediaController.getMediasByType); //для получени�
 router.get("/info/:id_media", mediaController.getInfo); //для получения подробной информации
 
 router.get("/search", mediaController.search); //для поиска
+
+router.get("/:mediaType/:mediaCategory", mediaController.getMedias); //для получения списка медиа по типу
 
 module.exports = router;
