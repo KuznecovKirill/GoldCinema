@@ -11,11 +11,17 @@ import UI from "../configs/UI";
 import mediaModule from "../api/modules/mediaModule";
 import HeaderPoster from "../components/common/HeaderPoster";
 import configs from "../api/configs/configs";
-import { Box, Chip, Divider, Stack, Typography } from "@mui/material";
+import { Box, Button, Chip, Divider, Stack, Typography } from "@mui/material";
+import { LoadingButton } from "@mui/lab";
+
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined";
+import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+
 import CircleRate from "../components/common/CircleRate";
 const MediaPage = () => {
   const { mediaType, id_media } = useParams();
-  const [fav, setFav] = useState(false);
+  const [isFav, setIsFav] = useState(false);
 
   const [media, setMedia] = useState(null);
   const [onRequest, setOnRequest] = useState(false);
@@ -34,7 +40,7 @@ const MediaPage = () => {
       if (response.media) {
         console.log(response);
         setMedia(response.media);
-        setFav(response.isFavorite);
+        setIsFav(response.isFavorite);
         setGenres([response.media.genre]);
       }
       if (err) toast.error(err.message);
@@ -53,7 +59,7 @@ const MediaPage = () => {
 
     if (onRequest) return;
 
-    if (fav) {
+    if (isFav) {
       removeFavClick();
       return;
     }
@@ -81,7 +87,7 @@ const MediaPage = () => {
     if (err) toast.error(err.message);
     if (response) {
       dispatch(addFavorite(response));
-      setFav(true);
+      setIsFav(true);
       toast.success("Медиа добавлен в избранное успешно!");
     }
   };
@@ -103,7 +109,7 @@ const MediaPage = () => {
     if (err) toast.error(err.message);
     if (response) {
       dispatch(removeFavorite(favorite));
-      setFav(false);
+      setIsFav(false);
       toast.success("Медиа удалён из избранного!");
     }
   };
@@ -112,23 +118,26 @@ const MediaPage = () => {
       <HeaderPoster posterPath={media.cover} />
       <Box
         sx={{
-          marginTop: { xs: "-10rem", md: "-15rem", lg: "-20rem" },
+          marginTop: { xs: "-8rem", md: "-14rem", lg: "-25rem" },
         }}
       >
         <Box
-          sx={{ display: "flex", flexDirection: { md: "row", xs: "column" } }}
+          sx={{ display: "flex", flexDirection: { md: "row", xs: "column" }, gap: { xs: 2, md: 4 } }}
+          
         >
           {/* Картинка */}
           <Box
             sx={{
-              width: { xs: "70%", sm: "50%", md: "40%" },
+              width: { xs: "60%", sm: "45%", md: "35%" },
               margin: { xs: "0 auto 2rem", md: "0 2rem 0 0" },
+              borderRadius: "8px", 
+              overflow: "hidden" //Обрезание выхода за границы
             }}
           >
             <Box
               sx={{
-                paddingTop: "140%",
-                height: 0,
+                paddingTop: "120%",
+                //height: 0,
                 ...UI.style.backgroundImage(configs.posterPath(media.id_media)),
               }}
             />
@@ -147,7 +156,7 @@ const MediaPage = () => {
                 variant="h4"
                 fontSize={{ xs: "2rem", md: "2rem", lg: "4rem" }}
                 fontWeight="700"
-                sx={{ ...UI.style.typoLines(2, "left") }}
+                sx={{ ...UI.style.typoLines(2, "left"), lineHeight: 1.1 }}
               >
                 {`${media.title} ${media.year}`}
               </Typography>
@@ -175,6 +184,35 @@ const MediaPage = () => {
                 {media.descrition}
               </Typography>
               {/* Описание */}
+
+              {/* Кнопки */}
+              <Stack direction="row" spacing={1}>
+                <LoadingButton
+                  variant="text"
+                  sx={{
+                    width: "max-content",
+                    "& .MuiButon-starIcon": { marginRight: "0" },
+                  }}
+                  size="large"
+                  startIcon={
+                    isFav ? <FavoriteIcon /> : <FavoriteBorderOutlinedIcon />
+                  }
+                  loadingPosition="start"
+                  loading={onRequest}
+                  onClick={addFavClick}
+                />
+                {/* Кнопки просмотра */}
+                <Button
+                  variant="contained"
+                  sx={{ width: "max-content" }}
+                  size="large"
+                  startIcon={<PlayArrowIcon />}
+                >
+                  Смотреть
+                </Button>
+                {/* Кнопки просмотра */}
+              </Stack>
+               {/* Кнопки */}
             </Stack>
           </Box>
         </Box>

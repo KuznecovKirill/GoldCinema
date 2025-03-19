@@ -8,6 +8,7 @@ const HeaderPoster = ({posterPath}) => {
     <Box sx={{
         zIndex: "-1",
         position: "relative",
+        //height: "50vh",
         paddingTop: {xs: "60%", sm: "40%", md: "35%"},
         backgroundPosition: "top",
         backgroundSize: "cover",
