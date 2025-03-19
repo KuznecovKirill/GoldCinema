@@ -10,6 +10,8 @@ import UI from "../configs/UI";
 
 import mediaModule from "../api/modules/mediaModule";
 import HeaderPoster from "../components/common/HeaderPoster";
+import ImageSlide from "../components/common/ImageSlide";
+import Container from "../components/common/Container";
 import configs from "../api/configs/configs";
 import { Box, Button, Chip, Divider, Stack, Typography } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
@@ -24,6 +26,7 @@ const MediaPage = () => {
   const [isFav, setIsFav] = useState(false);
 
   const [media, setMedia] = useState(null);
+  const [images, setImages] = useState(null);
   const [onRequest, setOnRequest] = useState(false);
   const [genres, setGenres] = useState([]);
   const { user, listFavorites } = useSelector((state) => state.user);
@@ -42,6 +45,7 @@ const MediaPage = () => {
         setMedia(response.media);
         setIsFav(response.isFavorite);
         setGenres([response.media.genre]);
+        setImages(response.images);
       }
       if (err) toast.error(err.message);
     };
@@ -49,7 +53,7 @@ const MediaPage = () => {
   }, [mediaType, id_media, dispatch]);
   useEffect(() => {
     if (genres.length > 0) {
-      console.log("Обновленный media:", genres); // Сработает при изменении media
+      console.log("Обновленный images:", images); // Сработает при изменении media
     }
   }, [genres]);
 
@@ -213,10 +217,20 @@ const MediaPage = () => {
                 {/* Кнопки просмотра */}
               </Stack>
                {/* Кнопки */}
+                
             </Stack>
           </Box>
+          {/* Медиа */}
         </Box>
+          {/* Картинки медиа */}
+       {images?.length > 0 ? (
+            <Container header="Изображения" sx={{ marginTop: "2rem",  maxWidth: "1366px", paddingX: { xs: "1rem", md: "2rem" } }}>
+              <ImageSlide images={images} />
+            </Container>
+          ): null}
+       {/* Картинки медиа */}
       </Box>
+     
     </>
   ) : null;
 };
