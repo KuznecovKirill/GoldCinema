@@ -3,15 +3,17 @@ const { modelUser } = require("../models/modelUser");
 const { modelMedia } = require("../models/modelMedia.js");
 const { modelPopularMovie } = require("../models/modelPopularMovie");
 const { modelPopularSeries } = require("../models/modelPopularSeries");
-const {modelFavorite} = require("../models/modelFavorite");
+const { modelFavorite } = require("../models/modelFavorite");
 const responseHandler = require("../handlers/response.handler.js");
 const sequelize = require("../models/database").sequelize;
 const tokenMiddleware = require("../middlewares/middleware.js");
 const similarController = require("../controllers/similarController.js");
 const keywordController = require("../controllers/keywordController.js");
+const imageController = require("../controllers/imageController.js");
 const { where } = require("sequelize");
 const { Op } = require("sequelize");
 const { swaggerAPI } = require("../swagger/swagger.api");
+const { modelImage } = require("../models/modelImage.js");
 
 //Для добавления медиа
 const modelMediaCreate = async (newMedia) => {
@@ -70,8 +72,7 @@ const getMedias = async (req, res) => {
         offset: offset, // Устанавливаем смещение
         order: [["id_media", "DESC"]], // Сортировка по id_media по убыванию
       }));
-    }
-    else if (mediaCategory == "popular" && mediaType == "TV_SERIES") {
+    } else if (mediaCategory == "popular" && mediaType == "TV_SERIES") {
       const popularId = await modelPopularSeries.findAll({
         attributes: ["id_media"],
       }); //список id популярных сериалов
@@ -98,7 +99,7 @@ const getMedias = async (req, res) => {
       page: page, // Текущая страница
       limit: limit, // Лимит на странице
       medias: rows, // Массив медиа-контента
-      mediaType: mediaType
+      mediaType: mediaType,
     });
   } catch (error) {
     console.error(error);
@@ -193,17 +194,16 @@ const setPopularMedia = async (
     // id, которых нет в текущих, но их нужно добавить
     const idsToAdd = newIds.filter((id) => !currentIds.includes(id));
 
-    popularModel.findAll().then( async(medias) => {
+    popularModel.findAll().then(async (medias) => {
       if (medias.length === 0) {
-        console.log("Таблица пустая. Нужно заполнить.")
+        console.log("Таблица пустая. Нужно заполнить.");
         await Promise.all(
           idsToAdd.map(async (id) => {
             await popularModel.create({ id_media: id });
             console.log(`Фильм с id ${id} добавлен в PopularMovie`);
           })
         );
-      } 
-      else{
+      } else {
         await Promise.all(
           currentPopular.map(async (media, index) => {
             if (index < idsToUpdate.length) {
@@ -301,10 +301,23 @@ const getGenres = async (req, res) => {
 const getInfo = async (req, res) => {
   //curl GET "http://localhost:8000/medias/info?id_media=1392743"
   try {
-    console.log("getInfo");
     const id_media = req.params.id_media;
-    console.log(id_media);
     const media = await modelMedia.findByPk(id_media);
+    let images = [];
+    const existImage = await modelImage.findOne({
+      where: { id_media: id_media },
+    });
+
+    if (!existImage) {
+      console.log("Картинок нет!");
+      await imageController.getImages(id_media);
+    }
+    images = await modelImage.findAll({
+      where: {
+        id_media: id_media,
+      },
+      order: [["id_image", "DESC"]],
+    });
     //const similar = await similarController.getSimilarMedia(id_media);
 
     //Тоже самое для изображений
@@ -317,10 +330,13 @@ const getInfo = async (req, res) => {
       user = await modelUser.findByPk(tokenDecoded.data);
 
       if (user) {
-        const isFav = await modelFavorite.findOne({ where: { // Явно указываем условие поиска
-          id_user: user.id_user, // Проверьте название поля в БД
-          id_media: parseInt(id_media) // Преобразуем строку в число
-        } });
+        const isFav = await modelFavorite.findOne({
+          where: {
+            // Явно указываем условие поиска
+            id_user: user.id_user, // Проверьте название поля в БД
+            id_media: parseInt(id_media), // Преобразуем строку в число
+          },
+        });
         isFavorite = isFav !== null;
       }
     }
@@ -336,6 +352,7 @@ const getInfo = async (req, res) => {
       reviews, //информация о обзорах
       user,
       isFavorite,
+      images,
     });
     // responseHandler.goodrequest(res, media);
   } catch (error) {

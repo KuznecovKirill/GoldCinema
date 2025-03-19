@@ -6,7 +6,7 @@ const sequelize = require("./database").sequelize;
 const modelImage = sequelize.define(
   "Image",
   {
-    id_picture: {
+    id_image: {
       type: DataTypes.INTEGER,
       autoIncrement: true,
       primaryKey: true,
@@ -43,5 +43,6 @@ modelImage.prototype.toJSON = function () {
 (async () => {
   // Синхронизация моделей с базой данных без удаления существующих данных
   await sequelize.sync();
+  //await sequelize.sync({ alter: true });
 })();
 module.exports = { modelImage };
