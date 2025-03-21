@@ -21,12 +21,14 @@ import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlin
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 
 import CircleRate from "../components/common/CircleRate";
+import SimilarSlide from "../components/common/SimilarSlide";
 const MediaPage = () => {
   const { mediaType, id_media } = useParams();
   const [isFav, setIsFav] = useState(false);
 
   const [media, setMedia] = useState(null);
   const [images, setImages] = useState(null);
+  const [similars, setSimilars] = useState(null);
   const [onRequest, setOnRequest] = useState(false);
   const [genres, setGenres] = useState([]);
   const { user, listFavorites } = useSelector((state) => state.user);
@@ -40,12 +42,13 @@ const MediaPage = () => {
 
       const { response, err } = await mediaModule.getInfo({ id_media });
       dispatch(setGlobalLoading(false));
-      if (response.media) {
+      if (response) {
         console.log(response);
         setMedia(response.media);
         setIsFav(response.isFavorite);
         setGenres([response.media.genre]);
         setImages(response.images);
+        setSimilars(response.similars);
       }
       if (err) toast.error(err.message);
     };
@@ -215,8 +218,15 @@ const MediaPage = () => {
                   Смотреть
                 </Button>
                 {/* Кнопки просмотра */}
+                   
+                  
               </Stack>
                {/* Кнопки */}
+               {/* Похожие проекты */}
+               <Container header="Похожие медиа">
+                    <SimilarSlide similars={similars} />
+                   </Container>
+                    {/* Похожие проекты */}
                 
             </Stack>
           </Box>
