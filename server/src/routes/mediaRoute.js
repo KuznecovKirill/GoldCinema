@@ -1,8 +1,10 @@
 const express = require("express");
 const mediaController = require("../controllers/mediaController");
 const { modelMedia } = require("../models/modelMedia");
+const similarController = require("../controllers/similarController");
 const requestHandler = require('../handlers/request.handler');
 const {body} = require('express-validator');
+const { modelSimilar } = require("../models/modelSimilar");
 const router = express.Router();
 
 //router.get("/medias", mediaController.getMedias); //для получения списка медиа по типу
@@ -25,11 +27,26 @@ router.post(
 router.get("/popularMovies", mediaController.setPopularMovie);
 router.get("/popularSeries", mediaController.setPopularSeries);
 
-router.get("/Type", mediaController.getMediasByType); //для получения типа медиа
 
+
+router.get("/Type", mediaController.getMediasByType); //для получения типа медиа
+router.get("/search", mediaController.search); //для поиска
+
+router.post(
+  "/similar",
+  body("id_media")
+    .exists()
+    .withMessage("ID Медиа")
+    .custom(async (value) => {
+      const media = await modelSimilar.findOne({ where: { id_origin: value } });
+      if (media) return Promise.reject(new Error("Для этого медиа similars определены!"));
+    }),
+    requestHandler.validate,
+    similarController.setSimilarMedia
+); //Добавление похожих медиа
 router.get("/info/:id_media", mediaController.getInfo); //для получения подробной информации
 
-router.get("/search", mediaController.search); //для поиска
+
 
 router.get("/:mediaType/:mediaCategory", mediaController.getMedias); //для получения списка медиа по типу
 
