@@ -14,6 +14,7 @@ const { where } = require("sequelize");
 const { Op } = require("sequelize");
 const { swaggerAPI } = require("../swagger/swagger.api");
 const { modelImage } = require("../models/modelImage.js");
+const { modelSimilar } = require("../models/modelSimilar.js");
 
 //Для добавления медиа
 const modelMediaCreate = async (newMedia) => {
@@ -299,7 +300,6 @@ const getGenres = async (req, res) => {
 };
 //Получение информации о проекте
 const getInfo = async (req, res) => {
-  //curl GET "http://localhost:8000/medias/info?id_media=1392743"
   try {
     const id_media = req.params.id_media;
     const media = await modelMedia.findByPk(id_media);
@@ -318,9 +318,15 @@ const getInfo = async (req, res) => {
       },
       order: [["id_image", "DESC"]],
     });
-    //const similar = await similarController.getSimilarMedia(id_media);
+    const existSimilars = await modelSimilar.findOne({
+      where: {id_origin: id_media},
+    });
+    if (!existSimilars){
+      await similarController.setSimilarMedia(id_media); //Добавление похожих медиа
+    }
+    const similars = await similarController.getSimilarMedia(id_media);
+    
 
-    //Тоже самое для изображений
 
     const tokenDecoded = tokenMiddleware.decode(req);
     let user = null;
@@ -348,11 +354,11 @@ const getInfo = async (req, res) => {
 
     responseHandler.goodrequest(res, {
       media, //информация о проекте
-      //similar, //информация о похожих проектах
       reviews, //информация о обзорах
       user,
       isFavorite,
       images,
+      similars
     });
     // responseHandler.goodrequest(res, media);
   } catch (error) {

@@ -6,7 +6,7 @@ const { swaggerAPI } = require("../swagger/swagger.api.js");
 const getImages = async (id_media) => {
   const newImages = await swaggerAPI.mediaImages(
     { id: `${id_media}/` },
-    { images: "images?", type: "SCREENSHOT", page: "1" }
+    { images: "images?", type: "STILL", page: "1" }
   );
   const firstSixImages = newImages.items.slice(0, 6); //Берутся только первые 6
   for (const item of firstSixImages) {

@@ -9,28 +9,25 @@ const { swaggerAPI } = require("../swagger/swagger.api.js");
 const mediaController = require("./mediaController.js");
 const axios = require("axios");
 const getSimilarMedia = async (id_media) => {
-    const similarEntries = await modelSimilar.findAll({
-      where: { id_origin: id_media },
-      include: [{
-        model: modelMedia,
-        as: 'similarMedia',
-        required: true // Это обеспечит получение только тех записей, которые имеют связанные медиа
-      }]
-    });
-    console.log(similarEntries);
-    return similarEntries.map(entry => entry.similarMedia);
+  const similarEntries = await modelSimilar.findAll({
+    where: { id_origin: id_media },
+    attributes: ['id_media'] // Выбираем только id связанных медиа
+  });
+  // Получение связанных медиа
+  const mediaIds = similarEntries.map(entry => entry.id_media);
+  const mediaList = await modelMedia.findAll({
+    where: { id_media: mediaIds }
+  });
+  return mediaList;
+
   };
-const setSimilarMedia = async (req, res) => { //curl -X POST "http://localhost:8000/medias/similar" -H "Content-Type: application/json" -d '{"id_media": "258687"}'
-  const {id_media} = req.body;
+const setSimilarMedia = async (id_media) => { //curl -X POST "http://localhost:8000/medias/similar" -H "Content-Type: application/json" -d '{"id_media": "258687"}'
+  //const {id_media} = req.body;
   
   const similars = await swaggerAPI.mediaSimilars( { id: `${id_media}/` },
     { similars: "similars" }
   );
 
-  if (similars.total == 0) {
-    responseHandler.goodrequest(res, null);
-    return null;
-  }
 
   const firstFiveSimilars = similars.items.slice(0, 5); //Берутся только первые 5
   for (const item of firstFiveSimilars) {
@@ -41,7 +38,6 @@ const setSimilarMedia = async (req, res) => { //curl -X POST "http://localhost:8
         const response = await axios.post('http://localhost:8000/medias/addMedia', {
           id_media: item.filmId
         });
-        //const response = await mediaController.addMedia(item.filmId);
         console.log(response);
         if (response.status !== 200) {
           throw new Error(`Ошибка добавления медиа ${item.filmId}`);
@@ -57,6 +53,6 @@ const setSimilarMedia = async (req, res) => { //curl -X POST "http://localhost:8
     }
   }
   sequelize.sync();
-  responseHandler.goodrequest(res, firstFiveSimilars);
+  // responseHandler.goodrequest(res, firstFiveSimilars);
 }
   module.exports = {getSimilarMedia, setSimilarMedia};
