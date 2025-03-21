@@ -30,10 +30,10 @@ const addFavorite = async (req, res) => { //curl -X POST http://localhost:8000/u
 // Удаление из избранного
 const removeFavorite = async (req, res) => {
   try {
-    const { favoriteId } = req.body;
+    const { id_favorite } = req.params;
 
     const favorite = await modelFavorite.findOne({
-      where: { id_user: req.user.id_user, id_favorite: favoriteId },
+      where: { id_user: req.user.id_user, id_favorite: id_favorite },
     });
 
     if (!favorite) return responseHandler.notfound(res);

@@ -3,7 +3,7 @@ import privateClient from "../client/privateClient";
 const favoriteEndpoints = {
     list: "user/favorites",
     add: "user/favorites",
-    remove: ({ favoriteId }) => `user/favorites/${favoriteId}`
+    remove: ({ id_favorite }) => `user/favorites/${id_favorite}`
   };
   
   const favoriteModule = {
@@ -28,9 +28,9 @@ const favoriteEndpoints = {
         return { response };
       } catch (err) { return { err }; }
     },
-    remove: async ({ favoriteId }) => {
+    remove: async ({ id_favorite }) => {
       try {
-        const response = await privateClient.delete(favoriteEndpoints.remove({ favoriteId }));
+        const response = await privateClient.delete(favoriteEndpoints.remove({ id_favorite }));
   
         return { response };
       } catch (err) { return { err }; }
