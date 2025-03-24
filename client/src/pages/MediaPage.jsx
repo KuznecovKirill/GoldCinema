@@ -62,7 +62,7 @@ const MediaPage = () => {
 
   //Добавление медиа в избранное через клик
   const addFavClick = async () => {
-    if (!user) return dispatch(setAuthModalOpen(true));
+    if (!user) return dispatch(setAuthModalOpen(true)); //без авторизации нельзя добавить в избранное
 
     if (onRequest) return;
 
@@ -108,7 +108,7 @@ const MediaPage = () => {
     );
 
     const { response, err } = await favoriteModule.remove({
-      favoriteId: favorite.id_favorite,
+      id_favorite: favorite.id_favorite,
     });
 
     setOnRequest(false);
@@ -129,16 +129,19 @@ const MediaPage = () => {
         }}
       >
         <Box
-          sx={{ display: "flex", flexDirection: { md: "row", xs: "column" }, gap: { xs: 2, md: 4 } }}
-          
+          sx={{
+            display: "flex",
+            flexDirection: { md: "row", xs: "column" },
+            gap: { xs: 2, md: 4 },
+          }}
         >
           {/* Картинка */}
           <Box
             sx={{
               width: { xs: "60%", sm: "45%", md: "35%" },
               margin: { xs: "0 auto 2rem", md: "0 2rem 0 0" },
-              borderRadius: "8px", 
-              overflow: "hidden" //Обрезание выхода за границы
+              borderRadius: "8px",
+              overflow: "hidden", //Обрезание выхода за границы
             }}
           >
             <Box
@@ -218,29 +221,32 @@ const MediaPage = () => {
                   Смотреть
                 </Button>
                 {/* Кнопки просмотра */}
-                   
-                  
               </Stack>
-               {/* Кнопки */}
-               {/* Похожие проекты */}
-               <Container header="Похожие медиа">
-                    <SimilarSlide similars={similars} />
-                   </Container>
-                    {/* Похожие проекты */}
-                
+              {/* Кнопки */}
+              {/* Похожие проекты */}
+              <Container header="Похожие медиа">
+                <SimilarSlide similars={similars} />
+              </Container>
+              {/* Похожие проекты */}
             </Stack>
           </Box>
           {/* Медиа */}
         </Box>
-          {/* Картинки медиа */}
-       {images?.length > 0 ? (
-            <Container header="Изображения" sx={{ marginTop: "2rem",  maxWidth: "1366px", paddingX: { xs: "1rem", md: "2rem" } }}>
-              <ImageSlide images={images} />
-            </Container>
-          ): null}
-       {/* Картинки медиа */}
+        {/* Картинки медиа */}
+        {images?.length > 0 ? (
+          <Container
+            header="Изображения"
+            sx={{
+              marginTop: "2rem",
+              maxWidth: "1366px",
+              paddingX: { xs: "1rem", md: "2rem" },
+            }}
+          >
+            <ImageSlide images={images} />
+          </Container>
+        ) : null}
+        {/* Картинки медиа */}
       </Box>
-     
     </>
   ) : null;
 };

@@ -70,18 +70,9 @@ router.post( //curl -X POST -H "Content-Type: application/json" -d '{"username":
   router.post(
     "/favorites",
     tokenMiddleware.user,
-    // body("mediaType")
-    //   .exists().withMessage("Тип медиа")
-    //   .custom(type => ["FILM", "MINI_SERIES","TV_SERIES","TV_SHOW"].includes(type)).withMessage("Ошибка типа данных"),
     body("id_media")
       .exists().withMessage("Требуется id медиа")
       .isLength({ min: 1 }).withMessage("ID не может быть пустым"),
-    // body("title")
-    //   .exists().withMessage("Требуется название медиа"),
-    // body("poster")
-    //   .exists().withMessage("Требуется постер медиа"),
-    // body("rating")
-    //   .exists().withMessage("Требуется рейтинг"),
     requestHandler.validate,
     favoriteController.addFavorite
   );
