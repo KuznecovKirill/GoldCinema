@@ -30,6 +30,7 @@ const MediaPage = () => {
   const [media, setMedia] = useState(null);
   const [images, setImages] = useState(null);
   const [similars, setSimilars] = useState(null);
+  const [reviews, setReviews] = useState(null);
   const [onRequest, setOnRequest] = useState(false);
   const [genres, setGenres] = useState([]);
   const { user, listFavorites } = useSelector((state) => state.user);
@@ -50,6 +51,7 @@ const MediaPage = () => {
         setGenres([response.media.genre]);
         setImages(response.images);
         setSimilars(response.similars);
+        setReviews(response.reviews);
       }
       if (err) toast.error(err.message);
     };
@@ -247,7 +249,7 @@ const MediaPage = () => {
           </Container>
         ) : null}
         {/* Картинки медиа */}
-        <MediaReview reviews={media.reviews} media={media} />
+        <MediaReview reviews={reviews} media={media} />
       </Box>
     </>
   ) : null;

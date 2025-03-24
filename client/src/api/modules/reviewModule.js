@@ -1,4 +1,4 @@
-import privateClient from "../client/private.client";
+import privateClient from "../client/privateClient";
 
 const reviewEndpoints = {
   listReviews: "reviews",
@@ -8,17 +8,19 @@ const reviewEndpoints = {
 
 const reviewModule = {
   create: async ({
+    id_user,
     id_media,
-    rating,
-    comment
+    rating_user,
+    comment_text
   }) => {
     try {
       const response = await privateClient.post(
         reviewEndpoints.create,
         {
+          id_user,
           id_media,
-          rating,
-          comment
+          rating_user,
+          comment_text
         }
       );
 

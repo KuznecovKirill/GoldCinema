@@ -1,16 +1,16 @@
 const responseHandler = require("../handlers/response.handler");
-const modelReview = require("../models/modelReview");
+const {modelReview} = require("../models/modelReview");
 const  modelUser  = require("../models/modelUser");
 const sequelize = require("../models/database").sequelize;
 const create = async (req, res) => {
   try {
-    const { user, id_media, rating, comment } = req.body;
+    const { id_user, id_media, rating_user, comment_text } = req.body;
 
     const review = await modelReview.create({
-      id_user: user.id_user,
+      id_user: id_user,
       id_media: id_media,
-      rating_user: rating,
-      comment_text: comment,
+      rating_user: rating_user,
+      comment_text: comment_text,
     });
     sequelize.sync();
 

@@ -79,28 +79,26 @@ const MediaReview = ({reviews = [] , media}) => {
     const [page, setPage] = useState(1);
     const [onRequest, setOnRequest] = useState(false);
     const [rating_user, setRating_user] = useState(0);
-    const [comment, setComment] = useState("");
+    const [comment_text, setComment] = useState("");
     const [reviewCount, setReviewCount] = useState(0);
     const skip = 4;
-    const safeReviews = useMemo(() => Array.isArray(reviews) ? reviews : [], [reviews]);
+    // const safeReviews = useMemo(() => Array.isArray(reviews) ? reviews : [], [reviews]);
     useEffect(() => {
-        const safeReviews = Array.isArray(media.reviews) ? media.reviews : [];
+        const safeReviews = Array.isArray(reviews) ? reviews : [];
         if (!isEqual(listReviews, safeReviews)) { // Проверка на изменение
           setListReviews([...safeReviews]);
           setFilteredReviews([...safeReviews].slice(0, skip));
           setReviewCount(safeReviews.length);
         }
-    }, [media.reviews]);
-  
+    }, [reviews]);
     const onAddReview = async () => {
       if (onRequest) return;
       setOnRequest(true);
-  
       const body = {
         id_user: user.id_user,
         id_media: media.id_media,
         rating_user,
-        comment,
+        comment_text,
       };
   
       const { response, err } = await reviewModule.create(body);
@@ -114,6 +112,7 @@ const MediaReview = ({reviews = [] , media}) => {
         setFilteredReviews([...filteredReviews, response]);
         setReviewCount(reviewCount + 1);
         setComment("");
+        setRating_user(1);
       }
     };
 
@@ -162,7 +161,7 @@ const MediaReview = ({reviews = [] , media}) => {
                       {user.username}
                     </Typography>
                     <TextField
-                      value={comment}
+                      value={comment_text}
                       onChange={(e) => setComment(e.target.value)}
                       multiline
                       rows={4}
