@@ -16,6 +16,7 @@
     "cra-template": "1.2.0",
     "dayjs": "^1.11.13",
     "formik": "^2.4.6",
+    "lodash": "^4.17.21",
     "query-string": "^9.1.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
@@ -51,6 +52,7 @@
     ]
   },
   "devDependencies": {
+    "@types/lodash": "^4.17.16",
     "web-vitals": "^4.2.4"
   }
 }
