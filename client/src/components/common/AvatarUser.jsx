@@ -4,6 +4,7 @@ import React from 'react'
 const AvatarUser = ({user}) => {
     const stringColor = (s) => {
         let hash = 0;
+        let i;
         for (i = 0; i < s.length; i += 1){
             hash = s.charCodeAt(i) + ((hash << 5) - hash);
         }

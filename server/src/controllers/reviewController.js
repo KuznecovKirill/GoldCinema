@@ -1,9 +1,10 @@
 const responseHandler = require("../handlers/response.handler");
 const modelReview = require("../models/modelReview");
+const  modelUser  = require("../models/modelUser");
 const sequelize = require("../models/database").sequelize;
 const create = async (req, res) => {
   try {
-    const { id_media, rating, comment } = req.body;
+    const { user, id_media, rating, comment } = req.body;
 
     const review = await modelReview.create({
       id_user: user.id_user,
@@ -14,7 +15,7 @@ const create = async (req, res) => {
     sequelize.sync();
 
     responseHandler.created(res, {
-      id: review.id_review,
+      id_review: review.id_review,
       user: req.user,
       ...review.dataValues,
     });
@@ -30,7 +31,7 @@ const remove = async (req, res) => {
     // Поиск отзыва по ID и пользователю
     const review = await modelReview.findOne({
       where: {
-        id: id_review,
+        id_review: id_review,
         id_user: req.user.id, // Проверяем, что отзыв принадлежит текущему пользователю
       },
     });
@@ -53,6 +54,11 @@ const getReviewsOfUser = async (req, res) => {
       where: {
         id_user: req.user.id,
       },
+      include: [{
+        model: modelUser,
+        as: 'user', // Указанный псевдоним
+        attributes: ['id_user','username'] // Выбираем нужные поля
+      }],
       order: [["id_review", "DESC"]], // Сортировка по дате создания в порядке убывания
     });
 

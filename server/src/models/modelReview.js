@@ -44,6 +44,12 @@ const modelReview = sequelize.define(
   }
 );
 
+
+modelReview.belongsTo(modelUser, {
+  foreignKey: 'id_user',
+  targetKey: 'id_user',
+  as: 'user'
+})
 modelReview.prototype.toObject = function () {
   const values = { ...this.get() };
   return values;

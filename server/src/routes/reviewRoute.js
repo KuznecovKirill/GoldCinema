@@ -25,4 +25,9 @@ router.post(
   requestHandler.validate,
   reviewController.create
 );
+router.delete(
+  "/:id_review",
+  tokenMiddleware.user,
+  reviewController.remove
+);
 module.exports = router;

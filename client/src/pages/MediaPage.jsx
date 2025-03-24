@@ -22,6 +22,7 @@ import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 
 import CircleRate from "../components/common/CircleRate";
 import SimilarSlide from "../components/common/SimilarSlide";
+import MediaReview from "../components/common/MediaReview";
 const MediaPage = () => {
   const { mediaType, id_media } = useParams();
   const [isFav, setIsFav] = useState(false);
@@ -246,6 +247,7 @@ const MediaPage = () => {
           </Container>
         ) : null}
         {/* Картинки медиа */}
+        <MediaReview reviews={media.reviews} media={media} />
       </Box>
     </>
   ) : null;
