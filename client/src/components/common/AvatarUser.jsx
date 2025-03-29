@@ -1,32 +1,35 @@
-import { Avatar } from '@mui/material'
-import React from 'react'
+import { Avatar } from '@mui/material';
+import React from 'react';
 
-const AvatarUser = ({user}) => {
-    const stringColor = (s) => {
-        let hash = 0;
-        let i;
-        for (i = 0; i < s.length; i += 1){
-            hash = s.charCodeAt(i) + ((hash << 5) - hash);
-        }
-        let color = "#";
+const AvatarUser = ({ text }) => {
+  const stringColor = (s) => {
+    if (!s) return "#cccccc"; // Возвращаем цвет по умолчанию, если строка отсутствует
+    let hash = 0;
+    let i;
+    for (i = 0; i < s.length; i += 1) {
+      hash = s.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    let color = "#";
 
-        for (i = 0; i < 3; i +=1) {
-            const value = (hash >> (i * 8)) & 0xff;
-            color += `00${value.toString(16)}`.slice(-2);
-        }
-        return color;
-    };
+    for (i = 0; i < 3; i += 1) {
+      const value = (hash >> (i * 8)) & 0xff;
+      color += `00${value.toString(16)}`.slice(-2);
+    }
+    return color;
+  };
+
+  const avatarText = text ? `${text.split(" ")[0][0]}` : "?"; // Заглушка, если текст отсутствует
 
   return (
     <Avatar 
-    sx={{
-        backgroundColor: stringColor(user),
+      sx={{
+        backgroundColor: stringColor(text),
         width: 40,
-        height: 40
-    }}
-    children={`${user.split(" ")[0][0]}`}
+        height: 40,
+      }}
+      children={avatarText}
     />
   );
 };
 
-export default AvatarUser
+export default AvatarUser;
