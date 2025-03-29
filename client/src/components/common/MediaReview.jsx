@@ -18,7 +18,6 @@ const ReviewItem = ({review, onRemoved}) => {
     const onRemove = async () => {
         if (onRequest) return;
         setOnRequest(true);
-    
         const { response, err } = await reviewModule.remove({ id_review: review.id_review });
     
         if (err) toast.error(err.message);

@@ -26,13 +26,13 @@ const create = async (req, res) => {
 };
 const remove = async (req, res) => {
   try {
-    const { id_review } = req.params;
+    const id_review = req.params.id_review;
 
     // Поиск отзыва по ID и пользователю
     const review = await modelReview.findOne({
       where: {
         id_review: id_review,
-        id_user: req.user.id, // Проверяем, что отзыв принадлежит текущему пользователю
+        id_user: req.user.id_user, // Проверяем, что отзыв принадлежит текущему пользователю
       },
     });
 
