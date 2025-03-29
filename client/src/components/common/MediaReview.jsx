@@ -30,6 +30,7 @@ const ReviewItem = ({ review, onRemoved }) => {
 
     if (err) toast.error(err.message);
     if (response) onRemoved(review.id_review);
+    console.log(review);
   };
   return (
     <Box
@@ -43,7 +44,7 @@ const ReviewItem = ({ review, onRemoved }) => {
     >
       <Stack direction="row" spacing={2}>
         {/* Аватар пользователя */}
-        {/* <AvatarUser text={review.user?.displayName} /> */}
+        <AvatarUser text={review.user?.username} />
         {/* Аватар пользователя */}
         <Stack spacing={2} flexGrow={1}>
           <Stack spacing={1}>
@@ -168,20 +169,23 @@ const MediaReview = ({ reviews = [], media }) => {
 
   return (
     <>
-       {filteredReviews.length > 0 ? (
       <Container header={`Обзоры (${reviewCount})`}>
         <Stack spacing={4} marginBottom={2}>
-          {console.log(filteredReviews)}
-          {filteredReviews.map((item) => (
-            item.user ? (
+          {filteredReviews.map((item) => {
+            if (!item || !item.user) return null; // Проверяем наличие данных перед рендерингом 
+
+            
+            return (
               <Box key={item.id_review}>
                 <ReviewItem review={item} onRemoved={onRemoved} />
-                <Divider sx={{
-                  display: { xs: "block", md: "none" }
-                }} />
+                <Divider
+                  sx={{
+                    display: { xs: "block", md: "none" },
+                  }}
+                />
               </Box>
-            ) : null
-          ))}
+            );
+          })}
           {filteredReviews.length < listReviews.length && (
             <Button onClick={onLoadMore}>Загрузить ещё</Button>
           )}
@@ -190,7 +194,7 @@ const MediaReview = ({ reviews = [], media }) => {
           <>
             <Divider />
             <Stack direction="row" spacing={2}>
-              {/* <TextAvatar text={user.username} /> */}
+              {/* <AvatarUser text={user.username} /> */}
               <Stack spacing={2} flexGrow={1}>
                 <Typography variant="h6" fontWeight="700">
                   {user.username}
@@ -219,9 +223,6 @@ const MediaReview = ({ reviews = [], media }) => {
           </>
         )}
       </Container>
-    ) : (
-      <Typography>Данные загружаются...</Typography> // Показываем сообщение, пока данные не загружены
-    )}
     </>
   );
 };

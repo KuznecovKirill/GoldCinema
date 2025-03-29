@@ -46,7 +46,6 @@ const MediaPage = () => {
       const { response, err } = await mediaModule.getInfo({ id_media });
       dispatch(setGlobalLoading(false));
       if (response) {
-        console.log(response);
         
         setMedia(response.media);
         setIsFav(response.isFavorite);

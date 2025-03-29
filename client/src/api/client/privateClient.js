@@ -20,7 +20,6 @@ privateClient.interceptors.request.use(async config => {
     }
 })
 privateClient.interceptors.response.use((response) => {
-    console.log(response);
     if (response?.data) return response.data;
     return response;
   }, (error) => {
