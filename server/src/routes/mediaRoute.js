@@ -49,5 +49,6 @@ router.get("/info/:id_media", mediaController.getInfo); //для получен�
 
 
 router.get("/:mediaType/:mediaCategory", mediaController.getMedias); //для получения списка медиа по типу
-
+//curl GET "http://localhost:8000/medias/FILM/all?&page=1&limit=40"
+//curl GET "http://localhost:8000/medias/FILM/popular?&page=1&limit=40"
 module.exports = router;

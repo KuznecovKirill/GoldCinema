@@ -16,15 +16,15 @@ const main = [
   },
   {
     display: "Фильмы",
-    path: "/movies",
+    path: "/FILM",
     icon: <MovieOutlinedIcon />,
-    state: "movie",
+    state: "FILM",
   },
   {
     display: "Сериалы",
-    path: "/tv",
+    path: "/TV_SERIES",
     icon: <LiveTvOutlined />,
-    state: "tv",
+    state: "TV_SERIES",
   },
   {
     display: "Поиск",

@@ -24,7 +24,6 @@ const MediaItem = ({ media, mediaType }) => {
 
     setRating(media.rating);
   }, [media, mediaType]);
-
   return (
     <Link to={routesGen.mediaInfo(mediaType, media.id_media)}>
       <Box

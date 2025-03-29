@@ -1,4 +1,5 @@
 import HomePage from "../pages/HomePage";
+import MediaList from "../pages/MediaList";
 import MediaPage from "../pages/MediaPage";
 export const routesGen = {
     home: "/",
@@ -15,10 +16,7 @@ export const routesGen = {
         element: <HomePage/>,
         state: "home"
     },
-    {
-        path: "/:mediaType/:id_media",
-        element: <MediaPage/>,
-    },
+   
     { 
       path: "/search",
       //Добавить потом элемент для search
@@ -40,9 +38,15 @@ export const routesGen = {
       //
       state: "reviews"
     },
+
     {
       path: "/:mediaType",
+      element: <MediaList/>
       //
     },
+    {
+      path: "/:mediaType/:id_media",
+      element: <MediaPage/>,
+  },
   ];
   export default routes;

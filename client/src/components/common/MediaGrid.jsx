@@ -1,15 +1,17 @@
-import { Grid, Grid2 } from '@mui/material'
+import { Grid } from '@mui/material'
 import React from 'react'
+import MediaItem from './MediaItem'
 
-const MediaGrid = (media, mediaType) => {
+const MediaGrid = ({medias, mediaType}) => {
+  console.log(medias);
   return (
-    <Grid2 container spacing={1} sx={{marginRight: "-8px!important"}}>
-        {media.map((med, index) => (
-            <Grid2 item xs={6} sm={4} md={3} key={index}>
-                //MediaItem нужен
-            </Grid2>
+    <Grid container spacing={1} sx={{marginRight: "-8px!important"}}>
+        {medias.map((med, index) => (
+            <Grid item xs={6} sm={4} md={3} key={index}>
+                <MediaItem media={med} mediaType={mediaType} />
+            </Grid>
         ))}
-    </Grid2>
+    </Grid>
   )
 }
 
