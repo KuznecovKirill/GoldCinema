@@ -23,6 +23,7 @@ import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import CircleRate from "../components/common/CircleRate";
 import SimilarSlide from "../components/common/SimilarSlide";
 import MediaReview from "../components/common/MediaReview";
+
 const MediaPage = () => {
   const { mediaType, id_media } = useParams();
   const [isFav, setIsFav] = useState(false);
@@ -46,6 +47,7 @@ const MediaPage = () => {
       dispatch(setGlobalLoading(false));
       if (response) {
         console.log(response);
+        
         setMedia(response.media);
         setIsFav(response.isFavorite);
         setGenres([response.media.genre]);

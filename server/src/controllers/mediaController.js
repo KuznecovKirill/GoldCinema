@@ -349,6 +349,11 @@ const getInfo = async (req, res) => {
     //Добавить получения отзывов о проекте
     const reviews = await modelReview.findAll({
       where: { id_media: id_media },
+      include: [{
+              model: modelUser,
+              as: 'user',
+              attributes: ['id_user', 'username'] // Указываем нужные поля
+            }],
       order: [["id_review", "DESC"]], // Сортируем отзывы по дате создания (по убыванию)
     });
 

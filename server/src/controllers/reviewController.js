@@ -13,7 +13,6 @@ const create = async (req, res) => {
       comment_text: comment_text,
     });
     sequelize.sync();
-
     responseHandler.created(res, {
       id_review: review.id_review,
       user: req.user,
@@ -46,7 +45,6 @@ const remove = async (req, res) => {
     responseHandler.error(res);
   }
 };
-
 const getReviewsOfUser = async (req, res) => {
   try {
     // Получаем все отзывы пользователя, сортируя их по дате создания
@@ -61,11 +59,11 @@ const getReviewsOfUser = async (req, res) => {
       }],
       order: [["id_review", "DESC"]], // Сортировка по дате создания в порядке убывания
     });
-
+    console.log(reviews);
     responseHandler.goodrequest(res, reviews); // Отправляем успешный ответ с отзывами
   } catch (error) {
     console.error("Ошибка:", error);
     responseHandler.error(res);
   }
 };
-module.exports = { create, remove, getReviewsOfUser };
+module.exports = { create, remove, getReviewsOfUser, getReviewsForMedia };
