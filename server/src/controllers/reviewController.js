@@ -66,4 +66,4 @@ const getReviewsOfUser = async (req, res) => {
     responseHandler.error(res);
   }
 };
-module.exports = { create, remove, getReviewsOfUser, getReviewsForMedia };
+module.exports = { create, remove, getReviewsOfUser };
