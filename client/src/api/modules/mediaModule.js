@@ -7,7 +7,7 @@ const mediaEndpoints = {
   medias: ({ mediaType, mediaCategory, page, limit }) => `/medias/${mediaType}/${mediaCategory}?&page=${page}&limit=${limit}`,
   mediasByType: ({mediaType}) => `/Type?mediaType=${mediaType}`, //curl GET "http://localhost:8000/medias/Type?mediaType=TV_SERIES" 
   info: ({id_media}) => `/medias/info/${id_media}`,
-  search: ({ mediaType, query, page }) => `${mediaType}/search?query=${query}&page=${page}`
+  search: ({ mediaType, query, page }) => `/medias/search/${mediaType}?query=${query}&page=${page}`
 };
 
 const mediaModule = {

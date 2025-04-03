@@ -10,7 +10,7 @@ const { TfIdf } = natural;
 const stopWords = [
     "в", "на", "к", "по", "с", "из", "у", "за", "от", "до",
     "и", "а", "но", "или", "как", "что", "чтобы", "если",
-    "бы", "же", "ли", "что-то",
+    "бы", "же", "ли", "что-то", "...",
 ];
 let globalVocabulary = new Set();
 
@@ -176,9 +176,9 @@ async function search(userQuerry) {
     }
 }
 
-const addInfo = async (req, res) => {
+async function addInfo(id_media) {
     try {
-        const { id_media } = req.body;
+        // const { id_media } = req.body;
         const media = await modelMedia.findByPk(id_media);
         const combineText = `${media.title} ${media.genre.replace(/,\s*/g, " ")} ${media.mediaType} ${media.country} ${media.descrition}`;
         const newText = await processText(combineText); // Лемматизируем текст
@@ -192,9 +192,10 @@ const addInfo = async (req, res) => {
             keywords: newTextString
         });
         sequelize.sync();
-        responseHandler.created(res, {
-            keywords
-        });
+        return keywords;
+        // responseHandler.created(res, {
+        //     keywords
+        // });
     } catch (error) {
         console.error("Ошибка:", error);
     }

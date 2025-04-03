@@ -15,6 +15,7 @@ const { Op } = require("sequelize");
 const { swaggerAPI } = require("../swagger/swagger.api");
 const { modelImage } = require("../models/modelImage.js");
 const { modelSimilar } = require("../models/modelSimilar.js");
+const { modelKeyWord } = require("../models/modelKeyWord.js");
 
 //Для добавления медиа
 const modelMediaCreate = async (newMedia) => {
@@ -35,6 +36,9 @@ const modelMediaCreate = async (newMedia) => {
       cover: newMedia.coverUrl || newMedia.posterUrl,
     });
     sequelize.sync();
+    // const keywords = await modelKeyWord.findOne({where: {id_media: newMedia.kinopoiskId}});
+    // if (!keywords)
+    //   keywordController.addInfo(newMedia.kinopoiskId);
     return result;
   } catch (error) {
     if (error.name == "SequelizeUniqueConstraintError") {
@@ -124,9 +128,10 @@ const addMedia = async (req, res) => {
   //curl -X POST "http://localhost:8000/medias/addMedia" -H "Content-Type: application/json" -d '{"id_media": "828"}'
   const { id_media } = req.body;
   const newMedia = await swaggerAPI.mediaByID({ id: id_media });
+
   // try {
   const result = await modelMediaCreate(newMedia);
-
+  keywordController.addInfo(id_media);
   responseHandler.goodrequest(res, result);
 };
 //Установка популярных медиа
@@ -326,7 +331,9 @@ const getInfo = async (req, res) => {
     }
     const similars = await similarController.getSimilarMedia(id_media);
     
-
+    const keywords = await modelKeyWord.findOne({where: {id_media: newMedia.kinopoiskId}});
+    if (!keywords)
+      keywordController.addInfo(id_media);
 
     const tokenDecoded = tokenMiddleware.decode(req);
     let user = null;
