@@ -17,7 +17,7 @@ const { modelImage } = require("../models/modelImage.js");
 const { modelSimilar } = require("../models/modelSimilar.js");
 const { modelKeyWord } = require("../models/modelKeyWord.js");
 const { modelGenre } = require("../models/modelGenre");
-const {modelMedia_Genre} = require("../models/modelMedia_Genre");
+const { modelMedia_Genre } = require("../models/modelMedia_Genre");
 //Для добавления медиа
 const modelMediaCreate = async (newMedia) => {
   try {
@@ -77,8 +77,6 @@ const modelMediaCreate = async (newMedia) => {
     }
   }
 };
-
-
 
 //Получение списка проектов
 const getMedias = async (req, res) => {
@@ -288,26 +286,22 @@ const getMediasByType = async (req, res) => {
 const getGenres = async (req, res) => {
   try {
     const mediaType = req.query.mediaType || "TV_SERIES";
-    
-    // Получаем все медиа указанного типа с их жанрами
+
     const medias = await modelMedia.findAll({
       where: { mediaType },
       include: [
         {
           model: modelGenre,
-          through: { attributes: [] }, // Не включаем атрибуты промежуточной таблицы
-          attributes: ['name_genre']
-        }
-      ]
+          as: 'Genres', // Используем алиас из ассоциации
+          attributes: ['name_genre'], // Выбираем только название жанра
+        },
+      ],
     });
 
-    // Собираем уникальные жанры
     const genresSet = new Set();
-    
-    medias.forEach(media => {
-      media.Genres.forEach(genre => {
-        genresSet.add(genre.name_genre);
-      });
+
+    medias.forEach((media) => {
+      media.Genres.forEach((genre) => genresSet.add(genre.name_genre));
     });
 
     const genres = Array.from(genresSet);
@@ -357,9 +351,28 @@ const getInfo = async (req, res) => {
   try {
     const id_media = req.params.id_media;
     const media = await modelMedia.findByPk(id_media);
+
+    // Получение жанров медиа через Media_Genre
+    const genres = await modelMedia_Genre.findAll({
+      where: { id_media },
+      include: [
+        {
+          model: modelGenre,
+          as: 'genre', // Используем алиас из ассоциации
+          attributes: ['name_genre'], // Выбираем только название жанра
+        },
+      ],
+    });
+
+    // Извлечение названий жанров
+    const mediaGenres = genres.map((mg) => mg.genre.name_genre);
+    console.log(mediaGenres);
+    // Добавление жанров к медиа
+    media.dataValues.genre = mediaGenres;
+
     let images = [];
     const existImage = await modelImage.findOne({
-      where: { id_media: id_media },
+      where: { id_media },
     });
 
     if (!existImage) {
@@ -367,21 +380,20 @@ const getInfo = async (req, res) => {
       await imageController.getImages(id_media);
     }
     images = await modelImage.findAll({
-      where: {
-        id_media: id_media,
-      },
+      where: { id_media },
       order: [["id_image", "DESC"]],
     });
+
     const existSimilars = await modelSimilar.findOne({
       where: { id_origin: id_media },
     });
     if (!existSimilars) {
-      await similarController.setSimilarMedia(id_media); //Добавление похожих медиа
+      await similarController.setSimilarMedia(id_media); // Добавление похожих медиа
     }
     const similars = await similarController.getSimilarMedia(id_media);
 
     const keywords = await modelKeyWord.findOne({
-      where: { id_media: id_media },
+      where: { id_media },
     });
     if (!keywords) keywordController.addInfo(id_media);
 
@@ -389,46 +401,41 @@ const getInfo = async (req, res) => {
     let user = null;
     let isFavorite = false;
     if (tokenDecoded) {
-      //Проверка работы decode
       user = await modelUser.findByPk(tokenDecoded.data);
 
       if (user) {
         const isFav = await modelFavorite.findOne({
           where: {
-            // Явно указываем условие поиска
-            id_user: user.id_user, // Проверьте название поля в БД
-            id_media: parseInt(id_media), // Преобразуем строку в число
+            id_user: user.id_user,
+            id_media: parseInt(id_media),
           },
         });
         isFavorite = isFav !== null;
       }
     }
-    //Добавить получения отзывов о проекте
+
     const reviews = await modelReview.findAll({
-      where: { id_media: id_media },
+      where: { id_media },
       include: [
         {
           model: modelUser,
           as: "user",
-          attributes: ["id_user", "username"], // Указываем нужные поля
+          attributes: ["id_user", "username"],
         },
       ],
-      order: [["id_review", "DESC"]], // Сортируем отзывы по дате создания (по убыванию)
+      order: [["id_review", "DESC"]],
     });
-
     responseHandler.goodrequest(res, {
-      media, //информация о проекте
-      reviews, //информация о обзорах
+      media,
+      reviews,
       user,
       isFavorite,
       images,
       similars,
     });
-    // responseHandler.goodrequest(res, media);
   } catch (error) {
     console.log(error);
     responseHandler.error(res);
-    return;
   }
 };
 

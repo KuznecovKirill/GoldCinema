@@ -7,7 +7,7 @@ const mediaEndpoints = {
   medias: ({ mediaType, mediaCategory, page, limit }) => `/medias/${mediaType}/${mediaCategory}?&page=${page}&limit=${limit}`,
   mediasByType: ({mediaType}) => `/Type?mediaType=${mediaType}`, //curl GET "http://localhost:8000/medias/Type?mediaType=TV_SERIES" 
   info: ({id_media}) => `/medias/info/${id_media}`,
-  search: ({ mediaType, query, page }) => `/medias/search/${mediaType}?query=${query}&page=${page}`
+  search: ({ mediaType }) => `/medias/search/${mediaType}`
 };
 
 const mediaModule = {
@@ -24,6 +24,7 @@ const mediaModule = {
       const response = await publicClient.get(
         mediaEndpoints.medias({ mediaType,mediaCategory, page, limit })
       );
+      console.log(response);
       return { response };
     } catch (err) { return { err }; }
   },
@@ -40,15 +41,21 @@ const mediaModule = {
       const response = await privateClient.get(
         mediaEndpoints.info({ id_media })
       );
-
+      console.log(response);
       return { response };
     } catch (err) { return { err }; }
   },
   search: async ({ mediaType, query, page }) => {
     try {
-      const response = await publicClient.get(
-        mediaEndpoints.search({ mediaType, query, page })
+      
+      const response = await publicClient.post(
+        mediaEndpoints.search({mediaType, query, page}),
+        {query, page}
       );
+      // const response = await publicClient.get(
+      //   mediaEndpoints.search({ mediaType, query, page })
+      // );
+
       return { response };
     } catch (err) { return { err }; }
   }

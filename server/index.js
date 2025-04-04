@@ -15,6 +15,8 @@ const favoriteController = require('./src/controllers/favoriteController');
 
 const keywordController = require('./src/controllers/keywordController');
 
+const { setupAssociations } = require('./src/models/associations');
+
 //const PlayGround = require('./src/models/PlayGround');
 
 const app = express();
@@ -71,6 +73,7 @@ connection.connect(err => {
         return console.error('Ошибка подключения: ' + err.message);
     }
     console.log('Подключение к серверу MySQL успешно установлено');
+    setupAssociations();
     console.log(`Server is running on http://localhost:${process.env.PORT}`);
     
     server.listen(port, () => {
