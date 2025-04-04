@@ -54,7 +54,7 @@ async function processText(text) {
   try {
       const lemmas = await lemmatizeText(text);
       const filteredLemmas = lemmas.filter(lemma => lemma.length > 2 && !stopWords.includes(lemma.toLowerCase())); // Добавлена проверка на стоп-слова после лемматизации
-      console.log(filteredLemmas);
+
       return filteredLemmas;
   } catch (error) {
       console.error("Ошибка в lemmatizeText:", error);

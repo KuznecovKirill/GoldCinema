@@ -12,7 +12,7 @@ const addFavorite = async (req, res) => { //curl -X POST http://localhost:8000/u
     });
     
     if (isFavorite){ 
-      console.log("Медиа уже в избранном!");
+      //console.log("Медиа уже в избранном!");
       return responseHandler.goodrequest(res, isFavorite);
     }
 
