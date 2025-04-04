@@ -16,7 +16,8 @@ const { swaggerAPI } = require("../swagger/swagger.api");
 const { modelImage } = require("../models/modelImage.js");
 const { modelSimilar } = require("../models/modelSimilar.js");
 const { modelKeyWord } = require("../models/modelKeyWord.js");
-
+const { modelGenre } = require("../models/modelGenre");
+const {modelMedia_Genre} = require("../models/modelMedia_Genre");
 //Для добавления медиа
 const modelMediaCreate = async (newMedia) => {
   try {
@@ -35,6 +36,33 @@ const modelMediaCreate = async (newMedia) => {
       descrition: newMedia.description || null,
       cover: newMedia.coverUrl || newMedia.posterUrl,
     });
+    // Добавление жанров в таблицу Media_Genre
+    for (const genreName of newMedia.genres.map((g) => g.genre)) {
+      console.log(genreName);
+      // Проверка существования жанра
+      const genre = await modelGenre.findOne({
+        where: { name_genre: genreName },
+      });
+      if (!genre) {
+        // Создание жанра, если его нет
+        await modelGenre.create({ name_genre: genreName });
+        // Получение только что созданного жанра
+        const newGenre = await modelGenre.findOne({
+          where: { name_genre: genreName },
+        });
+        // Добавление связи между медиа и жанром
+        await modelMedia_Genre.create({
+          id_media: result.id_media,
+          id_genre: newGenre.id_genre,
+        });
+      } else {
+        // Добавление связи между медиа и существующим жанром
+        await modelMedia_Genre.create({
+          id_media: result.id_media,
+          id_genre: genre.id_genre,
+        });
+      }
+    }
     sequelize.sync();
     // const keywords = await modelKeyWord.findOne({where: {id_media: newMedia.kinopoiskId}});
     // if (!keywords)
@@ -49,6 +77,8 @@ const modelMediaCreate = async (newMedia) => {
     }
   }
 };
+
+
 
 //Получение списка проектов
 const getMedias = async (req, res) => {
@@ -237,27 +267,6 @@ const setPopularMedia = async (
   }
 };
 
-// // Отдельные обработчики для роутов
-// exports.setPopularMovie = (req, res) => {
-//   setPopularMedia(
-//     req,
-//     res,
-//     "TOP_POPULAR_MOVIES",
-//     db.modelPopularMovie,
-//     "FILM"
-//   );
-// };
-
-// exports.setPopularSeries = (req, res) => {
-//   setPopularMedia(
-//     req,
-//     res,
-//     "POPULAR_SERIES",
-//     db.modelPopularSeries,
-//     "TV_SERIES"
-//   );
-// };
-
 const getMediasByType = async (req, res) => {
   try {
     const mediaType = req.query.mediaType || "FILM";
@@ -274,35 +283,75 @@ const getMediasByType = async (req, res) => {
     responseHandler.error(res);
   }
 };
-//Получение жанров
-// curl GET "http://localhost:8000/medias/genres?mediaType=FILM"
+
+//Получение жанров медиа
 const getGenres = async (req, res) => {
   try {
     const mediaType = req.query.mediaType || "TV_SERIES";
+    
+    // Получаем все медиа указанного типа с их жанрами
     const medias = await modelMedia.findAll({
-      where: { mediaType: mediaType }, //Поиск по mediaType
-    });
-    const genresSet = new Set(); // Set используется для уникальности жанров
-
-    medias.forEach((media) => {
-      if (media.genre) {
-        // Проверяем, есть ли жанры
-        const genresArray = media.genre.split(","); // Жанры разделены запятыми
-        genresArray.forEach((genre) => genresSet.add(genre.trim())); // Добавление жанров в Set
-      }
+      where: { mediaType },
+      include: [
+        {
+          model: modelGenre,
+          through: { attributes: [] }, // Не включаем атрибуты промежуточной таблицы
+          attributes: ['name_genre']
+        }
+      ]
     });
 
-    const genres = Array.from(genresSet); // Преобразование Set в массив
+    // Собираем уникальные жанры
+    const genresSet = new Set();
+    
+    medias.forEach(media => {
+      media.Genres.forEach(genre => {
+        genresSet.add(genre.name_genre);
+      });
+    });
+
+    const genres = Array.from(genresSet);
+
     if (genres.length === 0) {
       return responseHandler.notfound(res);
     }
 
-    return responseHandler.goodrequest(res, genres); // Отправляем ответ с найденными жанрами
+    return responseHandler.goodrequest(res, genres);
   } catch (error) {
     console.error(error);
     responseHandler.error(res);
   }
 };
+
+//Получение жанров
+// curl GET "http://localhost:8000/medias/genres?mediaType=FILM"
+// const getGenres = async (req, res) => {
+//   try {
+//     const mediaType = req.query.mediaType || "TV_SERIES";
+//     const medias = await modelMedia.findAll({
+//       where: { mediaType: mediaType }, //Поиск по mediaType
+//     });
+//     const genresSet = new Set(); // Set используется для уникальности жанров
+
+//     medias.forEach((media) => {
+//       if (media.genre) {
+//         // Проверяем, есть ли жанры
+//         const genresArray = media.genre.split(","); // Жанры разделены запятыми
+//         genresArray.forEach((genre) => genresSet.add(genre.trim())); // Добавление жанров в Set
+//       }
+//     });
+
+//     const genres = Array.from(genresSet); // Преобразование Set в массив
+//     if (genres.length === 0) {
+//       return responseHandler.notfound(res);
+//     }
+
+//     return responseHandler.goodrequest(res, genres); // Отправляем ответ с найденными жанрами
+//   } catch (error) {
+//     console.error(error);
+//     responseHandler.error(res);
+//   }
+// };
 //Получение информации о проекте
 const getInfo = async (req, res) => {
   try {
@@ -324,16 +373,17 @@ const getInfo = async (req, res) => {
       order: [["id_image", "DESC"]],
     });
     const existSimilars = await modelSimilar.findOne({
-      where: {id_origin: id_media},
+      where: { id_origin: id_media },
     });
-    if (!existSimilars){
+    if (!existSimilars) {
       await similarController.setSimilarMedia(id_media); //Добавление похожих медиа
     }
     const similars = await similarController.getSimilarMedia(id_media);
-    
-    const keywords = await modelKeyWord.findOne({where: {id_media: newMedia.kinopoiskId}});
-    if (!keywords)
-      keywordController.addInfo(id_media);
+
+    const keywords = await modelKeyWord.findOne({
+      where: { id_media: id_media },
+    });
+    if (!keywords) keywordController.addInfo(id_media);
 
     const tokenDecoded = tokenMiddleware.decode(req);
     let user = null;
@@ -356,11 +406,13 @@ const getInfo = async (req, res) => {
     //Добавить получения отзывов о проекте
     const reviews = await modelReview.findAll({
       where: { id_media: id_media },
-      include: [{
-              model: modelUser,
-              as: 'user',
-              attributes: ['id_user', 'username'] // Указываем нужные поля
-            }],
+      include: [
+        {
+          model: modelUser,
+          as: "user",
+          attributes: ["id_user", "username"], // Указываем нужные поля
+        },
+      ],
       order: [["id_review", "DESC"]], // Сортируем отзывы по дате создания (по убыванию)
     });
 
@@ -370,7 +422,7 @@ const getInfo = async (req, res) => {
       user,
       isFavorite,
       images,
-      similars
+      similars,
     });
     // responseHandler.goodrequest(res, media);
   } catch (error) {
@@ -381,11 +433,15 @@ const getInfo = async (req, res) => {
 };
 
 // Функция для поиска медиа
-// curl -X POST "http://localhost:8000/media/search" -H "Content-Type: application/json" -d '{"userQuerry": "фильм про зеленого чувака, который крадёт Рождество и он злой"}'
+// curl -X POST "http://localhost:8000/medias/search/FILM" -H "Content-Type: application/json" -d '{"query": "film Анора", "page": 1}'
 const search = async (req, res) => {
   try {
-    const { userQuerry } = req.body;
-    const searchResult = await keywordController.search(userQuerry);
+    console.log("Search работает");
+    const { mediaType } = req.params;
+    const { query } = req.body;
+    const { page } = req.query;
+    console.log(`${mediaType} + ${query} + + ${page}`);
+    const searchResult = await keywordController.search(query);
     const scoreMap = searchResult.reduce((acc, item) => {
       acc[item.id_media] = item.score;
       return acc;
