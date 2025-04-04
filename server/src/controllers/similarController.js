@@ -38,7 +38,6 @@ const setSimilarMedia = async (id_media) => { //curl -X POST "http://localhost:8
         const response = await axios.post('http://localhost:8000/medias/addMedia', {
           id_media: item.filmId
         });
-        console.log(response);
         if (response.status !== 200) {
           throw new Error(`Ошибка добавления медиа ${item.filmId}`);
         }
