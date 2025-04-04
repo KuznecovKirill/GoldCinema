@@ -1,13 +1,12 @@
 const { Sequelize, DataTypes } = require("sequelize");
 const sequelize = require("./database").sequelize;
-
 //Модель медиа
 const modelMedia = sequelize.define(
   "Media",
   {
     id_media: {
       type: DataTypes.INTEGER,
-      autoIncrement: true,
+      autoIncrement: false,
       primaryKey: true,
       allowNull: false,
     },
@@ -57,7 +56,6 @@ const modelMedia = sequelize.define(
     freezeTableName: true,
   }
 );
-
 modelMedia.prototype.toObject = function () {
   const values = { ...this.get() };
   return values;
