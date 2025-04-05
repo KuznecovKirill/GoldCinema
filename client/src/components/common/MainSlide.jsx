@@ -43,6 +43,7 @@ const MainSlide = ({ mediaType, mediaCategory }) => {
         limit: 10,
       });
       if (response) {
+        console.log(response);
         setMedias(response.medias);
       }
       if (err) toast.error(err.message);
@@ -174,12 +175,12 @@ const MainSlide = ({ mediaType, mediaCategory }) => {
                       {med.genre
                         .split(", ")
                         .slice(0, 3)
-                        .map((genre, index) => (
+                        .map((genres, index) => (
                           <Chip
                             variant="filled"
                             color="primary"
                             key={index}
-                            label={genre}
+                            label={genres}
                             sx={{
                               fontSize: "1rem",
                               height: "30px", // Фиксированная высота для Chip

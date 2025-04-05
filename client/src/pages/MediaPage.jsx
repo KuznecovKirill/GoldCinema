@@ -46,10 +46,9 @@ const MediaPage = () => {
       const { response, err } = await mediaModule.getInfo({ id_media });
       dispatch(setGlobalLoading(false));
       if (response) {
-        
         setMedia(response.media);
         setIsFav(response.isFavorite);
-        setGenres([response.media.genre]);
+        setGenres([response.media.genres]);
         setImages(response.images);
         setSimilars(response.similars);
         setReviews(response.reviews);
@@ -83,7 +82,7 @@ const MediaPage = () => {
       mediaType: media.mediaType,
       country: media.country,
       year: media.year,
-      genre: media.genres,
+      //genre: media.genres,
       running_time: media.running_time,
       rars: media.rars,
       rating: media.rating,

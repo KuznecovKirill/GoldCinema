@@ -36,33 +36,34 @@ const modelMediaCreate = async (newMedia) => {
       descrition: newMedia.description || null,
       cover: newMedia.coverUrl || newMedia.posterUrl,
     });
+    addGenres(result.id_media, newMedia.genres);
     // Добавление жанров в таблицу Media_Genre
-    for (const genreName of newMedia.genres.map((g) => g.genre)) {
-      console.log(genreName);
-      // Проверка существования жанра
-      const genre = await modelGenre.findOne({
-        where: { name_genre: genreName },
-      });
-      if (!genre) {
-        // Создание жанра, если его нет
-        await modelGenre.create({ name_genre: genreName });
-        // Получение только что созданного жанра
-        const newGenre = await modelGenre.findOne({
-          where: { name_genre: genreName },
-        });
-        // Добавление связи между медиа и жанром
-        await modelMedia_Genre.create({
-          id_media: result.id_media,
-          id_genre: newGenre.id_genre,
-        });
-      } else {
-        // Добавление связи между медиа и существующим жанром
-        await modelMedia_Genre.create({
-          id_media: result.id_media,
-          id_genre: genre.id_genre,
-        });
-      }
-    }
+    // for (const genreName of newMedia.genres.map((g) => g.genre)) {
+    //   console.log(genreName);
+    //   // Проверка существования жанра
+    //   const genre = await modelGenre.findOne({
+    //     where: { name_genre: genreName },
+    //   });
+    //   if (!genre) {
+    //     // Создание жанра, если его нет
+    //     await modelGenre.create({ name_genre: genreName });
+    //     // Получение только что созданного жанра
+    //     const newGenre = await modelGenre.findOne({
+    //       where: { name_genre: genreName },
+    //     });
+    //     // Добавление связи между медиа и жанром
+    //     await modelMedia_Genre.create({
+    //       id_media: result.id_media,
+    //       id_genre: newGenre.id_genre,
+    //     });
+    //   } else {
+    //     // Добавление связи между медиа и существующим жанром
+    //     await modelMedia_Genre.create({
+    //       id_media: result.id_media,
+    //       id_genre: genre.id_genre,
+    //     });
+    //   }
+    // }
     sequelize.sync();
     // const keywords = await modelKeyWord.findOne({where: {id_media: newMedia.kinopoiskId}});
     // if (!keywords)
@@ -77,61 +78,108 @@ const modelMediaCreate = async (newMedia) => {
     }
   }
 };
+const addGenres = async (id_media, genres) => {
+  for (const genreName of genres.map((g) => g.genre)) {
+    // Проверка существования жанра
+    const genre = await modelGenre.findOne({
+      where: { name_genre: genreName },
+    });
+    if (!genre) {
+      // Создание жанра, если его нет
+      await modelGenre.create({ name_genre: genreName });
+      // Получение только что созданного жанра
+      const newGenre = await modelGenre.findOne({
+        where: { name_genre: genreName },
+      });
+      // Добавление связи между медиа и жанром
+      await modelMedia_Genre.create({
+        id_media: id_media,
+        id_genre: newGenre.id_genre,
+      });
+    } else {
+      // Добавление связи между медиа и существующим жанром
+      await modelMedia_Genre.create({
+        id_media: id_media,
+        id_genre: genre.id_genre,
+      });
+    }
+  }
+  sequelize.sync();
+}
+const processMediasWithGenres = async (medias) => {
+  try {
+    // Обработка жанров для каждого медиа
+    medias.forEach(media => {
+      if (media.Genres) {
+        const genresString = media.Genres.map(genre => genre.name_genre).join(', ');
+        media.dataValues.genres = genresString;
+      }
+    });
 
+    return medias;
+  } catch (error) {
+    console.error("Ошибка при обработке жанров:", error);
+    throw error; // Пробрасываем ошибку для обработки выше
+  }
+};
+const getMediasQuery = async (mediaType, whereCondition = {}, options = {}) => {
+  const { limit = 40, offset = 0 } = options;
+  const { count, rows } = await modelMedia.findAndCountAll({
+    where: { ...whereCondition, mediaType },
+    limit,
+    offset,
+    order: [["id_media", "DESC"]],
+    include: [
+      {
+        model: modelGenre,
+        as: 'Genres',
+        attributes: ['name_genre']
+      }
+    ]
+  });
+
+  rows.forEach(media => {
+    if (media.Genres) {
+      const genresString = media.Genres.map(genre => genre.name_genre).join(', ');
+      media.dataValues.genres = genresString;
+    }
+  });
+
+  return { count, rows };
+};
 //Получение списка проектов
 const getMedias = async (req, res) => {
-  //curl GET "http://localhost:8000/medias/medias?mediaType=FILM&page=1&limit=10"
   try {
-    // Извлекаем параметры из объекта запроса
     const mediaType = req.params.mediaType;
     const mediaCategory = req.params.mediaCategory;
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 40;
-    const offset = (page - 1) * limit; //Расчёт смещения
+    const offset = (page - 1) * limit;
 
-    let count;
-    let rows;
-
-    // Запрос к базе данных
-    // Если нужно получить список популярных
+    let whereCondition = {};
     if (mediaCategory == "popular" && mediaType == "FILM") {
       const popularId = await modelPopularMovie.findAll({
         attributes: ["id_media"],
-      }); //список id популярных фильмов
-      const popularIdList = popularId.map((item) => item.id_media); //Преобразование в массив
-      ({ count, rows } = await modelMedia.findAndCountAll({
-        where: { id_media: popularIdList, mediaType: mediaType },
-        limit: limit, // Устанавливаем лимит
-        offset: offset, // Устанавливаем смещение
-        order: [["id_media", "DESC"]], // Сортировка по id_media по убыванию
-      }));
+      });
+      const popularIdList = popularId.map((item) => item.id_media);
+      whereCondition = { id_media: popularIdList };
     } else if (mediaCategory == "popular" && mediaType == "TV_SERIES") {
       const popularId = await modelPopularSeries.findAll({
         attributes: ["id_media"],
-      }); //список id популярных сериалов
-      const popularIdList = popularId.map((item) => item.id_media); //Преобразование в массив
-      ({ count, rows } = await modelMedia.findAndCountAll({
-        where: { id_media: popularIdList, mediaType: mediaType },
-        limit: limit, // Устанавливаем лимит
-        offset: offset, // Устанавливаем смещение
-        order: [["id_media", "DESC"]], // Сортировка по id_media по убыванию
-      }));
-    }
-    //Просто список по mediaType
-    else {
-      ({ count, rows } = await modelMedia.findAndCountAll({
-        where: { mediaType: mediaType },
-        limit: limit,
-        offset: offset,
-        order: [["id_media", "DESC"]],
-      }));
+      });
+      const popularIdList = popularId.map((item) => item.id_media);
+      whereCondition = { id_media: popularIdList };
     }
 
+    const { count, rows } = await getMediasQuery(mediaType, whereCondition, { limit, offset });
+
+    const processedMedias = await processMediasWithGenres(rows);
+
     responseHandler.goodrequest(res, {
-      total: count, // Общее количество записей
-      page: page, // Текущая страница
-      limit: limit, // Лимит на странице
-      medias: rows, // Массив медиа-контента
+      total: count,
+      page: page,
+      limit: limit,
+      medias: processedMedias,
       mediaType: mediaType,
     });
   } catch (error) {
@@ -139,12 +187,23 @@ const getMedias = async (req, res) => {
     responseHandler.error(res);
   }
 };
+
 //Получить все медиа
 const getAllMedias = async (req, res) => {
   try {
-    const medias = await modelMedia.findAll();
+    const medias = await modelMedia.findAll({
+      include: [
+        {
+          model: modelGenre,
+          as: 'Genres',
+          attributes: ['name_genre']
+        }
+      ]
+    });
 
-    responseHandler.goodrequest(res, medias);
+    const processedMedias = await processMediasWithGenres(medias);
+
+    responseHandler.goodrequest(res, processedMedias);
   } catch (error) {
     console.error(error);
     responseHandler.error(res);
@@ -172,7 +231,7 @@ const setPopularMedia = async (
 ) => {
   const popularMedias = await swaggerAPI.mediaCollections({
     type: mediaCollectionType,
-    page: 1,
+    page: 2,
   });
 
   const addedMedias = [];
@@ -363,12 +422,15 @@ const getInfo = async (req, res) => {
         },
       ],
     });
-
     // Извлечение названий жанров
-    const mediaGenres = genres.map((mg) => mg.genre.name_genre);
-    console.log(mediaGenres);
+    const mediaGenres = genres.map((mg) => mg.genre.name_genre).join(", ");
+    if (mediaGenres){
+      media.dataValues.genres = mediaGenres;
+    }
+      
+    console.log(media);
     // Добавление жанров к медиа
-    media.dataValues.genre = mediaGenres;
+    
 
     let images = [];
     const existImage = await modelImage.findOne({
