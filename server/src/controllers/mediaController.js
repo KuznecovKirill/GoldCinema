@@ -37,37 +37,7 @@ const modelMediaCreate = async (newMedia) => {
       cover: newMedia.coverUrl || newMedia.posterUrl,
     });
     addGenres(result.id_media, newMedia.genres);
-    // Добавление жанров в таблицу Media_Genre
-    // for (const genreName of newMedia.genres.map((g) => g.genre)) {
-    //   console.log(genreName);
-    //   // Проверка существования жанра
-    //   const genre = await modelGenre.findOne({
-    //     where: { name_genre: genreName },
-    //   });
-    //   if (!genre) {
-    //     // Создание жанра, если его нет
-    //     await modelGenre.create({ name_genre: genreName });
-    //     // Получение только что созданного жанра
-    //     const newGenre = await modelGenre.findOne({
-    //       where: { name_genre: genreName },
-    //     });
-    //     // Добавление связи между медиа и жанром
-    //     await modelMedia_Genre.create({
-    //       id_media: result.id_media,
-    //       id_genre: newGenre.id_genre,
-    //     });
-    //   } else {
-    //     // Добавление связи между медиа и существующим жанром
-    //     await modelMedia_Genre.create({
-    //       id_media: result.id_media,
-    //       id_genre: genre.id_genre,
-    //     });
-    //   }
-    // }
     sequelize.sync();
-    // const keywords = await modelKeyWord.findOne({where: {id_media: newMedia.kinopoiskId}});
-    // if (!keywords)
-    //   keywordController.addInfo(newMedia.kinopoiskId);
     return result;
   } catch (error) {
     if (error.name == "SequelizeUniqueConstraintError") {
@@ -122,31 +92,6 @@ const processMediasWithGenres = async (medias) => {
     throw error; // Пробрасываем ошибку для обработки выше
   }
 };
-const getMediasQuery = async (mediaType, whereCondition = {}, options = {}) => {
-  const { limit = 40, offset = 0 } = options;
-  const { count, rows } = await modelMedia.findAndCountAll({
-    where: { ...whereCondition, mediaType },
-    limit,
-    offset,
-    order: [["id_media", "DESC"]],
-    include: [
-      {
-        model: modelGenre,
-        as: 'Genres',
-        attributes: ['name_genre']
-      }
-    ]
-  });
-
-  rows.forEach(media => {
-    if (media.Genres) {
-      const genresString = media.Genres.map(genre => genre.name_genre).join(', ');
-      media.dataValues.genres = genresString;
-    }
-  });
-
-  return { count, rows };
-};
 //Получение списка проектов
 const getMedias = async (req, res) => {
   try {
@@ -171,7 +116,19 @@ const getMedias = async (req, res) => {
       whereCondition = { id_media: popularIdList };
     }
 
-    const { count, rows } = await getMediasQuery(mediaType, whereCondition, { limit, offset });
+    const { count, rows } = await modelMedia.findAndCountAll({
+      where: { ...whereCondition, mediaType },
+      limit: limit,
+      offset: offset,
+      order: [["id_media", "DESC"]],
+      include: [
+        {
+          model: modelGenre,
+          as: 'Genres',
+          attributes: ['name_genre']
+        }
+      ]
+    });
 
     const processedMedias = await processMediasWithGenres(rows);
 
