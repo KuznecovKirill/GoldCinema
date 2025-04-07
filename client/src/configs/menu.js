@@ -6,7 +6,7 @@ import FavoriteBorderOutlined from "@mui/icons-material/FavoriteBorderOutlined";
 import SearchOutlined from "@mui/icons-material/SearchOutlined";
 import ReviewIcon from "@mui/icons-material/RateReviewOutlined";
 import LockResetOutlinedIcon from "@mui/icons-material/LockResetOutlined"; // иконка сброса
-
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings'; //иконка админа
 const main = [
   {
     display: "Главная",
@@ -51,7 +51,14 @@ const user = [
         path: "/password-update",
         icon: <LockResetOutlinedIcon />,
         state: "password.update"
-      }
+      },
+      {
+        display: "Админ",
+        path: "/admin",
+        icon: <AdminPanelSettingsIcon />,
+        state: "admin",
+        adminOnly: true // Флаг для фильтрации
+    },
 ]
 const menuConfigs = {main, user};
 export default menuConfigs;

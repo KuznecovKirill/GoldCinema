@@ -17,6 +17,13 @@ const Sidebar = ({open, toggleSidebar}) => {
   const {appState} = useSelector((state) => state.appState);
   const {themeMode} = useSelector((state) => state.themeMode);
 
+  const filteredMenu = menuConfigs.user.filter(item => {
+    if (item.adminOnly) {
+      return user?.id_role === 2; // Проверяем id_role
+    }
+    return true;
+  });
+
   const sidebarWith = UI.size.sidebarWith;
   
   const onSwitchTheme = () => {
@@ -51,10 +58,10 @@ const Sidebar = ({open, toggleSidebar}) => {
           </ListItemButton>
       ))}
 
-      {user && (
+      {filteredMenu && (
         <>
         <Typography variant="h6" marginBottom="20px">Пользователь</Typography>
-        {menuConfigs.user.map((item,index) => (
+        {filteredMenu.map((item,index) => (
           <ListItemButton
           key={index}
           sx={{

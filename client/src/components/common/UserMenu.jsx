@@ -13,8 +13,15 @@ const UserMenu = () => {
 
   const [anchorEl, setAnchorEl] = useState(null);
 
+    // Фильтруем меню
+    const filteredMenu = menuConfigs.user.filter(item => {
+    if (item.adminOnly) {
+      return user?.id_role === 2; // Проверяем id_role
+    }
+    return true;
+  });
+
   const toggleMenu = (e) => setAnchorEl(e.currentTarget);
-  console.log("пользователь взаимодействует с меню");
   return (
     <>
     {user && (
@@ -31,7 +38,7 @@ const UserMenu = () => {
       anchorEl={anchorEl}
       onClose={() => setAnchorEl(null)}
       >
-        {menuConfigs.user.map((item, index) => (
+        {filteredMenu.map((item, index) => (
           <ListItemButton
           component={Link}
           to={item.path}
