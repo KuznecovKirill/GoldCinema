@@ -77,6 +77,12 @@ modelUser.prototype.toJSON = function () {
   return values;
 };
 
+//Проверка, что данный пользователь - это администратор
+modelUser.prototype.isAdmin = function() {
+  return this.id_role === 2; 
+};
+
+
 (async () => {
   // Синхронизация моделей с базой данных без удаления существующих данных
   await sequelize.sync();
