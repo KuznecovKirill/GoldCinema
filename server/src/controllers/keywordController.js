@@ -31,7 +31,18 @@ const stopWords = [
   "ли",
   "что-то",
   "...",
+  "для",
 ];
+// Правила замены
+const replacements = {
+  "FILM": "фильм",
+  "TV_SERIES": "сериал",
+  "18+": "для взрослых 18",
+  "16+": "для подростков 16",
+  "12+": "для детей старше 12 лет",
+  "6+": "для детей старше 6 лет",
+  "0+": "для всех возрастов"
+};
 let globalVocabulary = new Set();
 
 //Для python-файла
@@ -73,7 +84,18 @@ async function lemmatizeText(text) {
       }
     });
   });
+};
+
+
+// Функция для замены слов
+function replaceWords(text, replacements) {
+  for (const [key, value] of Object.entries(replacements)) {
+    const regex = new RegExp(`\\b${key}\\b`, 'g'); // Регулярное выражение для точного совпадения слова
+    text = text.replace(regex, value);
+  }
+  return text;
 }
+
 async function processText(text) {
   let tokens = tokenizer.tokenize(text);
   tokens = tokens.filter((token) => !stopWords.includes(token.toLowerCase()));
@@ -228,11 +250,13 @@ async function addInfo(id_media) {
 
     // Объединяем жанры в строку через пробел
     const genresString = genresArray.join(" ");
-    console.log(`Строка жанров ${genresString}`);
 
-    const combineText = `${media.title} ${genresString} ${
+    const combine = `${media.title} ${genresString} ${
       media.mediaType
-    } ${media.country} ${media.descrition}`;
+    } ${media.country} ${media.descrition} ${media.rars}`;
+
+    const combineText = replaceWords(combine, replacements); //Замена слов
+    console.log(combineText);
     const newText = await processText(combineText); // Лемматизируем текст
     const newTextString = newText.join(" ");
     //Обновление словаря
