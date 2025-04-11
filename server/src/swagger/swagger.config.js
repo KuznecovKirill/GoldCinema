@@ -14,7 +14,6 @@ const getUrl = (version, object, endUrl, params ='') => {
     return `${baseUrl}${version}${object}${endUrl}${similars}`;
   }
   else if (count == 2){
-    console.log(baseUrl);
     const {type, page} = params;
     return `${baseUrl}${version}${object}${endUrl}type=${type}&page=${page}`;
   }

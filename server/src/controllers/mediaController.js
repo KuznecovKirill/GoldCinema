@@ -98,7 +98,7 @@ const getMedias = async (req, res) => {
     const mediaType = req.params.mediaType;
     const mediaCategory = req.params.mediaCategory;
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 40;
+    const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
 
     let whereCondition = {};
@@ -114,6 +114,30 @@ const getMedias = async (req, res) => {
       });
       const popularIdList = popularId.map((item) => item.id_media);
       whereCondition = { id_media: popularIdList };
+    } else if (mediaCategory == "top" && mediaType == "FILM") {
+      const { count, rows } = await modelMedia.findAndCountAll({
+        where: { mediaType: "FILM" },
+        limit: limit,
+        offset: offset,
+        order: [["rating", "DESC"]],
+        include: [
+          {
+            model: modelGenre,
+            as: 'Genres',
+            attributes: ['name_genre']
+          }
+        ]
+      });
+
+      const processedMedias = await processMediasWithGenres(rows);
+
+      return responseHandler.goodrequest(res, {
+        total: count,
+        page: page,
+        limit: limit,
+        medias: processedMedias,
+        mediaType: mediaType,
+      });
     }
 
     const { count, rows } = await modelMedia.findAndCountAll({
@@ -282,22 +306,69 @@ const setPopularMedia = async (
   }
 };
 
-const getMediasByType = async (req, res) => {
+const setTopMedia = async ( req, res, mediaCollectionType, mediaTypeLabel) =>{
   try {
-    const mediaType = req.query.mediaType || "FILM";
-
-    const medias = await modelMedia.findAll({
-      where: { mediaType: mediaType }, //Поиск по mediaType
-      order: [["id_media", "DESC"]],
+    const medias = await swaggerAPI.mediaCollections({
+      type: mediaCollectionType,
+      page: 1,
     });
-    console.log("Медиа получены успешно");
+    if (!medias || !medias.items) {
+      return responseHandler.badrequest(res, "Не удалось получить медиа из API");
+    };
+    const addedMedias = [];
+    const errors = [];
+    let counter = 0;
+    await Promise.all(
+      medias.items.slice(0, 10).map(async (media) =>{
+        const existingMedia = await modelMedia.findOne({
+          where: { id_media: media.kinopoiskId },
+        });
+  
+        if (!existingMedia) {
+          try {
+            await modelMediaCreate(media);
+              addedMedias.push(media.kinopoiskId);
+              counter++;
+          } catch (error) {
+            errors.push({ id_media: media.kinopoiskId, error: error.message });
+          }
+        } else {
+          console.log(`Медиа с id ${media.kinopoiskId} уже существует.`);
+        }
 
-    return responseHandler.goodrequest(res, medias); // Отправляем ответ с найденными жанрами
+      })
+    );
+
+    const result = {
+      added: addedMedias,
+      errors: errors,
+    };
+    console.log(result);
+    responseHandler.goodrequest(res, result);
   } catch (error) {
     console.error(error);
     responseHandler.error(res);
   }
 };
+
+
+
+// const getMediasByType = async (req, res) => {
+//   try {
+//     const mediaType = req.query.mediaType || "FILM";
+
+//     const medias = await modelMedia.findAll({
+//       where: { mediaType: mediaType }, //Поиск по mediaType
+//       order: [["id_media", "DESC"]],
+//     });
+//     console.log("Медиа получены успешно");
+
+//     return responseHandler.goodrequest(res, medias); // Отправляем ответ с найденными жанрами
+//   } catch (error) {
+//     console.error(error);
+//     responseHandler.error(res);
+//   }
+// };
 
 //Получение жанров медиа
 const getGenres = async (req, res) => {
@@ -501,7 +572,6 @@ module.exports = {
   getAllMedias,
   addMedia,
   getGenres,
-  getMediasByType,
   getInfo,
   setPopularMedia,
   search,
@@ -516,6 +586,12 @@ module.exports = {
       modelPopularSeries,
       "TV_SERIES"
     );
+  },
+  setTopMovie: (req, res) => {
+    setTopMedia(req, res, "TOP_250_MOVIES", "FILM");
+  },
+  setTopSeries: (req, res) => {
+    setTopMedia(req, res, "TOP_250_TV_SHOWS", "TV_SERIES");
   },
 };
 //curl -X GET http://localhost:8000/api/medias?page=1&limit=10

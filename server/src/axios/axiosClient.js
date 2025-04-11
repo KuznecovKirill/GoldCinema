@@ -10,6 +10,7 @@ const get = async (url) => {
     // Выполнение GET-запроса
 
     // console.log(process.env);
+    console.log(url);
     const conn = await fetch(url, {
         method: 'GET',
         headers: {

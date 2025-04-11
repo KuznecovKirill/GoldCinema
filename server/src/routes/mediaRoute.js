@@ -26,10 +26,10 @@ router.post(
 ); //Добавление медиа
 router.get("/popularMovies", mediaController.setPopularMovie);
 router.get("/popularSeries", mediaController.setPopularSeries);
+router.get("/topMovies", mediaController.setTopMovie);
 
 
-
-router.get("/Type", mediaController.getMediasByType); //для получения типа медиа
+// router.get("/Type", mediaController.getMediasByType); //для получения типа медиа
 
 
 router.post(
