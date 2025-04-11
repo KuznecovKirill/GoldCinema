@@ -18,6 +18,7 @@ const { modelSimilar } = require("../models/modelSimilar.js");
 const { modelKeyWord } = require("../models/modelKeyWord.js");
 const { modelGenre } = require("../models/modelGenre");
 const { modelMedia_Genre } = require("../models/modelMedia_Genre");
+const { query } = require("express-validator");
 //Для добавления медиа
 const modelMediaCreate = async (newMedia) => {
   try {
@@ -213,7 +214,7 @@ const setPopularMedia = async (
 ) => {
   const popularMedias = await swaggerAPI.mediaCollections({
     type: mediaCollectionType,
-    page: 2,
+    page: req.query.page,
   });
 
   const addedMedias = [];
@@ -310,7 +311,7 @@ const setTopMedia = async ( req, res, mediaCollectionType, mediaTypeLabel) =>{
   try {
     const medias = await swaggerAPI.mediaCollections({
       type: mediaCollectionType,
-      page: 1,
+      page: 2,
     });
     if (!medias || !medias.items) {
       return responseHandler.badrequest(res, "Не удалось получить медиа из API");

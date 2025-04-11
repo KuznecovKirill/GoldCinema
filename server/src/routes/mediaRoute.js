@@ -27,6 +27,7 @@ router.post(
 router.get("/popularMovies", mediaController.setPopularMovie);
 router.get("/popularSeries", mediaController.setPopularSeries);
 router.get("/topMovies", mediaController.setTopMovie);
+router.get("/topSeries", mediaController.setTopSeries);
 
 
 // router.get("/Type", mediaController.getMediasByType); //для получения типа медиа

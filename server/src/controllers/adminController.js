@@ -8,17 +8,30 @@ const handleCommand = async (req, res) => {
     switch (command) {
       case "addMedia":
         //curl -X POST "http://localhost:8000/admin/add-media" -H "Content-Type: application/json" -d '{"command": "addMedia", "params": {"id_media": "900"}}'
-        req.body = {id_media: params.id_media}
-        await mediaController.addMedia(req, res); 
+        req.body = { id_media: params.id_media };
+        await mediaController.addMedia(req, res);
         break;
-        case "addMediaList":
-          //curl -X POST "http://localhost:8000/admin/add-media" -H "Content-Type: application/json" -d '{"command": "addMediaList", "params": {"collection": "TOP_250_MOVIES", "page": "1"}}'
-          req.params = { mediaType: params.collection === "TOP_250_MOVIES" ? "FILM" : "TV_SERIES", mediaCategory: "top" };
-          req.query = { page: params.page };
-          await mediaController.getMedias(req, res);
-          break;
+      case "addMediaList":
+        //curl -X POST "http://localhost:8000/admin/add-media" -H "Content-Type: application/json" -d '{"command": "addMediaList", "params": {"collection": "TOP_250_MOVIES", "page": "1"}}'
+        req.params = {
+          mediaType:
+            params.collection === "TOP_250_MOVIES" ? "FILM" : "TV_SERIES",
+          mediaCategory: "top",
+        };
+        req.query = { page: params.page };
+        await mediaController.getMedias(req, res);
+        break;
       case "updatePopular":
-        await mediaController.updatePopular(params.mediaType, params.page);
+        req.params = {
+          mediaType: params.collection === "TOP_POPULAR_MOVIES" ? "FILM" : "TV_SERIES",
+          mediaCategory: "popular",
+        };
+        req.query = { page: params.page };
+        console.log(req.params.mediaType);
+        if (req.params.mediaType === "FILM")
+          mediaController.setPopularMovie(req, res, "TOP_POPULAR_MOVIES", params.mediaType); //curl -X POST "http://localhost:8000/admin/add-media" -H "Content-Type: application/json" -d '{"command": "updatePopular", "params": {"collection": "TOP_POPULAR_MOVIES", "page": "1"}}'
+        else
+        mediaController.setPopularSeries(req, res, "POPULAR_SERIES", params.mediaType);
         break;
       default:
         return responseHandler.badrequest(res, "Неизвестная команда");
