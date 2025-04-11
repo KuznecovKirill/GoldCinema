@@ -170,6 +170,7 @@ const getAllMedias = async (req, res) => {
 //Добавление медиа по id
 const addMedia = async (req, res) => {
   //curl -X POST "http://localhost:8000/medias/addMedia" -H "Content-Type: application/json" -d '{"id_media": "828"}'
+  console.log(req.body);
   const { id_media } = req.body;
   const newMedia = await swaggerAPI.mediaByID({ id: id_media });
 

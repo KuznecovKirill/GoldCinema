@@ -30,7 +30,7 @@ router.get("/popularSeries", mediaController.setPopularSeries);
 
 
 router.get("/Type", mediaController.getMediasByType); //для получения типа медиа
-router.get("/search", mediaController.search); //для поиска
+
 
 router.post(
   "/similar",
@@ -46,8 +46,15 @@ router.post(
 ); //Добавление похожих медиа
 router.get("/info/:id_media", mediaController.getInfo); //для получения подробной информации
 
-
-
+router.post("/search/:mediaType",
+  body("query")
+  .exists(),
+  body("page")
+  .exists(),
+  requestHandler.validate,
+  mediaController.search
+);
+//router.get("/search/:mediaType", mediaController.search); //для поиска
 router.get("/:mediaType/:mediaCategory", mediaController.getMedias); //для получения списка медиа по типу
 //curl GET "http://localhost:8000/medias/FILM/all?&page=1&limit=40"
 //curl GET "http://localhost:8000/medias/FILM/popular?&page=1&limit=40"
