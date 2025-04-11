@@ -54,7 +54,7 @@ const signIn = async (req, res) => {
   try {
     const { username, password } = req.body;
     const user = await modelUser.findOne({ 
-      where: {username: username}, 
+      where: {username: username, password: password}, 
       attributes: ['id_user', 'username', 'password', 'passToken', 'id_role'] });
     console.log(user);
     if (!user) return responseHandler.badrequest(res, "Такого пользователя не существует!"); //Проверка пользователя
@@ -67,6 +67,7 @@ const signIn = async (req, res) => {
       { expiresIn: "24h" }
     );
 
+    //Для безопасности убирается пароль и токен из ответа
     user.password = undefined;
     user.passToken = undefined;
     console.log("Вход успешен");
@@ -84,13 +85,14 @@ const signIn = async (req, res) => {
 const updatePassword = async (req, res) => {
   try {
     const { password, newPassword } = req.body;
-
-    const user = await modelUser.findByPk(req.user.id_user).select("id_user password passToken");
-
+    const user = await modelUser.findByPk(req.user.id_user, {
+      attributes: ['id_user', 'password', 'passToken']
+    });
+    // const user = await modelUser.findByPk(req.user.id_user).select("id_user password passToken");
     if (!user) return responseHandler.notauthorized(res);
 
     if (!user.validPassword(password)) return responseHandler.badrequest(res, "Неверный пароль!");
-
+    
     user.setPassword(newPassword); //установка нового пароля
 
     await user.save();
