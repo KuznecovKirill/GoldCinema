@@ -39,6 +39,13 @@ const modelMediaCreate = async (newMedia) => {
     });
     addGenres(result.id_media, newMedia.genres);
     sequelize.sync();
+    // const isKeywords = await modelKeyWord.findOne({
+    //   where: {id_media: result.id_media}
+    // });
+    // console.log(isKeywords);
+    // if (!isKeywords)
+    //   keywordController.addInfo(result.id_media);
+
     return result;
   } catch (error) {
     if (error.name == "SequelizeUniqueConstraintError") {

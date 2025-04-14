@@ -1,6 +1,7 @@
 const responseHandler = require("../handlers/response.handler");
 const { modelKeyWord } = require("../models/modelKeyWord");
 const { modelMedia } = require("../models/modelMedia.js");
+const {modelReview} = require("../models/modelReview");
 const sequelize = require("../models/database").sequelize;
 
 const natural = require("natural");
@@ -32,6 +33,7 @@ const stopWords = [
   "что-то",
   "...",
   "для",
+  "про",
 ];
 // Правила замены
 const replacements = {
@@ -49,6 +51,7 @@ let globalVocabulary = new Set();
 const { spawn } = require("child_process");
 const path = require("path");
 const { modelGenre } = require("../models/modelGenre.js");
+const { where } = require("sequelize");
 
 async function lemmatizeText(text) {
   return new Promise((resolve, reject) => {
@@ -236,6 +239,7 @@ async function addInfo(id_media) {
   try {
     // const { id_media } = req.body;
     //const media = await modelMedia.findByPk(id_media);
+    
     const media = await modelMedia.findByPk(id_media, {
       include: [
         {
@@ -251,9 +255,15 @@ async function addInfo(id_media) {
     // Объединяем жанры в строку через пробел
     const genresString = genresArray.join(" ");
 
+    const reviewsArray = await modelReview.findAll({
+      where: { id_media: id_media },
+      order: [['id_review', 'DESC']],
+      attributes: ['comment_text']
+  });
+  const reviewsText = reviewsArray.map(review => review.comment_text).join(" ");
     const combine = `${media.title} ${genresString} ${
       media.mediaType
-    } ${media.country} ${media.descrition} ${media.rars}`;
+    } ${media.country} ${media.descrition} ${media.rars}, ${reviewsText}`;
 
     const combineText = replaceWords(combine, replacements); //Замена слов
     console.log(combineText);
@@ -263,15 +273,31 @@ async function addInfo(id_media) {
     newText.forEach((word) => globalVocabulary.add(word));
     console.log(newTextString);
 
-    const keywords = await modelKeyWord.create({
-      id_media: id_media,
-      keywords: newTextString,
-    });
-    sequelize.sync();
-    return keywords;
-    // responseHandler.created(res, {
-    //     keywords
-    // });
+    const isKeyword = await modelKeyWord.findOne(
+      {where: { id_media: id_media },}
+    );
+    if(isKeyword){
+      const existingKeywords = isKeyword.keywords;
+      const updatedKeywords = existingKeywords + " " + newTextString;
+
+      await modelKeyWord.update(
+        { keywords: updatedKeywords },
+        { where: { id_media: id_media } }
+      );
+
+      sequelize.sync();
+      return { message: "Keywords updated successfully", keywords: updatedKeywords };
+      // Добавить текст
+    }
+    else {
+      const keywords = await modelKeyWord.create({
+        id_media: id_media,
+        keywords: newTextString,
+      });
+
+      sequelize.sync();
+      return keywords;
+    }
   } catch (error) {
     console.error("Ошибка:", error);
   }
