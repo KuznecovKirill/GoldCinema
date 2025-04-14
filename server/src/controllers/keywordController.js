@@ -1,9 +1,9 @@
 const responseHandler = require("../handlers/response.handler");
 const { modelKeyWord } = require("../models/modelKeyWord");
 const { modelMedia } = require("../models/modelMedia.js");
-const {modelReview} = require("../models/modelReview");
+const { modelReview } = require("../models/modelReview");
 const sequelize = require("../models/database").sequelize;
-
+const { Op } = require("sequelize");
 const natural = require("natural");
 const tokenizer = new natural.WordTokenizer();
 
@@ -37,13 +37,13 @@ const stopWords = [
 ];
 // Правила замены
 const replacements = {
-  "FILM": "фильм",
-  "TV_SERIES": "сериал",
+  FILM: "фильм",
+  TV_SERIES: "сериал",
   "18+": "для взрослых 18",
   "16+": "для подростков 16",
   "12+": "для детей старше 12 лет",
   "6+": "для детей старше 6 лет",
-  "0+": "для всех возрастов"
+  "0+": "для всех возрастов",
 };
 let globalVocabulary = new Set();
 
@@ -87,13 +87,12 @@ async function lemmatizeText(text) {
       }
     });
   });
-};
-
+}
 
 // Функция для замены слов
 function replaceWords(text, replacements) {
   for (const [key, value] of Object.entries(replacements)) {
-    const regex = new RegExp(`\\b${key}\\b`, 'g'); // Регулярное выражение для точного совпадения слова
+    const regex = new RegExp(`\\b${key}\\b`, "g"); // Регулярное выражение для точного совпадения слова
     text = text.replace(regex, value);
   }
   return text;
@@ -176,9 +175,15 @@ function cosineSimilarity(vectorA, vectorB) {
 
   return dotProduct / (magnitudeA * magnitudeB);
 }
-async function search(userQuerry) {
+async function search(userQuerry, idList) {
   try {
-    const keywords = await modelKeyWord.findAll();
+    const keywords = await modelKeyWord.findAll({
+      where: {
+        id_media: {
+          [Op.in]: idList,
+        },
+      },
+    });
     // Обрабатываем все keywords и получаем тексты
     const keywordsTexts = keywords.map((keyword) => {
       const keywordsArray = keyword.keywords ? keyword.keywords.split(" ") : [];
@@ -239,7 +244,7 @@ async function addInfo(id_media) {
   try {
     // const { id_media } = req.body;
     //const media = await modelMedia.findByPk(id_media);
-    
+
     const media = await modelMedia.findByPk(id_media, {
       include: [
         {
@@ -257,26 +262,64 @@ async function addInfo(id_media) {
 
     const reviewsArray = await modelReview.findAll({
       where: { id_media: id_media },
-      order: [['id_review', 'DESC']],
-      attributes: ['comment_text']
-  });
-  const reviewsText = reviewsArray.map(review => review.comment_text).join(" ");
-    const combine = `${media.title} ${genresString} ${
-      media.mediaType
-    } ${media.country} ${media.descrition} ${media.rars}, ${reviewsText}`;
+      order: [["id_review", "DESC"]],
+      attributes: ["comment_text"],
+    });
+    // let reviewsText = reviewsArray.map(review => review.comment_text).join(" ");
+    let reviewsText = reviewsArray
+      .map((review) => review.comment_text)
+      .join(" ");
+    // let reviewsToken = tokenizer.tokenize(reviewsText);
+    // reviewsToken = reviewsToken.filter(token => token.toLowerCase() !== 'фильм' && token.toLowerCase() !== 'сериал');
+    // // Обратно в строку
+    // reviewsText = reviewsToken.join(" ");
+    console.log(reviewsText);
+
+    const combine = `${media.title} ${genresString} ${media.mediaType} ${media.country} ${media.descrition} ${media.rars}, ${reviewsText}`;
 
     const combineText = replaceWords(combine, replacements); //Замена слов
     console.log(combineText);
     const newText = await processText(combineText); // Лемматизируем текст
-    const newTextString = newText.join(" ");
+    let newTextString = newText.join(" ");
     //Обновление словаря
     newText.forEach((word) => globalVocabulary.add(word));
     console.log(newTextString);
 
-    const isKeyword = await modelKeyWord.findOne(
-      {where: { id_media: id_media },}
-    );
-    if(isKeyword){
+    // Удаление повторов слов "фильм" и "сериал"
+    const words = newTextString.split(" ");
+    const uniqueWords = [];
+
+    //для проверки их существования
+    const filmCount = words.filter((word) => word === "фильм").length; 
+    const serialCount = words.filter((word) => word === "сериал").length;
+
+    // Добавление слова "фильм" один раз, если оно есть
+    if (filmCount > 0) {
+      uniqueWords.push("фильм");
+    }
+
+    // Добавляем слова "сериал" один раз, если оно есть
+    if (serialCount > 0) {
+      uniqueWords.push("сериал");
+    }
+
+    // Добавление остальных слов, исключая повторы "фильм" и "сериал"
+    words.forEach((word) => {
+      if (
+        word !== "фильм" &&
+        word !== "сериал" &&
+        !uniqueWords.includes(word)
+      ) {
+        uniqueWords.push(word);
+      }
+    });
+
+    newTextString = uniqueWords.join(" ");
+
+    const isKeyword = await modelKeyWord.findOne({
+      where: { id_media: id_media },
+    });
+    if (isKeyword) {
       const existingKeywords = isKeyword.keywords;
       const updatedKeywords = existingKeywords + " " + newTextString;
 
@@ -286,10 +329,12 @@ async function addInfo(id_media) {
       );
 
       sequelize.sync();
-      return { message: "Keywords updated successfully", keywords: updatedKeywords };
+      return {
+        message: "Keywords updated successfully",
+        keywords: updatedKeywords,
+      };
       // Добавить текст
-    }
-    else {
+    } else {
       const keywords = await modelKeyWord.create({
         id_media: id_media,
         keywords: newTextString,

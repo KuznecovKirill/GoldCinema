@@ -556,9 +556,13 @@ const search = async (req, res) => {
     console.log("Search работает");
     const { mediaType } = req.params;
     const { query } = req.body;
-    const { page } = req.query;
+    const { page } = req.body;
     console.log(`${mediaType} + ${query} + + ${page}`);
-    const searchResult = await keywordController.search(query);
+
+    const medias = await modelMedia.findAll({where: {mediaType: mediaType}});
+    const idForSearch = medias.map((item) => item.id_media);
+
+    const searchResult = await keywordController.search(query, idForSearch);
     const scoreMap = searchResult.reduce((acc, item) => {
       acc[item.id_media] = item.score;
       return acc;
