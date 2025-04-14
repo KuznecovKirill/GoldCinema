@@ -1,19 +1,35 @@
-const {NaturalLanguageClient} = require('@google-cloud/language').v1;
+const puppeteer = require('puppeteer');
+const axios = require('axios');
+const cheerio = require('cheerio');
 
-async function analyzeText(text) {
-  const client = new NaturalLanguageClient();
-  const [response] = await client.analyzeEntities({
-    document: {
-      content: text,
-      type: 'PLAIN_TEXT',
-    },
-  });
+async function getKeywordsFromKinopoisk(url) {
+  try {
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
+    await page.goto(url);
 
-  const entities = response.entities;
-  const keywords = entities.map(entity => entity.name);
-  return keywords;
+    const html = await page.content();
+    const $ = cheerio.load(html);
+    const keywords = [];
+
+    $('a[data-real-keyword]').each((index, element) => {
+      keywords.push($(element).text());
+    });
+
+    await browser.close();
+
+    return keywords.join(', ');
+  } catch (error) {
+    console.error('Error scraping keywords:', error);
+    return null;
+  }
 }
 
-// Пример использования
-const filmDescription = 'Описание фильма';
-analyzeText(filmDescription).then(keywords => console.log(keywords));
+const url = 'https://www.kinopoisk.ru/film/301/keywords/';
+
+getKeywordsFromKinopoisk(url)
+  .then(keywordsText => {
+    if (keywordsText) {
+      console.log(keywordsText);
+    }
+  });
