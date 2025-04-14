@@ -172,7 +172,7 @@ const MainSlide = ({ mediaType, mediaCategory }) => {
                     <Divider orientation="vertical" />
                     {/* Жанры*/}
                     <Stack direction="row" spacing={1}>
-                      {med.genre
+                      {med.genres
                         .split(", ")
                         .slice(0, 3)
                         .map((genres, index) => (

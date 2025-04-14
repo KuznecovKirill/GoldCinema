@@ -22,7 +22,7 @@ const AdminPage = () => {
     initialValues: {
       id_media: "",
       collection: "TOP_250_MOVIES",
-      mediaType: "MOVIE",
+      mediaType: "FILM",
       page: 1,
     },
     onSubmit: async (values) => {
