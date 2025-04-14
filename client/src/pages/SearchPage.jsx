@@ -84,7 +84,7 @@ const SearchPage = () => {
           </Stack>
           <TextField
             color="success"
-            placeholder="Search MoonFlix"
+            placeholder="Search GoldCinema"
             sx={{ width: "100%" }}
             autoFocus
             onChange={queryChange}
