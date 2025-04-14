@@ -27,7 +27,7 @@ const handleCommand = async (req, res) => {
         break;
       case "updatePopular":
         req.params = {
-          mediaType: params.collection === "TOP_POPULAR_MOVIES" ? "FILM" : "TV_SERIES",
+          mediaType: params.mediaType,
           mediaCategory: "popular",
         };
         req.query = { page: params.page };

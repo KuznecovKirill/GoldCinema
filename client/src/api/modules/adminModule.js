@@ -6,7 +6,6 @@ const adminEndpoints = {
 
 const adminModule = {
   executeCommand: async ({ command, params }) => {
-    console.log(params);
     try {
       console.log(`POST-запрос: ${command}`);
       const response = await privateClient.post(adminEndpoints.executeCommand, {

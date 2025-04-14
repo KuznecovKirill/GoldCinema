@@ -13,11 +13,11 @@ import {
 import { toast } from "react-toastify";
 import adminModule from "../api/modules/adminModule";
 import Container from "../components/common/Container";
+import { useDispatch } from "react-redux";
 
 const AdminPage = () => {
   const [command, setCommand] = useState("addMedia");
   const [onRequest, setOnRequest] = useState(false);
-
   const form = useFormik({
     initialValues: {
       id_media: "",
