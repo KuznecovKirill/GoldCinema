@@ -21,4 +21,4 @@ const error = (res) => response(res, 500, {
   message: "Ошибка 500"
 });
 
-module.exports = {badrequest,goodrequest,created,notauthorized,notfound,error};
+module.exports = {badrequest, goodrequest,created,notauthorized,notfound,error};

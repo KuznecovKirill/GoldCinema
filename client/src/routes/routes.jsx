@@ -1,12 +1,16 @@
+import AdminPage from "../pages/AdminPage";
+import FavoritesPage from "../pages/FavoritesPage";
 import HomePage from "../pages/HomePage";
 import MediaList from "../pages/MediaList";
 import MediaPage from "../pages/MediaPage";
+import PasswordUpdate from "../pages/PasswordUpdate";
+import SearchPage from "../pages/SearchPage";
 export const routesGen = {
     home: "/",
     mediaList: (type) => `/${type}`,
     mediaInfo: (type, id) => `/${type}/${id}`,
     mediaSearch: "/search",
-    passwordUpdate: "passwordUpdate",
+    passwordUpdate: "password-update",
     favoriteList: "/favorites",
     reviewList: "/reviews",
   };
@@ -19,24 +23,31 @@ export const routesGen = {
    
     { 
       path: "/search",
+      element: <SearchPage/>,
       //Добавить потом элемент для search
       state: "search"
 
     },
     {
-      path: "/passwordUpdate",
-      //
-      state: "passwordUpdate"
-    },
-    {
       path: "/favorites",
-      //
+      element: <FavoritesPage/>,
       state: "favorites"
     },
     {
       path: "/reviews",
       //
       state: "reviews"
+    },
+    {
+      path: "/password-update",
+      element: <PasswordUpdate/>,
+      //
+      state: "password-update"
+    },
+    {
+      path: "/admin",
+      element: <AdminPage/>,
+      state: "admin"
     },
 
     {

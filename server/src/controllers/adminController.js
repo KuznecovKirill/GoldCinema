@@ -9,6 +9,10 @@ const handleCommand = async (req, res) => {
       case "addMedia":
         //curl -X POST "http://localhost:8000/admin/add-media" -H "Content-Type: application/json" -d '{"command": "addMedia", "params": {"id_media": "900"}}'
         req.body = { id_media: params.id_media };
+        const mediaExists = await mediaController.checkMediaExists(params.id_media);
+         if (mediaExists) {
+          return responseHandler.badrequest(res, "Медиа с таким ID уже существует.");
+        }
         await mediaController.addMedia(req, res);
         break;
       case "addMediaList":
@@ -37,7 +41,7 @@ const handleCommand = async (req, res) => {
         return responseHandler.badrequest(res, "Неизвестная команда");
     }
 
-    responseHandler.goodrequest(res, { message: "Команда успешно выполнена" });
+    //responseHandler.goodrequest(res, { message: "Команда успешно выполнена" });
   } catch (error) {
     console.error("Ошибка при выполнении команды:", error);
     responseHandler.error(res);

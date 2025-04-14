@@ -204,6 +204,17 @@ const addMedia = async (req, res) => {
   keywordController.addInfo(id_media);
   responseHandler.goodrequest(res, result);
 };
+const checkMediaExists = async (id_media) => {
+  try {
+      const media = await modelMedia.findOne({
+          where: { id_media },
+      });
+      return !!media; // true, если медиа существует
+  } catch (error) {
+      console.error("Ошибка при проверке медиа:", error);
+      return false;
+  }
+};
 //Установка популярных медиа
 const setPopularMedia = async (
   req,
@@ -572,6 +583,7 @@ module.exports = {
   getMedias,
   getAllMedias,
   addMedia,
+  checkMediaExists,
   getGenres,
   getInfo,
   setPopularMedia,
