@@ -1,6 +1,7 @@
 const responseHandler = require("../handlers/response.handler");
-const {modelReview} = require("../models/modelReview");
-const  modelUser  = require("../models/modelUser");
+const { modelMedia } = require("../models/modelMedia");
+const { modelReview } = require("../models/modelReview");
+const { modelUser } = require("../models/modelUser");
 const sequelize = require("../models/database").sequelize;
 const create = async (req, res) => {
   try {
@@ -50,16 +51,18 @@ const getReviewsOfUser = async (req, res) => {
     // Получаем все отзывы пользователя, сортируя их по дате создания
     const reviews = await modelReview.findAll({
       where: {
-        id_user: req.user.id,
+        id_user: req.user.id_user,
       },
-      include: [{
-        model: modelUser,
-        as: 'user', // Указанный псевдоним
-        attributes: ['id_user','username'] // Выбираем нужные поля
-      }],
+      include: [
+        { model: modelUser, as: "user", attributes: ["id_user", "username"] },
+        {
+          model: modelMedia,
+          as: "media",
+          attributes: ["id_media", "title", "mediaType", "cover"],
+        },
+      ],
       order: [["id_review", "DESC"]], // Сортировка по дате создания в порядке убывания
     });
-    console.log(reviews);
     responseHandler.goodrequest(res, reviews); // Отправляем успешный ответ с отзывами
   } catch (error) {
     console.error("Ошибка:", error);

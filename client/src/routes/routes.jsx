@@ -4,6 +4,7 @@ import HomePage from "../pages/HomePage";
 import MediaList from "../pages/MediaList";
 import MediaPage from "../pages/MediaPage";
 import PasswordUpdate from "../pages/PasswordUpdate";
+import ReviewList from "../pages/ReviewList";
 import SearchPage from "../pages/SearchPage";
 export const routesGen = {
     home: "/",
@@ -24,7 +25,6 @@ export const routesGen = {
     { 
       path: "/search",
       element: <SearchPage/>,
-      //Добавить потом элемент для search
       state: "search"
 
     },
@@ -35,13 +35,12 @@ export const routesGen = {
     },
     {
       path: "/reviews",
-      //
+      element: <ReviewList/>,
       state: "reviews"
     },
     {
       path: "/password-update",
       element: <PasswordUpdate/>,
-      //
       state: "password-update"
     },
     {
@@ -52,7 +51,8 @@ export const routesGen = {
 
     {
       path: "/:mediaType",
-      element: <MediaList/>
+      element: <MediaList/>,
+      
       //
     },
     {
