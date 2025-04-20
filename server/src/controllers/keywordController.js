@@ -114,25 +114,26 @@ async function processText(text) {
   }
 }
 
-// async function processText(text) {
-//     let tokens = tokenizer.tokenize(text);
-//     tokens = tokens.filter(token => !stopWords.includes(token.toLowerCase())); // Важно: toLowerCase()
-//     try {
-//         const lemmas = await lemmatizeText(text);
-//         const filteredLemmas = lemmas.filter(lemma => lemma.length > 2);
-//         console.log(filteredLemmas);
-//         return filteredLemmas;
-//     } catch (error) {
-//         console.error("Ошибка в lemmatizeText:", error);
-//         return []; // Важно: возвращаем пустой массив, чтобы не сломать дальнейшую обработку
-//     }
-// }
+//Нормализация вектора
+function normalizeVector(vector) {
+  let sumSquares = 0;
+  for (const term in vector) {
+    sumSquares += vector[term] * vector[term];
+  }
+  const magnitude = Math.sqrt(sumSquares);
+  if (magnitude === 0) return vector; // или вернуть пустой вектор
+  const normalized = {};
+  for (const term in vector) {
+    normalized[term] = vector[term] / magnitude;
+  }
+  return normalized;
+}
 
 // Функция для вычисления TF-IDF векторов
 function calculateTfIdf(documents, query) {
   const tfidf = new TfIdf();
 
-  // Добавляем документы в TF-IDF
+  // Сбор Мешка слов из документа и добавление документов в TF-IDF
   documents.forEach((document) => {
     tfidf.addDocument(document);
   });
@@ -146,7 +147,7 @@ function calculateTfIdf(documents, query) {
   tfidf.listTerms(queryIndex).forEach((item) => {
     queryVector[item.term] = item.tf;
   });
-
+  queryVector = normalizeVector(queryVector);
   return { tfidf, queryVector };
 }
 
@@ -184,31 +185,34 @@ async function search(userQuerry, idList) {
         },
       },
     });
-    // Обрабатываем все keywords и получаем тексты
+    // Преобразование keywords в текстовый вид
     const keywordsTexts = keywords.map((keyword) => {
       const keywordsArray = keyword.keywords ? keyword.keywords.split(" ") : [];
       return {
         ...keyword.get({ plain: true }),
-        keywords: keywordsArray.join(" "), // Объединяем в текст для TF-IDF
+        keywords: keywordsArray.join(" "), // Обьединение в текст
       };
     });
 
     // Создаем документы для TF-IDF
     const documents = keywordsTexts.map((item) => item.keywords);
     // Вычисляем TF-IDF
-    const processedQuery = await processText(userQuerry); // Лемматизируем запрос
+    const processedQuery = await processText(userQuerry); // Обработка пользовательского запроса
     const { tfidf, queryVector } = calculateTfIdf(
       documents,
       processedQuery.join(" ")
     );
     console.log(queryVector);
-    // Сравниваем запрос с каждым документом
+
+
+    // Сравнение запроса с каждым документом
     const results = keywordsTexts
       .map((keyword, index) => {
         let documentVector = {};
         tfidf.listTerms(index).forEach((item) => {
           documentVector[item.term] = item.tf;
         });
+        documentVector = normalizeVector(documentVector);
         const score = cosineSimilarity(queryVector, documentVector); // Вычисляем косинусную близость
         return { ...keyword, score };
       })
@@ -239,7 +243,12 @@ async function search(userQuerry, idList) {
     throw error;
   }
 }
-
+async function addInfoForAll (){
+  const medias = await modelMedia.findAll();
+  medias.map((media) => {
+    addInfo(media.id_media);
+  })
+}
 async function addInfo(id_media) {
   try {
     // const { id_media } = req.body;
