@@ -13,10 +13,14 @@ const HomePage = () => {
       <Container header="Популярные фильмы">
         <MediaSlide mediaType={configs.mediaType.FILM} mediaCategory={configs.mediaCategory.popular} />
       </Container>
-    </Box>
-    <Box marginTop="-4rem" sx={{...UI.style.mainContent }}>
       <Container header="Популярные сериалы">
         <MediaSlide mediaType={configs.mediaType.TV_SERIES} mediaCategory={configs.mediaCategory.popular} />
+      </Container>
+      <Container header="Лучшие фильмы">
+        <MediaSlide mediaType={configs.mediaType.FILM} mediaCategory={configs.mediaCategory.top_rated} />
+      </Container>
+      <Container header="Лучшие сериалы">
+        <MediaSlide mediaType={configs.mediaType.TV_SERIES} mediaCategory={configs.mediaCategory.top_rated} />
       </Container>
     </Box>
     </>
