@@ -37,6 +37,10 @@ const modelReview = sequelize.define(
       type: DataTypes.TEXT,
       allowNull: false,
     },
+    createdAt: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+    },
   },
   {
     timestamps: false,
@@ -49,7 +53,12 @@ modelReview.belongsTo(modelUser, {
   foreignKey: 'id_user',
   targetKey: 'id_user',
   as: 'user'
-})
+});
+modelReview.belongsTo(modelMedia, {
+  foreignKey: 'id_media',
+  targetKey: 'id_media',
+  as: 'media'
+});
 modelReview.prototype.toObject = function () {
   const values = { ...this.get() };
   return values;
@@ -62,6 +71,6 @@ modelReview.prototype.toJSON = function () {
 };
 (async () => {
   // Синхронизация моделей с базой данных без удаления существующих данных
-  await sequelize.sync();
+  await sequelize.sync({ alter: true });
 })();
 module.exports = { modelReview };

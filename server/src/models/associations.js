@@ -22,8 +22,8 @@ module.exports.setupAssociations = function () {
     as: 'genre',
   });
   // Отзыв принадлежит медиа
-  modelReview.belongsTo(modelMedia, {
-    foreignKey: 'id_media',
-    as: 'media',
-  });
+  // modelReview.belongsTo(modelMedia, {
+  //   foreignKey: 'id_media',
+  //   as: 'media',
+  // });
 };
