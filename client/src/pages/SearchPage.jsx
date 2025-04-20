@@ -5,7 +5,7 @@ import UI from "../configs/UI";
 import MediaGrid from "../components/common/MediaGrid";
 import { Box, Button, Stack, TextField, Toolbar } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
-const mediaTypes = ["FILM", "TV_SERIES", "MINI_SERIES", "ALL"];
+const mediaTypes = ["FILM", "TV_SERIES", "ALL"];
 let timer;
 const timeOut = 1000;
 const SearchPage = () => {

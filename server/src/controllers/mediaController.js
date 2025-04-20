@@ -523,9 +523,16 @@ const search = async (req, res) => {
     const { page } = req.body;
     console.log(`${mediaType} + ${query} + + ${page}`);
 
-    const medias = await modelMedia.findAll({
-      where: { mediaType: mediaType },
-    });
+    let medias;
+    if (mediaType !== "ALL"){
+      medias = await modelMedia.findAll({
+        where: { mediaType: mediaType },
+      });
+    }
+    else{
+      medias = await modelMedia.findAll();
+    }
+    
     const idForSearch = medias.map((item) => item.id_media);
 
     const searchResult = await keywordController.search(query, idForSearch);
