@@ -6,6 +6,7 @@ import {
   Stack,
   TextField,
   Typography,
+  Rating,
 } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
 import SendOutlinedIcon from "@mui/icons-material/SendOutlined";
@@ -55,6 +56,9 @@ const ReviewItem = ({ review, onRemoved }) => {
               {dayjs(review.createdAt).format("DD-MM-YYYY HH:mm:ss")}
             </Typography>
           </Stack>
+          <Typography variant="h6" fontWeight="700">
+          <Rating name="rating" value={review.rating_user}/>
+          </Typography> 
           <Typography variant="body1" textAlign="justify">
             {review.comment_text}
           </Typography>
@@ -122,7 +126,7 @@ const MediaReview = ({ reviews = [], media }) => {
       setFilteredReviews([...filteredReviews, response]);
       setReviewCount(reviewCount + 1);
       setComment("");
-      setRating_user(1);
+      setRating_user(0);
     }
   };
 
@@ -133,48 +137,24 @@ const MediaReview = ({ reviews = [], media }) => {
     setFilteredReviews([...filteredReviews, ...newReviews]);
     setPage(page + 1);
   };
-  // const onLoadMore = () => {
-  //   setFilteredReviews([
-  //     ...filteredReviews,
-  //     ...[...listReviews].splice(page * skip, skip),
-  //   ]);
-  //   setPage(page + 1);
-  // };
+
 
   const onRemoved = (id_review) => {
-    const newListReviews = listReviews.filter(e => e.id_review !== id_review);
+    const newListReviews = listReviews.filter((e) => e.id_review !== id_review);
     setListReviews(newListReviews);
     setFilteredReviews(newListReviews.slice(0, page * skip));
-  
-    setReviewCount(newListReviews.length); // Обновляем количество отзывов
+
+    setReviewCount(newListReviews.length); // Обновление кол-ва отзывов
     toast.success("Удаление успешно");
   };
-  // const onRemoved = (id_review) => {
-  //   if (listReviews.findIndex((e) => e.id_review === id_review) !== -1) {
-  //     const newListReviews = [...listReviews].filter(
-  //       (e) => e.id_review !== id_review
-  //     );
-  //     setListReviews(newListReviews);
-  //     setFilteredReviews([...newListReviews].splice(0, page * skip));
-  //   } else {
-  //     setFilteredReviews(
-  //       [...filteredReviews].filter((e) => e.id_review !== id_review)
-  //     );
-  //   }
-
-  //   setReviewCount(reviewCount - 1);
-
-  //   toast.success("Удаление успешно");
-  // };
 
   return (
     <>
       <Container header={`Обзоры (${reviewCount})`}>
         <Stack spacing={4} marginBottom={2}>
           {filteredReviews.map((item) => {
-            if (!item || !item.user) return null; // Проверяем наличие данных перед рендерингом 
+            if (!item || !item.user) return null; // Проверяем наличие данных перед рендерингом
 
-            
             return (
               <Box key={item.id_review}>
                 <ReviewItem review={item} onRemoved={onRemoved} />
@@ -197,7 +177,16 @@ const MediaReview = ({ reviews = [], media }) => {
               {/* <AvatarUser text={user.username} /> */}
               <Stack spacing={2} flexGrow={1}>
                 <Typography variant="h6" fontWeight="700">
+                  {/* Компонент Rating */}
                   {user.username}
+                  <Rating
+                    name="rating"
+                    value={rating_user}
+                    onChange={(event, newValue) => {
+                      setRating_user(newValue);
+                    }}
+                  />
+                  
                 </Typography>
                 <TextField
                   value={comment_text}
