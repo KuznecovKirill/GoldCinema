@@ -26,10 +26,6 @@ const modelMedia = sequelize.define(
       type: DataTypes.STRING,
       allowNull: true,
     },
-    genre: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
     running_time: {
       type: DataTypes.INTEGER,
       allowNull: true,

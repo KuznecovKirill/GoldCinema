@@ -243,12 +243,6 @@ async function search(userQuerry, idList) {
     throw error;
   }
 }
-async function addInfoForAll (){
-  const medias = await modelMedia.findAll();
-  medias.map((media) => {
-    addInfo(media.id_media);
-  })
-}
 async function addInfo(id_media) {
   try {
     // const { id_media } = req.body;

@@ -30,7 +30,7 @@ const modelReview = sequelize.define(
       allowNull: false,
     },
     rating_user: {
-      type: DataTypes.FLOAT,
+      type: DataTypes.SMALLINT,
       allowNull: false,
     },
     comment_text: {

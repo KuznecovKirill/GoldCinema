@@ -16,7 +16,7 @@ router.post(
   "/addMedia",
   body("id_media")
     .exists()
-    .withMessage("Имя пользователя")
+    .withMessage("Идентификатор медиа")
     .custom(async (value) => {
       const media = await modelMedia.findOne({ where: { id_media: value } });
       if (media) return Promise.reject(new Error("Такое медиа уже есть!"));
@@ -24,10 +24,10 @@ router.post(
     requestHandler.validate,
     mediaController.addMedia
 ); //Добавление медиа
-router.get("/popularMovies", mediaController.setPopularMovie);
-router.get("/popularSeries", mediaController.setPopularSeries);
-router.get("/topMovies", mediaController.setTopMovie);
-router.get("/topSeries", mediaController.setTopSeries);
+// router.get("/popularMovies", mediaController.setPopularMovie);
+// router.get("/popularSeries", mediaController.setPopularSeries);
+// router.get("/topMovies", mediaController.setTopMovie);
+// router.get("/topSeries", mediaController.setTopSeries);
 
 
 // router.get("/Type", mediaController.getMediasByType); //для получения типа медиа
