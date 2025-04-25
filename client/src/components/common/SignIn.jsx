@@ -74,7 +74,7 @@ const SignIn = ({ switchAuthState }) => {
         sx={{ marginTop: 4 }}
         loading={isLoginRequest}
         >
-            Войти
+            Вход
         </LoadingButton>
         <Button
         fullWidth
