@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import mediaModule from "../api/modules/mediaModule";
 import { toast } from "react-toastify";
 import UI from "../configs/UI";
@@ -6,7 +6,6 @@ import MediaGrid from "../components/common/MediaGrid";
 import { Box, Button, Stack, TextField, Toolbar } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 
-// Опции для разделения английских и русских слов
 const mediaTypeOptions = [
   { key: "FILM", label: "Фильм" },
   { key: "TV_SERIES", label: "Сериал" },
@@ -15,49 +14,69 @@ const mediaTypeOptions = [
 
 let timer;
 const timeOut = 1000;
+const skip = 8;
 
 const SearchPage = () => {
-  const [searchM, setSearchM] = useState(false);
-  const [mediaType, setMediaType] = useState(mediaTypeOptions[0].key); // Используется ключ
-  const [query, setQuerry] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [mediaType, setMediaType] = useState(mediaTypeOptions[0].key);
+  const [query, setQuery] = useState("");
   const [medias, setMedias] = useState([]);
-  const [page, setPage] = useState(1);
+  const [filtredMedias, setFiltredMedias] = useState([]); // медиа, которые будут отображаться
+  const [page, setPage] = useState(0);
 
   const search = useCallback(async () => {
-    setSearchM(true);
+    if (query.trim().length === 0) {
+      setMedias([]);
+      setFiltredMedias([]);
+      setPage(0);
+      return;
+    }
+
+    setLoading(true);
     const { response, err } = await mediaModule.search({
       mediaType,
       query,
-      page,
+      // Можно не передавать page
     });
-    setSearchM(false);
-    
-    if (err) toast.error(err.message);
+    setLoading(false);
+
+    if (err) {
+      toast.error(err.message);
+      return;
+    }
+
     if (response) {
-      page > 1 ? setMedias((med) => [...med, ...response]) : setMedias([...response]);
+      setMedias(response);
+      setPage(0);
+      setFiltredMedias(response.slice(0, skip)); // берутся следующие 8 медиа
     }
-  }, [mediaType, query, page]);
+  }, [mediaType, query]);
 
   useEffect(() => {
-    if (query.trim().length === 0) {
-      setMedias([]);
-      setPage(1);
-    } else {
-      search();
-    }
-  }, [search, query, mediaType, page]);
+    search();
+  }, [search]);
 
   useEffect(() => {
+    // Сброс результата при смене типа
     setMedias([]);
-    setPage(1);
+    setFiltredMedias([]);
+    setPage(0);
   }, [mediaType]);
 
+  //Загрузить ещё медиа
+  const onLoadMore = () => {
+    const nextPage = page + 1;
+    const newItems = medias.slice(nextPage * skip, nextPage * skip + skip);
+    setFiltredMedias(prev => [...prev, ...newItems]);
+    setPage(nextPage);
+  };
+
   const categoryChange = (cat) => setMediaType(cat);
-  
+
   const queryChange = (e) => {
     const newQuery = e.target.value;
     clearTimeout(timer);
-    timer = setTimeout(() => setQuerry(newQuery), timeOut);
+    timer = setTimeout(() => setQuery(newQuery), timeOut);
   };
 
   return (
@@ -77,31 +96,32 @@ const SearchPage = () => {
                 key={item.key}
                 variant={mediaType === item.key ? "contained" : "text"}
                 sx={{
-                  color: mediaType === item.key 
-                    ? "primary.contrastText" 
-                    : "text.primary",
+                  color:
+                    mediaType === item.key
+                      ? "primary.contrastText"
+                      : "text.primary",
                 }}
                 onClick={() => categoryChange(item.key)}
               >
-                {item.label} {/* Отображение типов на русском*/}
+                {item.label}
               </Button>
             ))}
           </Stack>
-          
+
           <TextField
             color="success"
-            placeholder="Search GoldCinema"
+            placeholder="Поиск GoldCinema"
             sx={{ width: "100%" }}
             autoFocus
             onChange={queryChange}
           />
 
-          {medias.length > 0 && (
-            <MediaGrid medias={medias} mediaType={mediaType} />
+          {filtredMedias.length > 0 && (
+            <MediaGrid medias={filtredMedias} mediaType={mediaType} />
           )}
 
-          {medias.length > 0 && (
-            <LoadingButton loading={searchM} onClick={() => setPage(page + 1)}>
+          {filtredMedias.length < medias.length && (
+            <LoadingButton loading={loading} onClick={onLoadMore}>
               Загрузить ещё
             </LoadingButton>
           )}

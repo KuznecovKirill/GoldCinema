@@ -216,7 +216,7 @@ async function search(userQuerry, idList) {
         const score = cosineSimilarity(queryVector, documentVector); // Вычисляем косинусную близость
         return { ...keyword, score };
       })
-      .filter((keyword) => keyword.score > 0.07); // Фильтруем результаты
+      .filter((keyword) => keyword.score > 0.03); // Фильтруем результаты
 
     results.sort((a, b) => b.score - a.score);
 
