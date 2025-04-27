@@ -52,7 +52,8 @@ const modelReview = sequelize.define(
 modelReview.belongsTo(modelUser, {
   foreignKey: 'id_user',
   targetKey: 'id_user',
-  as: 'user'
+  as: 'user',
+  onDelete: 'CASCADE'
 });
 modelReview.belongsTo(modelMedia, {
   foreignKey: 'id_media',

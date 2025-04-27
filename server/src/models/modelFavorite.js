@@ -33,7 +33,11 @@ const modelFavorite = sequelize.define(
     freezeTableName: true,
   }
 );
-
+modelFavorite.belongsTo(modelUser, {
+  foreignKey: 'id_user',
+  targetKey: 'id_user',
+  onDelete: 'CASCADE'
+});
 modelFavorite.prototype.toObject = function () {
   const values = { ...this.get() };
   return values;
