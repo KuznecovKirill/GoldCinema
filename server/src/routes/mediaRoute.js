@@ -43,7 +43,7 @@ router.post(
       if (media) return Promise.reject(new Error("Для этого медиа similars определены!"));
     }),
     requestHandler.validate,
-    similarController.setSimilarMedia
+    similarController.setSimilarMediaByAPI
 ); //Добавление похожих медиа
 router.get("/info/:id_media", mediaController.getInfo); //для получения подробной информации
 
@@ -55,6 +55,7 @@ router.post("/search/:mediaType",
   requestHandler.validate,
   mediaController.search
 );
+router.get("/search/:mediaType", mediaController.search);
 //router.get("/search/:mediaType", mediaController.search); //для поиска
 router.get("/:mediaType/:mediaCategory", mediaController.getMedias); //для получения списка медиа по типу
 //curl GET "http://localhost:8000/medias/FILM/all?&page=1&limit=40"

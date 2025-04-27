@@ -241,7 +241,7 @@ const setPopularMedia = async (
 ) => {
   const popularMedias = await swaggerAPI.mediaCollections({
     type: mediaCollectionType,
-    page: req.query.page,
+    page: req.query.page || 1,
   });
 
   const addedMedias = [];
@@ -519,9 +519,8 @@ const search = async (req, res) => {
   try {
     console.log("Search работает");
     const { mediaType } = req.params;
-    const { query } = req.body;
-    const { page } = req.body;
-    console.log(`${mediaType} + ${query} + + ${page}`);
+    const { query } = req.query;
+    const { page } = req.query;
 
     let medias;
     if (mediaType !== "ALL"){
