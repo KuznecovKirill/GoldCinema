@@ -7,7 +7,7 @@ const mediaEndpoints = {
   medias: ({ mediaType, mediaCategory, page, limit }) => `/medias/${mediaType}/${mediaCategory}?&page=${page}&limit=${limit}`,
   mediasByType: ({mediaType}) => `/Type?mediaType=${mediaType}`, //curl GET "http://localhost:8000/medias/Type?mediaType=TV_SERIES" 
   info: ({id_media}) => `/medias/info/${id_media}`,
-  search: ({ mediaType, query, page }) => `/medias/search/${mediaType}?&query=${query}&page=${page}`,
+  search: ({ mediaType, query}) => `/medias/search/${mediaType}?&query=${query}`,
 };
 
 const mediaModule = {
@@ -45,17 +45,13 @@ const mediaModule = {
       return { response };
     } catch (err) { return { err }; }
   },
-  search: async ({ mediaType, query, page }) => {
+  search: async ({ mediaType, query }) => {
     try {
       
       const response = await publicClient.get(
-        mediaEndpoints.search({mediaType, query, page}),
+        mediaEndpoints.search({mediaType, query}),
         
       );
-      // {query, page}
-      // const response = await publicClient.get(
-      //   mediaEndpoints.search({ mediaType, query, page })
-      // );
 
       return { response };
     } catch (err) { return { err }; }

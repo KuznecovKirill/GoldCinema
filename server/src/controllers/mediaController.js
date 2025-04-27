@@ -520,7 +520,6 @@ const search = async (req, res) => {
     console.log("Search работает");
     const { mediaType } = req.params;
     const { query } = req.query;
-    const { page } = req.query;
 
     let medias;
     if (mediaType !== "ALL"){
