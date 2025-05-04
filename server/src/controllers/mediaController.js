@@ -502,7 +502,7 @@ const getInfo = async (req, res) => {
     responseHandler.goodrequest(res, {
       media,
       reviews,
-      user,
+      // user,
       isFavorite,
       images,
       similars,

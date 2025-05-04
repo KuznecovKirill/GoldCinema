@@ -41,7 +41,7 @@ const user = [
         state: "favorite"
       },
       {
-        display: "Обзоры",
+        display: "Мои отзывы",
         path: "/reviews",
         icon: <ReviewIcon />,
         state: "reviews"

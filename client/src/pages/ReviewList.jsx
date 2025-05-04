@@ -109,7 +109,7 @@ const ReviewList = () => {
   
     useEffect(() => {
       const getReviews = async () => {
-        console.log("Страница обзоров");
+        console.log("Страница отзывов");
         dispatch(setGlobalLoading(true));
         const { response, err } = await reviewModule.getReviewsOfUser();
         dispatch(setGlobalLoading(false));
@@ -142,7 +142,7 @@ const ReviewList = () => {
 
     return (
       <Box sx={{ ...UI.style.mainContent }}>
-        <Container header={`Ваши обзоры (${count})`}>
+        <Container header={`Ваши отзывы (${count})`}>
           <Stack spacing={2}>
             {filteredReviews.map((item) => (
               <Box key={item.id}>

@@ -54,11 +54,11 @@ const FavoritesItem = ({media, onRemoved}) => {
 const FavoritesPage = () => {
     const [medias, setMedias] = useState([]);
     const [filtredMedias, setFiltredMedias] = useState([]);
-    const [page, setPage] = useState(1);
+    const [page, setPage] = useState(0);
     const [count, setCount] = useState(0);
 
     const dispatch = useDispatch();
-    const skip = 5;
+    const skip = 4;
 
     useEffect(() => {
         const getFavorites = async() => {
@@ -67,23 +67,30 @@ const FavoritesPage = () => {
         dispatch(setGlobalLoading(false));
 
         if (err) toast.error(err.message);
+        console.log(response);
         if (response) {
             setCount(response.length);
             setMedias([...response]);
-            setFiltredMedias([...response].splice(0, skip));
+            setFiltredMedias([...response].slice(0, skip));
         }
     };
     getFavorites();
     }, []);
 
     const onLoadMore = () => {
-        setFiltredMedias([...filtredMedias, ...[medias].splice(page * skip, skip)]);
-        setPage(page + 1);
+        const newItems = medias.slice(
+            (page + 1) * skip, 
+            (page + 1) * skip + skip
+          );
+          setFiltredMedias(prev => [...prev, ...newItems]);
+          setPage(prev => prev + 1);
+        // setFiltredMedias([...filtredMedias, ...[...medias].slice(page * skip, skip)]);
+        // setPage(page + 1);
     };
     const onRemoved = (id_media) => {
         const newMedias = [...medias].filter(e => e.id_media !== id_media);
         setMedias(newMedias);
-        setFiltredMedias([...newMedias].splice(0, page * skip));
+        setFiltredMedias([...newMedias].slice(0, page * skip));
         setCount(count - 1);
     };
     console.log("Это страница избранного списка");
@@ -97,7 +104,7 @@ const FavoritesPage = () => {
                         </Grid>
                     ))}
                 </Grid>
-                {filtredMedias.length > medias.length && (
+                {filtredMedias.length < medias.length && (
                     <Button onClick={onLoadMore}> загрузить ещё</Button>
                 )}
             </Container>

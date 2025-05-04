@@ -15,7 +15,7 @@ const create = async (req, res) => {
     });
     sequelize.sync();
     responseHandler.created(res, {
-      id_review: review.id_review,
+      // id_review: review.id_review,
       user: req.user,
       ...review.dataValues,
     });

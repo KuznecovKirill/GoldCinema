@@ -47,14 +47,14 @@ router.post(
 ); //Добавление похожих медиа
 router.get("/info/:id_media", mediaController.getInfo); //для получения подробной информации
 
-router.post("/search/:mediaType",
-  body("query")
-  .exists(),
-  body("page")
-  .exists(),
-  requestHandler.validate,
-  mediaController.search
-);
+// router.post("/search/:mediaType",
+//   body("query")
+//   .exists(),
+//   body("page")
+//   .exists(),
+//   requestHandler.validate,
+//   mediaController.search
+// );
 router.get("/search/:mediaType", mediaController.search);
 //router.get("/search/:mediaType", mediaController.search); //для поиска
 router.get("/:mediaType/:mediaCategory", mediaController.getMedias); //для получения списка медиа по типу
