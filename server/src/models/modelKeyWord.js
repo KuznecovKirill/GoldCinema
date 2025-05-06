@@ -1,5 +1,4 @@
 const { DataTypes } = require("sequelize");
-const { modelUser } = require("./modelUser");
 const { modelMedia } = require("./modelMedia");
 const sequelize = require("./database").sequelize;
 
@@ -42,7 +41,6 @@ modelKeyWord.prototype.toJSON = function () {
   return values;
 };
 (async () => {
-  // Синхронизация моделей с базой данных без удаления существующих данных
   await sequelize.sync();
 })();
 module.exports = {  modelKeyWord };

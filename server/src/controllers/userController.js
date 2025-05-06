@@ -24,27 +24,19 @@ const signUp = async (req, res) => {
         user.id_role = 2;
 
     await user.save();
-    // const user = await modelUser.create({
-    //   username: username,
-    //   password: password,
-    //   passToken: crypto.randomBytes(16).toString("hex"),
-    //   id_role: 1
-    // });
-    // sequelize.sync();
     const token = jsonwebtoken.sign(
       { data: user.id_user },
       process.env.TOKEN_SECRET,
       { expiresIn: "24h" }
     );
-
+    
     //Отправка успешного ответа
     responseHandler.created(res, {
       token,
       ...user.dataValues,
-      id: user.id_user,
+      // id: user.id_user,
     });
-  } catch (err) {
-    // console.log(err);
+  } catch {
     responseHandler.error(res);
   }
 };
@@ -57,7 +49,7 @@ const signIn = async (req, res) => {
       where: {username: username, password: password}, 
       attributes: ['id_user', 'username', 'password', 'passToken', 'id_role'] });
     console.log(user);
-    if (!user) return responseHandler.badrequest(res, "Такого пользователя не существует!"); //Проверка пользователя
+    if (!user) return responseHandler.notfound(res); //Проверка пользователя
 
     if (!user.validPassword(password)) return responseHandler.badrequest(res, "Неверный пароль!");
 
@@ -74,8 +66,7 @@ const signIn = async (req, res) => {
     responseHandler.created(res, {
       token,
       ...user.dataValues,
-      // ...user._doc,
-      id: user.id_user
+      // id: user.id_user
     });
   } catch {
     responseHandler.error(res);
@@ -88,7 +79,6 @@ const updatePassword = async (req, res) => {
     const user = await modelUser.findByPk(req.user.id_user, {
       attributes: ['id_user', 'password', 'passToken']
     });
-    // const user = await modelUser.findByPk(req.user.id_user).select("id_user password passToken");
     if (!user) return responseHandler.notauthorized(res);
 
     if (!user.validPassword(password)) return responseHandler.badrequest(res, "Неверный пароль!");
@@ -96,7 +86,6 @@ const updatePassword = async (req, res) => {
     user.setPassword(newPassword); //установка нового пароля
 
     await user.save();
-
     responseHandler.goodrequest(res);
   } catch {
     responseHandler.error(res);

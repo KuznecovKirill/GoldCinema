@@ -41,7 +41,7 @@ const handleCommand = async (req, res) => {
         return responseHandler.badrequest(res, "Неизвестная команда");
     }
 
-    //responseHandler.goodrequest(res, { message: "Команда успешно выполнена" });
+    responseHandler.goodrequest(res, { message: "Команда успешно выполнена" });
   } catch (error) {
     console.error("Ошибка при выполнении команды:", error);
     responseHandler.error(res);

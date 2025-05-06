@@ -1,7 +1,6 @@
 const { Sequelize, DataTypes } = require("sequelize");
 const sequelize = require("./database").sequelize;
 
-//Модель медиа
 const modelMedia_Genre = sequelize.define(
   "Media_Genre",
   {
@@ -39,7 +38,6 @@ modelMedia_Genre.prototype.toJSON = function () {
 
 async () => {
     await sequelize.sync({ alter: true });
-    //await sequelize.sync();
   };
 
 module.exports = { modelMedia_Genre };

@@ -87,22 +87,4 @@ modelUser.prototype.isAdmin = function() {
   // Синхронизация моделей с базой данных без удаления существующих данных
   await sequelize.sync();
 })();
-// (async () => {
-//     await modelUser.sync(); // Синхронизация таблицы
-
-//     // Создание нового пользователя
-//     const newUser = await modelUser.create({
-//         username: "toem",
-//         displayName: "Tom",
-//         password: "password", // Временный пароль
-//         salt: crypto.randomBytes(16).toString("hex") // Генерация соли
-//     });
-
-//     // Сохранение пользователя с новым хешированным паролем и солью
-//     await newUser.save();
-
-//     console.log('Пользователь создан:', newUser.toJSON());
-//     console.log(newUser.toJSON());
-// })();
-
 module.exports = { modelUser };

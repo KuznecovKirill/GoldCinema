@@ -37,8 +37,8 @@ modelPopularMovie.prototype.toJSON = function () {
 };
 
 async () => {
-  await sequelize.sync({ alter: true });
-  //await sequelize.sync();
+  // await sequelize.sync({ alter: true });
+  await sequelize.sync();
 };
 
 module.exports = { modelPopularMovie };
