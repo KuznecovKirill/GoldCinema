@@ -35,7 +35,7 @@ const setSimilarMedia = async (id_media) => { //curl -X POST "http://localhost:8
       const existingMedia = await modelMedia.findOne({ where: { id_media: item.filmId } }); //Проверка на существование similarMedia в в Media
       if (!existingMedia) {
         // Добавление медиа
-        const response = await axios.post('http://localhost:8000/medias/addMedia', {
+        const response = await axios.post('http://localhost:8000/goldcinema/v1/medias/addMedia', {
           id_media: item.filmId
         });
         if (response.status !== 200) {
@@ -69,7 +69,7 @@ const setSimilarMediaByAPI = async (req, res) => { //curl -X POST "http://localh
       const existingMedia = await modelMedia.findOne({ where: { id_media: item.filmId } }); //Проверка на существование similarMedia в в Media
       if (!existingMedia) {
         // Добавление медиа
-        const response = await axios.post('http://localhost:8000/medias/addMedia', {
+        const response = await axios.post('http://localhost:8000/goldcinema/v1/medias/addMedia', {
           id_media: item.filmId
         });
         if (response.status !== 200) {

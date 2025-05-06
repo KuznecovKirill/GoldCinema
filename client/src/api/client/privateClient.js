@@ -1,7 +1,7 @@
 import axios from "axios";
 import queryString from "query-string";
 
-const baseURL = "http://localhost:8000";
+const baseURL = "http://localhost:8000/goldcinema/v1";
 
 const privateClient = axios.create({
     baseURL,

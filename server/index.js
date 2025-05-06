@@ -26,7 +26,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(bodyParser.json());
 
-app.use("", routes);
+app.use("/goldcinema/v1", routes);
 ///goldcinema/v1
 
 const port = process.env.PORT;
@@ -45,27 +45,6 @@ const connection = mysql.createConnection({
 app.post('/', (req, res) => {
     res.send('POST запрос на корневом маршруте');
 });
-// app.post("/signUp", userController.signUp);
-// app.post("/user/signIn", userController.signIn); //curl -X POST -H "Content-Type: application/json" -d '{"username": "новичок", "password": "password123"}' http://localhost:8000/signIn
-// app.post("/medias", mediaController.getMedias);
-// app.post('/genres', mediaController.getGenres);
-// app.post('/media/search', mediaController.search);
-// app.post('/keyword',keywordController.addInfo);
-// app.post('/keyword/search', keywordController.search);
-// app.post('/favorites', favoriteController.addFavorite); //curl -X POST -H "Content-Type: application/json" -d '{"id_user": "1", "id_media": "738499"}' http://localhost:8000/favorites
-
-// app.post('/medias', (req, res) => {
-//     const page = req.body.page; // Получаем значение page из тела запроса
-//     const limit = req.body.limit || 10;
-//     const newReq = {
-//         query: { page, limit }, // Передаем параметры как query
-//         body: req.body,
-//     };
-//     return mediaController.getMedias(newReq, res);
-
-//     console.log(page);
-//     res.send(`Страница: ${page}`);
-// });
 //Подключение
 
 connection.connect(err => {
@@ -80,7 +59,6 @@ connection.connect(err => {
         console.log(`Сервер слушает порт ${port}`);
     });
 });
-//PlayGround.getMovies();
 
 //connection.end();
 
