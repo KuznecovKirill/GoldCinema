@@ -25,8 +25,8 @@ const MediaList = () => {
     const prevMediaType = usePrevious(mediaType);
     const dispatch = useDispatch();
   
-    const mediaCategories = useMemo(() => ["popular", "rated","all"], []);
-    const category = ["popular", "rated", "all"];
+    const mediaCategories = useMemo(() => ["all","popular", "top"], []);
+    const category = ["Все", "Популярные", "Высокооценённые"];
   
     useEffect(() => {
       dispatch(setAppState(mediaType));
@@ -37,7 +37,6 @@ const MediaList = () => {
       const getMedias = async () => {
         if (currPage === 1) dispatch(setGlobalLoading(true));
         setMediaLoading(true);
-  
         const { response, err } = await mediaModule.getMedias({
           mediaType,
           mediaCategory: mediaCategories[currCategory],
@@ -50,6 +49,10 @@ const MediaList = () => {
   
         if (err) toast.error(err.message);
         if (response) {
+          let newMedias = response.medias;
+          if (mediaCategories[currCategory] === "top") {
+            newMedias = newMedias.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+          }
           if (currPage !== 1) setMedias(m => [...m, ...response.medias]);
           else setMedias([...response.medias]);
         }
@@ -61,9 +64,6 @@ const MediaList = () => {
       }
 
       getMedias();
-    //   if (mediaType !== prevMediaType || currPage !== 1 || currCategory !== 0) {
-    //     getMedias();
-    // }
     }, [
       mediaType,
       currCategory,
