@@ -41,7 +41,6 @@ const mediaModule = {
       const response = await privateClient.get(
         mediaEndpoints.info({ id_media })
       );
-      console.log(response);
       return { response };
     } catch (err) { return { err }; }
   },

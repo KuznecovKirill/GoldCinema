@@ -116,6 +116,7 @@ const MediaReview = ({ reviews = [], media }) => {
     };
 
     const { response, err } = await reviewModule.create(body);
+    console.log(response);
 
     setOnRequest(false);
 
@@ -150,7 +151,7 @@ const MediaReview = ({ reviews = [], media }) => {
 
   return (
     <>
-      <Container header={`Обзоры (${reviewCount})`}>
+      <Container header={`Отзывы (${reviewCount})`}>
         <Stack spacing={4} marginBottom={2}>
           {filteredReviews.map((item) => {
             if (!item || !item.user) return null; // Проверяем наличие данных перед рендерингом
@@ -193,7 +194,7 @@ const MediaReview = ({ reviews = [], media }) => {
                   onChange={(e) => setComment(e.target.value)}
                   multiline
                   rows={4}
-                  placeholder="Напишите свой обзор"
+                  placeholder="Напишите свой отзыв"
                   variant="outlined"
                 />
                 <LoadingButton
@@ -205,7 +206,7 @@ const MediaReview = ({ reviews = [], media }) => {
                   loading={onRequest}
                   onClick={onAddReview}
                 >
-                  отправить
+                  Опубликовать
                 </LoadingButton>
               </Stack>
             </Stack>

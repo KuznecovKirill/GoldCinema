@@ -1,19 +1,10 @@
 import React, { useState } from "react";
 import { useFormik } from "formik";
 import { LoadingButton } from "@mui/lab";
-import {
-  Box,
-  Stack,
-  TextField,
-  MenuItem,
-  Select,
-  InputLabel,
-  FormControl,
-} from "@mui/material";
+import { Box, Stack, TextField, MenuItem, Select, InputLabel, FormControl } from "@mui/material";
 import { toast } from "react-toastify";
 import adminModule from "../api/modules/adminModule";
 import Container from "../components/common/Container";
-import { useDispatch } from "react-redux";
 
 const AdminPage = () => {
   const [command, setCommand] = useState("addMedia");
@@ -92,12 +83,7 @@ const AdminPage = () => {
             <>
               <FormControl fullWidth>
                 <InputLabel>Тип коллекции</InputLabel>
-                <Select
-                  name="collection"
-                  value={form.values.collection}
-                  onChange={form.handleChange}
-                  label="Тип коллекции"
-                >
+                <Select name="collection" value={form.values.collection} onChange={form.handleChange} label="Тип коллекции">
                   <MenuItem value="TOP_250_MOVIES">Лучшие фильмы</MenuItem>
                   <MenuItem value="TOP_250_SERIES">Лучшие сериалы</MenuItem>
                 </Select>
@@ -117,24 +103,12 @@ const AdminPage = () => {
             <>
               <FormControl fullWidth>
                 <InputLabel>Тип медиа</InputLabel>
-                <Select
-                  name="mediaType"
-                  value={form.values.mediaType}
-                  onChange={form.handleChange}
-                  label="Тип медиа"
-                >
+                <Select name="mediaType" value={form.values.mediaType} onChange={form.handleChange} label="Тип медиа">
                   <MenuItem value="FILM">Фильмы</MenuItem>
                   <MenuItem value="TV_SERIES">Сериалы</MenuItem>
                 </Select>
               </FormControl>
-              <TextField
-                type="number"
-                name="page"
-                label="Номер страницы"
-                value={form.values.page}
-                onChange={form.handleChange}
-                fullWidth
-              />
+              <TextField type="number" name="page" label="Номер страницы" value={form.values.page} onChange={form.handleChange} fullWidth/>
             </>
           )}
 

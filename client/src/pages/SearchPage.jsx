@@ -7,9 +7,10 @@ import { Box, Button, Stack, TextField, Toolbar } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 
 const mediaTypeOptions = [
+  { key: "ALL", label: "Все" },
   { key: "FILM", label: "Фильм" },
-  { key: "TV_SERIES", label: "Сериал" },
-  { key: "ALL", label: "Все" }
+  { key: "TV_SERIES", label: "Сериал" }
+  
 ];
 
 let timer;
@@ -57,13 +58,10 @@ const SearchPage = () => {
   }, [search]);
 
   useEffect(() => {
-    // Сброс результата при смене типа
     setMedias([]);
     setFiltredMedias([]);
     setPage(0);
   }, [mediaType]);
-
-  //Загрузить ещё медиа
   const onLoadMore = () => {
     const nextPage = page + 1;
     const newItems = medias.slice(nextPage * skip, nextPage * skip + skip);
