@@ -8,33 +8,7 @@ const natural = require("natural");
 const tokenizer = new natural.WordTokenizer();
 
 const { TfIdf } = natural;
-const stopWords = [
-  "в",
-  "на",
-  "к",
-  "по",
-  "с",
-  "из",
-  "у",
-  "за",
-  "от",
-  "до",
-  "и",
-  "а",
-  "но",
-  "или",
-  "как",
-  "что",
-  "чтобы",
-  "если",
-  "бы",
-  "же",
-  "ли",
-  "что-то",
-  "...",
-  "для",
-  "про",
-];
+const stopWords = [ "в", "на", "к", "по","с","из","у","за","от","до","и","а","но","или","как","что","чтобы","если","бы","же","ли","что-то","...","для","про"];
 // Правила замены
 const replacements = {
   FILM: "фильм",
@@ -245,8 +219,6 @@ async function search(userQuerry, idList) {
 }
 async function addInfo(id_media) {
   try {
-    // const { id_media } = req.body;
-    //const media = await modelMedia.findByPk(id_media);
 
     const media = await modelMedia.findByPk(id_media, {
       include: [
@@ -268,14 +240,9 @@ async function addInfo(id_media) {
       order: [["id_review", "DESC"]],
       attributes: ["comment_text"],
     });
-    // let reviewsText = reviewsArray.map(review => review.comment_text).join(" ");
     let reviewsText = reviewsArray
       .map((review) => review.comment_text)
       .join(" ");
-    // let reviewsToken = tokenizer.tokenize(reviewsText);
-    // reviewsToken = reviewsToken.filter(token => token.toLowerCase() !== 'фильм' && token.toLowerCase() !== 'сериал');
-    // // Обратно в строку
-    // reviewsText = reviewsToken.join(" ");
     console.log(reviewsText);
 
     const combine = `${media.title} ${genresString} ${media.mediaType} ${media.country} ${media.descrition} ${media.rars}, ${reviewsText}`;

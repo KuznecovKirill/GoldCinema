@@ -589,8 +589,3 @@ module.exports = {
     setTopMedia(req, res, "TOP_250_TV_SHOWS", "TV_SERIES");
   },
 };
-//curl -X GET http://localhost:8000/api/medias?page=1&limit=10
-//curl -X GET http://localhost:8000/medias?page=1&limit=10
-//curl -X POST http://localhost:8000/medias -H "Content-Type: application/json" -d '{"page": 1}'
-//curl -X POST http://localhost:8000/medias/genres -H "Content-Type: application/json" -d '{"mediaType": 'FILM'}'
-//curl -X POST "http://localhost:8000/genres" -H "Content-Type: application/json" -d '{"mediaType": "FILM"}'
