@@ -24,8 +24,8 @@ router.post(
     requestHandler.validate,
     mediaController.addMedia
 ); //Добавление медиа
-// router.get("/popularMovies", mediaController.setPopularMovie);
-// router.get("/popularSeries", mediaController.setPopularSeries);
+router.get("/popularMovies", mediaController.setPopularMovie);
+router.get("/popularSeries", mediaController.setPopularSeries);
 // router.get("/topMovies", mediaController.setTopMovie);
 // router.get("/topSeries", mediaController.setTopSeries);
 

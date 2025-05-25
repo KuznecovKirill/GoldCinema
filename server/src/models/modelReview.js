@@ -58,7 +58,8 @@ modelReview.belongsTo(modelUser, {
 modelReview.belongsTo(modelMedia, {
   foreignKey: 'id_media',
   targetKey: 'id_media',
-  as: 'media'
+  as: 'media',
+  onDelete: 'CASCADE'
 });
 modelReview.prototype.toObject = function () {
   const values = { ...this.get() };

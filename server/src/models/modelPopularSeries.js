@@ -24,7 +24,11 @@ const modelPopularSeries = sequelize.define(
     freezeTableName: true,
   }
 );
-
+modelPopularSeries.belongsTo(modelMedia, {
+  foreignKey: 'id_media',
+  targetKey: 'id_media',
+  onDelete: 'CASCADE'
+});
 modelPopularSeries.prototype.toObject = function () {
   const values = { ...this.get() };
   return values;

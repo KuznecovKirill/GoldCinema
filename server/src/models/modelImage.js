@@ -30,6 +30,12 @@ const modelImage = sequelize.define(
   }
 );
 
+modelImage.belongsTo(modelMedia, {
+  foreignKey: 'id_media',
+  targetKey: 'id_media',
+  onDelete: 'CASCADE'
+});
+
 modelImage.prototype.toObject = function () {
   const values = { ...this.get() };
   return values;

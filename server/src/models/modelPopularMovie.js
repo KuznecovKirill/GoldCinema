@@ -24,7 +24,11 @@ const modelPopularMovie = sequelize.define(
     freezeTableName: true,
   }
 );
-
+modelPopularMovie.belongsTo(modelMedia, {
+  foreignKey: 'id_media',
+  targetKey: 'id_media',
+  onDelete: 'CASCADE'
+});
 modelPopularMovie.prototype.toObject = function () {
   const values = { ...this.get() };
   return values;

@@ -32,7 +32,16 @@ const modelSimilar = sequelize.define(
     freezeTableName: true,
   }
 );
-
+modelSimilar.belongsTo(modelMedia, {
+  foreignKey: 'id_media',
+  targetKey: 'id_media',
+  onDelete: 'CASCADE'
+});
+modelSimilar.belongsTo(modelMedia, {
+  foreignKey: 'id_origin',
+  targetKey: 'id_media',
+  onDelete: 'CASCADE'
+});
 modelSimilar.prototype.toObject = function () {
   const values = { ...this.get() };
   return values;
