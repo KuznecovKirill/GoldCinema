@@ -1,9 +1,6 @@
 const { modelUser } = require("../models/modelUser");
-const {modelRole} = require("../models/modelRole");
 const jsonwebtoken = require("jsonwebtoken");
 const responseHandler = require("../handlers/response.handler.js");
-const sequelize = require("../models/database").sequelize;
-const crypto = require('crypto');
 
 //Регистрация
 const signUp = async (req, res) => {

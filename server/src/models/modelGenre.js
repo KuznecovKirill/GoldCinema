@@ -1,4 +1,4 @@
-const { Sequelize, DataTypes } = require("sequelize");
+const { DataTypes } = require("sequelize");
 const sequelize = require("./database").sequelize;
 
 //Модель медиа
@@ -33,7 +33,6 @@ modelGenre.prototype.toJSON = function () {
 };
 
 async () => {
-    //await sequelize.sync({ alter: true });
     await sequelize.sync({ alter: true });
     //await sequelize.sync();
   };

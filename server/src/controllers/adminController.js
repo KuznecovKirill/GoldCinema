@@ -24,6 +24,7 @@ const handleCommand = async (req, res) => {
         };
         req.query = { page: params.page };
         await mediaController.getMedias(req, res);
+        console.log("топ медиа");
         break;
       case "updatePopular":
         req.params = {

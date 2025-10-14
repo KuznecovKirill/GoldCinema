@@ -45,8 +45,8 @@ const connection = mysql.createConnection({
 app.post('/', (req, res) => {
     res.send('POST запрос на корневом маршруте');
 });
-//Подключение
 
+//Подключение
 connection.connect(err => {
     if (err) {
         return console.error('Ошибка подключения: ' + err.message);
