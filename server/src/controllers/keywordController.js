@@ -6,7 +6,8 @@ const sequelize = require("../models/database").sequelize;
 const { Op } = require("sequelize");
 const natural = require("natural");
 const tokenizer = new natural.WordTokenizer();
-
+const ollama = require('ollama');
+const fetch = require('node-fetch');
 const { TfIdf } = natural;
 const stopWords = [ "в", "на", "к", "по","с","из","у","за","от","до","и","а","но","или","как","что","чтобы","если","бы","же","ли","что-то","...","для","про"];
 // Правила замены
@@ -26,6 +27,7 @@ const { spawn } = require("child_process");
 const path = require("path");
 const { modelGenre } = require("../models/modelGenre.js");
 const { where } = require("sequelize");
+const { title } = require("process");
 
 async function lemmatizeText(text) {
   return new Promise((resolve, reject) => {
@@ -150,6 +152,56 @@ function cosineSimilarity(vectorA, vectorB) {
 
   return dotProduct / (magnitudeA * magnitudeB);
 }
+
+// После TF-IDF и получения массива results
+async function ragSearchByKeywords(userQuery, topResults) {
+  const keywordList = await Promise.all(topResults.map(async (item) => {
+    const keywordEntry = await modelKeyWord.findOne({ where: { id_media: item.id_media } });
+    const nameMedia = await modelMedia.findOne({where: {id_media: item.id_media}});
+    return {
+      id_media: item.id_media,
+      title: nameMedia?.title || '',
+      keywords: keywordEntry?.keywords || '',
+    };
+  }));
+  console.log(keywordList);
+  const prompt = `
+Ты - ассистент по поиску фильмов. Вот список фильмов из базы данных, для каждого указан id_media и набор ключевых слов.
+
+Твоя задача: на основе пользовательского запроса выбрать из этого списка наиболее подходящий фильм (или фильмы).
+Очень важно:
+- Не придумывай фильмы, которых нет в списке.
+- Не изменяй ключевые слова, используй их ровно так, как они даны в списке!
+- Отвечай на русском языке.
+- В ответе укажи id_media и название медиа-контента (он написан после Название:, а после него - ключевые слова - их не надо в ответе писать) например:
+id_media: 301, ключевые слова: Звёздные воины
+
+Пользовательский запрос: "${userQuery}"
+
+Список фильмов:
+${keywordList.map((item, idx) =>
+  `${idx + 1}. id_media: ${item.id_media}
+Название: ${item.title}
+Ключевые слова: ${item.keywords}
+`).join('\n')}
+
+Ответь: какие фильмы наиболее соответствуют запросу? Ответ должен содержать только названия медиаконтентов из списка!
+`;
+
+  const res = await fetch('http://localhost:11434/api/generate', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'qwen2:7b',
+      prompt,
+      stream: false
+    })
+  });
+  const data = await res.json();
+  return data.response;
+}
+
+
 async function search(userQuerry, idList) {
   try {
     const keywords = await modelKeyWord.findAll({
@@ -202,18 +254,26 @@ async function search(userQuerry, idList) {
     });
 
     // Подготовка к responseHandler
-    const idMediaList = results.map((keyword) => ({
+     const idMediaList = results.map((keyword) => ({
       id_media: keyword.id_media,
       score: keyword.score,
     }));
-
-    // Сортируем idMediaList по убыванию score
     idMediaList.sort((a, b) => b.score - a.score);
+    const topResults = idMediaList.slice(0, 20);
 
+    // Запускаем нейросетевую модель асинхронно, не дожидаясь результата
+    ragSearchByKeywords(userQuerry, topResults)
+      .then((llmSuggestion) => {
+        console.log('Qwen2:7b уточнил:', llmSuggestion);
+      })
+      .catch((err) => {
+        console.error('Ошибка Qwen2:7b:', err);
+      });
+
+    // Сразу возвращаем результат поиска
     return idMediaList;
   } catch (error) {
     console.error(error);
-    // Обработка ошибок
     throw error;
   }
 }
@@ -289,18 +349,23 @@ async function addInfo(id_media) {
     const isKeyword = await modelKeyWord.findOne({
       where: { id_media: id_media },
     });
-    if (isKeyword) {
-      const existingKeywords = isKeyword.keywords;
-      const updatedKeywords = existingKeywords + " " + newTextString;
-
+     if (isKeyword) {
       await modelKeyWord.update(
-        { keywords: updatedKeywords },
+        { keywords: newTextString },
         { where: { id_media: id_media } }
       );
+    // if (isKeyword) {
+    //   const existingKeywords = isKeyword.keywords;
+    //   const updatedKeywords = existingKeywords + " " + newTextString;
+
+    //   await modelKeyWord.update(
+    //     { keywords: updatedKeywords },
+    //     { where: { id_media: id_media } }
+    //   );
 
       sequelize.sync();
       return {
-        message: "Keywords updated successfully",
+        message: "Ключевые слова обновлены успешно",
         keywords: updatedKeywords,
       };
       // Добавить текст
