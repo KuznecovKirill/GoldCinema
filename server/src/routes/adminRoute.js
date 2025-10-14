@@ -9,7 +9,7 @@ const router = express.Router();
 
 router.post(
   "/add-media",
-  //tokenMiddleware.user,
+  tokenMiddleware.user,
   body("command")
     .exists().withMessage("Требуется команда")
     .isIn(["addMedia", "addMediaList", "updatePopular"]),

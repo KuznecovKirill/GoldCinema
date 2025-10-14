@@ -63,6 +63,16 @@ const MediaPage = () => {
     }
   }, [genres]);
 
+  // очистка данных после перехода на новый медиа
+  useEffect(() => {
+  setMedia(null);
+  setIsFav(false);
+  setGenres([]);
+  setImages(null);
+  setSimilars(null);
+  setReviews(null);
+}, [id_media]);
+
   //Добавление медиа в избранное через клик
   const addFavClick = async () => {
     if (!user) return dispatch(setAuthModalOpen(true)); //без авторизации нельзя добавить в избранное
