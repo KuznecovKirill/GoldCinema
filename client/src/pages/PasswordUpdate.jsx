@@ -3,7 +3,6 @@ import * as Yup from "yup";
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import {useFormik} from "formik";
-import mediaModule from "../api/modules/mediaModule";
 import userModule from "../api/modules/userModule";
 
 import { setUser } from '../redux/slices/userSlice';
@@ -116,5 +115,4 @@ const PasswordUpdate = () => {
     </Box>
   )
 }
-
 export default PasswordUpdate

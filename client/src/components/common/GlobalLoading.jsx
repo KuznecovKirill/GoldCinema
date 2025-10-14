@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Paper, Box, LinearProgress, Toolbar } from "@mui/material";
-// import zIndex from '@mui/material/styles/zIndex';
 import Logo from './Logo';
 
 
@@ -15,7 +14,7 @@ export const GlobalLoading = () => {
       else{
         setTimeout(() => {
             setfirst(false)
-        }, 2000);
+        }, 1000);
       }
     }, [globalLoading])
     
