@@ -4,108 +4,121 @@ const { modelKeyWord } = require("../models/modelKeyWord.js");
 const { processText } = require("./keywordController.js");
 const sequelize = require("../models/database").sequelize;
 const { Op } = require("sequelize");
-
-// Hugging Face API token (получить на https://huggingface.co/settings/tokens)
-const HF_API_TOKEN = process.env.HF_API_TOKEN || 'YOUR_HUGGINGFACE_TOKEN_HERE';
-const HF_API_URL = 'https://api-inference.huggingface.co/models/deepvk/llava-saiga-8b';
-
 /**
- * Анализирует изображение с помощью LLaVA-Saiga на Hugging Face
- * Модель специализирована на русском языке
+ * Перевод текста на русский через Google Translate API
  */
-async function analyzeImageWithVisionSaiga(imageUrl) {
+async function translateText(text, targetLanguage = 'ru') {
+    if (!text || text.length === 0) {
+        return '';
+    }
     try {
-        console.log(`📷 Загрузка изображения: ${imageUrl}`);
-        
-        // Загружаем изображение в base64
-        const imageResponse = await fetch(imageUrl);
-        const imageBuffer = await imageResponse.buffer();
-        const base64Image = imageBuffer.toString('base64');
-        
-        const mimeType = 'image/jpeg';
+        console.log(`🔄 Перевод текста: "${text.substring(0, 50)}..."`);
 
-        // Промпт на русском для LLaVA-Saiga
-        const prompt = `Опиши эту картинку из киноленты на русском языке кратко, ключевыми словами:
-- кто персонажи
-- что происходит
-- какие предметы видны
-- жанры киноленты
-- какая атмосфера
+        const encodedText = encodeURIComponent(text);
+        const googleUrl = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${targetLanguage}&dt=t&q=${encodedText}`;
 
-Ответь ТОЛЬКО на русском, ключевыми словами без предложений.`;
-
-        console.log(`🔄 Отправка запроса к LLaVA-Saiga на Hugging Face...`);
-
-        const response = await fetch(HF_API_URL, {
-            method: 'POST',
+        const response = await fetch(googleUrl, {
             headers: {
-                'Authorization': `Bearer ${HF_API_TOKEN}`,
-                'Content-Type': 'application/json'
+                'User-Agent': 'Mozilla/5.0'
             },
-            body: JSON.stringify({
-                inputs: {
-                    image: `data:${mimeType};base64,${base64Image}`,
-                    text: prompt
-                }
-            })
+            timeout: 10000
         });
 
         if (!response.ok) {
-            const error = await response.text();
-            console.error('Ошибка HF API:', response.status, error);
-            
-            if (response.status === 429) {
-                console.warn('⚠️ Слишком много запросов. Ожидание 60 секунд...');
-                await new Promise(resolve => setTimeout(resolve, 60000));
-                return await analyzeImageWithVisionSaiga(imageUrl);
-            }
-            
-            throw new Error(`HF API error: ${response.status}`);
+            console.warn('⚠️ Google Translate недоступен');
+            return text;
         }
 
         const data = await response.json();
-        
-        // LLaVA-Saiga возвращает результат в формате массива
-        let description = '';
-        
-        if (Array.isArray(data) && data?.generated_text) {
-            description = data.generated_text;
-        } else if (data.generated_text) {
-            description = data.generated_text;
-        } else {
-            console.warn('Неожиданный формат ответа:', JSON.stringify(data).substring(0, 200));
-            description = JSON.stringify(data);
-        }
 
-        // Очищаем текст
-        if (description.includes('Ответь ТОЛЬКО')) {
-            description = description.split('Ответь ТОЛЬКО') || description;
+        let translated = "";
+        // Google API возвращает массив: [[[translated_text, original_text],...],...]
+        for (let item of data[0]){
+          if (Array.isArray(item) && item){
+            translated += item[0];
+          }
         }
-        
-        description = description.trim();
-        
-        // Убираем повторения промпта
-        const lines = description.split('\n');
-        const cleanedLines = lines.filter(line => 
-            !line.includes('картинку') && 
-            !line.includes('русском') && 
-            line.trim().length > 0
-        );
-        
-        description = cleanedLines.join(' ').trim();
-
-        console.log(`✅ Ответ от LLaVA-Saiga: "${description}"`);
-        
-        return description;
+        console.log(`✅ Переведено: "${translated}"`);
+        if (translated)
+          return translated;
+        else
+          return text;
 
     } catch (error) {
-        console.error('❌ Ошибка анализа изображения:', error.message);
+        console.error('❌ Ошибка перевода:', error.message);
+        return text;  // Возвращаем оригинальный текст если перевод не прошёл
+    }
+}
+
+/**
+ * Анализ изображения с bakllava на английском
+ * затем переводи результата на русский
+ */
+async function analyzeImageWithVisionAndTranslate(imageUrl) {
+    try {
+        console.log(`📷 Загрузка изображения: ${imageUrl}`);
+        
+        const imageResponse = await fetch(imageUrl);
+        const imageBuffer = await imageResponse.buffer();
+        const base64Image = imageBuffer.toString('base64');
+
+        // Анализируем на английском (bakllava работает хорошо)
+        const promptEnglish = `Describe this image from a movie scene briefly using key words only:
+- who/characters
+- what's happening
+- objects/items
+- film genres
+- atmosphere
+
+Answer in 1-2 sentences, key words only.`;
+
+        console.log(`🔄 Анализ через Ollama (bakllava)...`);
+
+        const response = await fetch('http://localhost:11434/api/generate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                model: 'bakllava',
+                prompt: promptEnglish,
+                images: [base64Image],
+                stream: false,
+                options: {
+                    temperature: 0.1,
+                    num_predict: 150
+                }
+            }),
+            timeout: 120000
+        });
+
+        if (!response.ok) {
+            throw new Error(`Ollama error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        let englishDescription = (data.response || '').trim();
+
+        console.log(`📝 English: "${englishDescription}"`);
+
+        if (!englishDescription || englishDescription.length === 0) {
+            console.warn('⚠️ Пустой ответ от bakllava');
+            return '';
+        }
+
+        // Перевод на русский через Google Translate
+        const russianDescription = await translateText(englishDescription, 'ru');
+
+        console.log(`✅ Русский: "${russianDescription}"`);
+        
+        return russianDescription;
+
+    } catch (error) {
+        console.error('❌ Ошибка анализа:', error.message);
         return '';
     }
 }
 
 /**
- * Обработка непроанализированных изображений с LLaVA-Saiga
+ * Обработка непроанализированных изображений
  */
 async function processMediaImages(id_media) {
     try {
@@ -125,16 +138,16 @@ async function processMediaImages(id_media) {
             return;
         }
 
-        console.log(`\n📷 Обработка ${images.length} изображений (LLaVA-Saiga) для медиа ID: ${id_media}\n`);
+        console.log(`\n📷 Обработка ${images.length} изображений для медиа ID: ${id_media}\n`);
 
         const imageDescriptions = [];
 
         for (const image of images) {
             try {
                 console.log(`\n--- Изображение ${image.id_image} ---`);
-                const description = await analyzeImageWithVisionSaiga(image.imageUrl);
+                const description = await analyzeImageWithVisionAndTranslate(image.imageUrl);
                 
-                if (description && description.length > 0) {
+                if (description && description.length > 3) {
                     imageDescriptions.push(description);
 
                     await modelImage.update(
@@ -142,16 +155,24 @@ async function processMediaImages(id_media) {
                         { where: { id_image: image.id_image } }
                     );
 
-                    console.log(`✓ Обработано`);
+                    console.log(`✓ Обработано успешно`);
                 } else {
                     console.warn(`⚠ Пустое описание`);
+                    await modelImage.update(
+                        { isAnalyzed: true },
+                        { where: { id_image: image.id_image } }
+                    );
                 }
             } catch (imageError) {
                 console.error(`✗ Ошибка:`, imageError.message);
+                await modelImage.update(
+                    { isAnalyzed: true },
+                    { where: { id_image: image.id_image } }
+                );
             }
             
-            // Задержка между запросами
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            // Задержка между изображениями
+            await new Promise(resolve => setTimeout(resolve, 2000));
         }
 
         if (imageDescriptions.length === 0) {
@@ -160,10 +181,15 @@ async function processMediaImages(id_media) {
         }
 
         const combinedDescription = imageDescriptions.join(' ');
-        console.log(`\n📝 Объединённое описание: ${combinedDescription}`);
+        console.log(`\n📝 Объединённое: ${combinedDescription}`);
 
         const processedKeywords = await processText(combinedDescription);
         const keywordsString = processedKeywords.join(' ');
+
+        if (!keywordsString || keywordsString.length === 0) {
+            console.log('⚠️ Ключевые слова не найдены');
+            return;
+        }
 
         console.log(`🔑 Ключевые слова: ${keywordsString}\n`);
 
@@ -181,11 +207,13 @@ async function processMediaImages(id_media) {
                 { keywords: uniqueKeywords },
                 { where: { id_media: id_media } }
             );
+            console.log(`✓ Ключевые слова обновлены`);
         } else {
             await modelKeyWord.create({
                 id_media: id_media,
                 keywords: keywordsString
             });
+            console.log(`✓ Ключевые слова созданы`);
         }
 
         await sequelize.sync();
@@ -197,6 +225,6 @@ async function processMediaImages(id_media) {
 }
 
 module.exports = {
-    analyzeImageWithVisionSaiga,
+    analyzeImageWithVisionAndTranslate,
     processMediaImages
 };

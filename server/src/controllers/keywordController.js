@@ -263,13 +263,13 @@ async function search(userQuerry, idList) {
     const topResults = idMediaList.slice(0, 20);
 
     // Запускаем нейросетевую модель асинхронно, не дожидаясь результата
-    ragSearchByKeywords(userQuerry, topResults)
-      .then((llmSuggestion) => {
-        console.log('Qwen2:7b уточнил:', llmSuggestion);
-      })
-      .catch((err) => {
-        console.error('Ошибка Qwen2:7b:', err);
-      });
+    // ragSearchByKeywords(userQuerry, topResults)
+    //   .then((llmSuggestion) => {
+    //     console.log('Qwen2:7b уточнил:', llmSuggestion);
+    //   })
+    //   .catch((err) => {
+    //     console.error('Ошибка Qwen2:7b:', err);
+    //   });
 
     // Сразу возвращаем результат поиска
     return idMediaList;
