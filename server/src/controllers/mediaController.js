@@ -19,6 +19,7 @@ const { modelKeyWord } = require("../models/modelKeyWord.js");
 const { modelGenre } = require("../models/modelGenre");
 const { modelMedia_Genre } = require("../models/modelMedia_Genre");
 const { query } = require("express-validator");
+const { processMediaImages } = require("./imageAnalysisController.js");
 //Для добавления медиа
 const modelMediaCreate = async (newMedia) => {
   try {
@@ -50,6 +51,8 @@ const modelMediaCreate = async (newMedia) => {
     }
   }
 };
+
+//Добавить жанры
 const addGenres = async (id_media, genres) => {
   for (const genreName of genres.map((g) => g.genre)) {
     // Проверка существования жанра
@@ -108,11 +111,13 @@ const getMedias = async (req, res) => {
     let baseQuery = {
       limit,
       offset,
-      include: [{
-        model: modelGenre,
-        as: "Genres",
-        attributes: ["name_genre"]
-      }]
+      include: [
+        {
+          model: modelGenre,
+          as: "Genres",
+          attributes: ["name_genre"],
+        },
+      ],
     };
 
     // Если категория обработки == top
@@ -120,42 +125,40 @@ const getMedias = async (req, res) => {
       const { count, rows } = await modelMedia.findAndCountAll({
         ...baseQuery,
         where: { mediaType },
-        order: [["rating", "DESC"]]
+        order: [["rating", "DESC"]],
       });
 
       const processedMedias = await processMediasWithGenres(rows);
-       if (mediaType === "FILM")
+      if (mediaType === "FILM")
         setTopMedia(req, res, "TOP_250_MOVIES", mediaType, page);
-      else
-        setTopMedia(req, res, "TOP_250_SHOWS", mediaType, page);
+      else setTopMedia(req, res, "TOP_250_SHOWS", mediaType, page);
       return responseHandler.goodrequest(res, {
         total: count,
         page,
         limit,
         medias: processedMedias,
-        mediaType
+        mediaType,
       });
     }
 
     // Если категория обработки == popular
     if (mediaCategory === "popular") {
-      const popularModel = mediaType === "FILM" 
-        ? modelPopularMovie 
-        : modelPopularSeries;
+      const popularModel =
+        mediaType === "FILM" ? modelPopularMovie : modelPopularSeries;
 
       const popularIds = await popularModel.findAll({
-        attributes: ["id_media"]
+        attributes: ["id_media"],
       });
-      
-      const idList = popularIds.map(item => item.id_media);
-      
+
+      const idList = popularIds.map((item) => item.id_media);
+
       const { count, rows } = await modelMedia.findAndCountAll({
         ...baseQuery,
         where: {
           id_media: idList,
-          mediaType
+          mediaType,
         },
-        order: [["id_media", "DESC"]]
+        order: [["id_media", "DESC"]],
       });
 
       const processedMedias = await processMediasWithGenres(rows);
@@ -164,7 +167,7 @@ const getMedias = async (req, res) => {
         page,
         limit,
         medias: processedMedias,
-        mediaType
+        mediaType,
       });
     }
 
@@ -172,7 +175,7 @@ const getMedias = async (req, res) => {
     const { count, rows } = await modelMedia.findAndCountAll({
       ...baseQuery,
       where: { mediaType },
-      order: [["id_media", "DESC"]]
+      order: [["id_media", "DESC"]],
     });
 
     const processedMedias = await processMediasWithGenres(rows);
@@ -181,9 +184,8 @@ const getMedias = async (req, res) => {
       page,
       limit,
       medias: processedMedias,
-      mediaType
+      mediaType,
     });
-
   } catch (error) {
     console.error(error);
     responseHandler.error(res);
@@ -219,6 +221,7 @@ const addMedia = async (req, res) => {
     const newMedia = await swaggerAPI.mediaByID({ id: id_media });
     const result = await modelMediaCreate(newMedia);
     await keywordController.addInfo(id_media);
+
     return responseHandler.goodrequest(res, result);
   } catch (error) {
     console.error("Ошибка в addMedia:", error);
@@ -299,110 +302,6 @@ const setPopularMedia = async (
     responseHandler.error(res, `Ошибка обновления ${mediaTypeLabel}ов`);
   }
 };
-
-
-//Установка популярных медиа
-// const setPopularMedia = async (
-//   req,
-//   res,
-//   mediaCollectionType, // "TOP_POPULAR_MOVIES" или "TOP_POPULAR_SERIES"
-//   popularModel, // modelPopularMovie или modelPopularSeries
-//   mediaTypeLabel // "фильм" или "сериал"
-// ) => {
-//   const popularMedias = await swaggerAPI.mediaCollections({
-//     type: mediaCollectionType,
-//     page: req.query.page || 1,
-//   });
-//   const addedMedias = [];
-//   const errors = [];
-
-//   // Обработка каждого элемента
-//   await Promise.all(
-//     popularMedias.items.slice(0, 10).map(async (item) => {
-//       // Обрабатываем только первые 10 элементов
-//       if (item.nameRu == null) return;
-
-//       try {
-//         let result = await modelMediaCreate(item);
-//         // result && result.error
-//         if (result?.error) {
-//           if (!result.error.includes("Такое медиа уже существует!")) {
-//             errors.push(result.error);
-//           } else {
-//             const existingMedia = await modelMedia.findOne({
-//               where: { id_media: item.kinopoiskId },
-//             });
-//             if (existingMedia) {
-//               result = existingMedia;
-//               console.log(
-//                 "Медиа уже существует, поэтому используется текущая запись"
-//               );
-//             }
-//           }
-//         }
-//         if (result && !result.error) {
-//           console.log("Популярное медиа добавлено!");
-//           addedMedias.push(result);
-//         } else {
-//           console.log("Медиа не был добавлен");
-//         }
-//       } catch (error) {
-//         errors.push(`Ошибка: ${error}`);
-//       }
-//     })
-//   );
-
-//   try {
-//     // Получение текущих популярных медиа
-//     const currentPopular = await popularModel.findAll();
-//     const currentIds = currentPopular.map((media) => media.id_media);
-
-//     // Берутся первые 10 id из популярных фильмов для добавления
-//     const newIds = addedMedias.map((media) => media.id_media).slice(0, 10);
-
-//     // Остаются только те записи, которые есть в новом списке
-//     const idsToKeep = currentIds.filter((id) => newIds.includes(id));
-//     // Определяются id, которых ещё нет в текущих записях
-//     const idsToUpdate = newIds.filter((id) => !idsToKeep.includes(id));
-//     // id, которых нет в текущих, но их нужно добавить
-//     const idsToAdd = newIds.filter((id) => !currentIds.includes(id));
-
-//     popularModel.findAll().then(async (medias) => {
-//       if (medias.length === 0) {
-//         console.log("Таблица пустая. Нужно заполнить.");
-//         await Promise.all(
-//           idsToAdd.map(async (id) => {
-//             await popularModel.create({ id_media: id });
-//             console.log(`Фильм с id ${id} добавлен в PopularMovie`);
-//           })
-//         );
-//       } else {
-//         await Promise.all(
-//           currentPopular.map(async (media, index) => {
-//             if (index < idsToUpdate.length) {
-//               const newId = idsToUpdate[index];
-//               await media.update({ id_media: newId });
-//               console.log(`Медиа с id ${media.id_media} обновлен на ${newId}`);
-//             }
-//           })
-//         );
-//       }
-//     });
-
-//     if (addedMedias.length == 0) {
-//       console.log("Ошибки:", errors);
-//       responseHandler.error(res, "Медиа не добавлены!");
-//     } else {
-//       responseHandler.goodrequest(res, {
-//         message: `Обновлено ${idsToUpdate.length} ${mediaTypeLabel}ов`,
-//         ids: idsToUpdate,
-//       });
-//     }
-//   } catch (error) {
-//     console.error(`Ошибка обновления ${mediaTypeLabel}ов:`, error);
-//     errors.push(`Ошибка обновления ${mediaTypeLabel}ов:`);
-//   }
-// };
 
 const setTopMedia = async (req, res, mediaCollectionType, mediaType, page) => {
   try {
@@ -527,6 +426,11 @@ const getInfo = async (req, res) => {
       order: [["id_image", "DESC"]],
     });
 
+    //Обработка изображений
+    processMediaImages(id_media).catch((err) => {
+      console.error("Ошибка фоновй обработки изображений:", err);
+    });
+
     const existSimilars = await modelSimilar.findOne({
       where: { id_origin: id_media },
     });
@@ -591,15 +495,14 @@ const search = async (req, res) => {
     const { query } = req.query;
 
     let medias;
-    if (mediaType !== "ALL"){
+    if (mediaType !== "ALL") {
       medias = await modelMedia.findAll({
         where: { mediaType: mediaType },
       });
-    }
-    else{
+    } else {
       medias = await modelMedia.findAll();
     }
-    
+
     const idForSearch = medias.map((item) => item.id_media);
 
     const searchResult = await keywordController.search(query, idForSearch);

@@ -1,7 +1,8 @@
 const { modelMedia } = require("../models/modelMedia.js");
-const {modelImage} = require("../models/modelImage.js");
+const { modelImage } = require("../models/modelImage.js");
 const sequelize = require("../models/database").sequelize;
 const { swaggerAPI } = require("../swagger/swagger.api.js");
+const { processMediaImages } = require("./imageAnalysisController.js");
 
 const getImages = async (id_media) => {
   const newImages = await swaggerAPI.mediaImages(
@@ -19,6 +20,17 @@ const getImages = async (id_media) => {
       if (error instanceof sequelize.UnknownConstraintError) {
         console.log("Отлов ошибки изображения!");
       }
+    }
+
+    try {
+      console.log(`Начинаем анализ изображений для медиа ID: ${id_media}`);
+      await processMediaImages(id_media);
+      console.log(`Анализ изображений завершен для медиа ID: ${id_media}`);
+    } catch (error) {
+      console.error(
+        `Ошибка при анализе изображений для медиа ID ${id_media}:`,
+        error
+      );
     }
   }
   sequelize.sync();

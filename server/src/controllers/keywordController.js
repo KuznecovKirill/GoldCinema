@@ -8,6 +8,7 @@ const natural = require("natural");
 const tokenizer = new natural.WordTokenizer();
 const ollama = require('ollama');
 const fetch = require('node-fetch');
+
 const { TfIdf } = natural;
 const stopWords = [ "в", "на", "к", "по","с","из","у","за","от","до","и","а","но","или","как","что","чтобы","если","бы","же","ли","что-то","...","для","про"];
 // Правила замены
@@ -305,7 +306,10 @@ async function addInfo(id_media) {
       .join(" ");
     console.log(reviewsText);
 
-    const combine = `${media.title} ${genresString} ${media.mediaType} ${media.country} ${media.descrition} ${media.rars}, ${reviewsText}`;
+    // Получаем текст из картинок
+ 
+
+    const combine = `${media.title} ${genresString} ${media.mediaType} ${media.country} ${media.descrition} ${media.rars} ${reviewsText}`;
 
     const combineText = replaceWords(combine, replacements); //Замена слов
     console.log(combineText);
@@ -354,14 +358,6 @@ async function addInfo(id_media) {
         { keywords: newTextString },
         { where: { id_media: id_media } }
       );
-    // if (isKeyword) {
-    //   const existingKeywords = isKeyword.keywords;
-    //   const updatedKeywords = existingKeywords + " " + newTextString;
-
-    //   await modelKeyWord.update(
-    //     { keywords: updatedKeywords },
-    //     { where: { id_media: id_media } }
-    //   );
 
       sequelize.sync();
       return {

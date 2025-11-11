@@ -30,6 +30,7 @@
     "python-shell": "^5.0.0",
     "routes": "^2.1.0",
     "sequelize": "^6.37.5",
-    "sequelize-to-json": "^0.10.4"
+    "sequelize-to-json": "^0.10.4",
+    "typo-js": "^1.3.1"
   }
 }

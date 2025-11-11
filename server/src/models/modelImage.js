@@ -22,7 +22,11 @@ const modelImage = sequelize.define(
     imageUrl: {
       type: DataTypes.STRING,
       allowNull: true,
-    }
+    },
+    isAnalyzed: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+    },
   },
   {
     timestamps: false,
