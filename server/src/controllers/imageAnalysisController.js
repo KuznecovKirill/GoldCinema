@@ -72,7 +72,7 @@ async function analyzeImageWithVisionAndTranslate(imageUrl) {
 
 Answer in 1-2 sentences, key words only.`;
 
-        console.log(`🔄 Анализ через Ollama (bakllava)...`);
+        console.log(`Анализ через Ollama (bakllava)`);
 
         const response = await fetch('http://localhost:11434/api/generate', {
             method: 'POST',
@@ -97,22 +97,22 @@ Answer in 1-2 sentences, key words only.`;
         const data = await response.json();
         let englishDescription = (data.response || '').trim();
 
-        console.log(`📝 English: "${englishDescription}"`);
+        console.log(`Английский: "${englishDescription}"`);
 
         if (!englishDescription || englishDescription.length === 0) {
-            console.warn('⚠️ Пустой ответ от bakllava');
+            console.warn('Пустой ответ от bakllava');
             return '';
         }
 
         // Перевод на русский через Google Translate
         const russianDescription = await translateText(englishDescription, 'ru');
 
-        console.log(`✅ Русский: "${russianDescription}"`);
+        console.log(`Русский: "${russianDescription}"`);
         
         return russianDescription;
 
     } catch (error) {
-        console.error('❌ Ошибка анализа:', error.message);
+        console.error('Ошибка анализа:', error.message);
         return '';
     }
 }
@@ -138,7 +138,7 @@ async function processMediaImages(id_media) {
             return;
         }
 
-        console.log(`\n📷 Обработка ${images.length} изображений для медиа ID: ${id_media}\n`);
+        console.log(`\nОбработка ${images.length} изображений для медиа ID: ${id_media}\n`);
 
         const imageDescriptions = [];
 
@@ -164,7 +164,7 @@ async function processMediaImages(id_media) {
                     );
                 }
             } catch (imageError) {
-                console.error(`✗ Ошибка:`, imageError.message);
+                console.error(`Ошибка:`, imageError.message);
                 await modelImage.update(
                     { isAnalyzed: true },
                     { where: { id_image: image.id_image } }
@@ -176,22 +176,22 @@ async function processMediaImages(id_media) {
         }
 
         if (imageDescriptions.length === 0) {
-            console.log('⚠️ Нет описаний');
+            console.log('Нет описаний');
             return;
         }
 
         const combinedDescription = imageDescriptions.join(' ');
-        console.log(`\n📝 Объединённое: ${combinedDescription}`);
+        console.log(`\nОбъединённое: ${combinedDescription}`);
 
         const processedKeywords = await processText(combinedDescription);
         const keywordsString = processedKeywords.join(' ');
 
         if (!keywordsString || keywordsString.length === 0) {
-            console.log('⚠️ Ключевые слова не найдены');
+            console.log('Ключевые слова не найдены');
             return;
         }
 
-        console.log(`🔑 Ключевые слова: ${keywordsString}\n`);
+        console.log(`Ключевые слова: ${keywordsString}\n`);
 
         const existingKeyword = await modelKeyWord.findOne({
             where: { id_media: id_media }
@@ -207,13 +207,13 @@ async function processMediaImages(id_media) {
                 { keywords: uniqueKeywords },
                 { where: { id_media: id_media } }
             );
-            console.log(`✓ Ключевые слова обновлены`);
+            console.log(`Ключевые слова обновлены`);
         } else {
             await modelKeyWord.create({
                 id_media: id_media,
                 keywords: keywordsString
             });
-            console.log(`✓ Ключевые слова созданы`);
+            console.log(`Ключевые слова созданы`);
         }
 
         await sequelize.sync();
