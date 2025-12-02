@@ -25,7 +25,7 @@ async function translateText(text, targetLanguage = 'ru') {
         });
 
         if (!response.ok) {
-            console.warn('⚠️ Google Translate недоступен');
+            console.warn('Google Translate недоступен');
             return text;
         }
 
@@ -38,14 +38,14 @@ async function translateText(text, targetLanguage = 'ru') {
             translated += item[0];
           }
         }
-        console.log(`✅ Переведено: "${translated}"`);
+        console.log(`Переведено: "${translated}"`);
         if (translated)
           return translated;
         else
           return text;
 
     } catch (error) {
-        console.error('❌ Ошибка перевода:', error.message);
+        console.error('Ошибка перевода:', error.message);
         return text;  // Возвращаем оригинальный текст если перевод не прошёл
     }
 }
@@ -78,7 +78,7 @@ Answer in 1-2 sentences, key words only.`;
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                model: 'bakllava',
+                model: 'qwen3',
                 prompt: promptEnglish,
                 images: [base64Image],
                 stream: false,
