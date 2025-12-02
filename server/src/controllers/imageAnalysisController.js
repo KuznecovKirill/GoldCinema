@@ -12,7 +12,7 @@ async function translateText(text, targetLanguage = 'ru') {
         return '';
     }
     try {
-        console.log(`🔄 Перевод текста: "${text.substring(0, 50)}..."`);
+        console.log(`Перевод текста: "${text.substring(0, 50)}..."`);
 
         const encodedText = encodeURIComponent(text);
         const googleUrl = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${targetLanguage}&dt=t&q=${encodedText}`;
@@ -56,7 +56,7 @@ async function translateText(text, targetLanguage = 'ru') {
  */
 async function analyzeImageWithVisionAndTranslate(imageUrl) {
     try {
-        console.log(`📷 Загрузка изображения: ${imageUrl}`);
+        console.log(`Загрузка изображения: ${imageUrl}`);
         
         const imageResponse = await fetch(imageUrl);
         const imageBuffer = await imageResponse.buffer();
@@ -155,9 +155,9 @@ async function processMediaImages(id_media) {
                         { where: { id_image: image.id_image } }
                     );
 
-                    console.log(`✓ Обработано успешно`);
+                    console.log(`Обработано успешно`);
                 } else {
-                    console.warn(`⚠ Пустое описание`);
+                    console.warn(`Пустое описание`);
                     await modelImage.update(
                         { isAnalyzed: true },
                         { where: { id_image: image.id_image } }
