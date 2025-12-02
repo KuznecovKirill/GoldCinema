@@ -32,7 +32,7 @@ async function translateText(text, targetLanguage = 'ru') {
         const data = await response.json();
 
         let translated = "";
-        // Google API возвращает массив: [[[translated_text, original_text],...],...]
+        
         for (let item of data[0]){
           if (Array.isArray(item) && item){
             translated += item[0];
@@ -78,7 +78,7 @@ Answer in 1-2 sentences, key words only.`;
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                model: 'qwen3',
+                model: 'bakllava',
                 prompt: promptEnglish,
                 images: [base64Image],
                 stream: false,
