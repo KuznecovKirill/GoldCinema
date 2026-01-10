@@ -1,5 +1,4 @@
 import { Avatar } from '@mui/material';
-import React from 'react';
 
 const AvatarUser = ({ text }) => {
   const stringColor = (s) => {

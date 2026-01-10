@@ -4,28 +4,27 @@
   "private": true,
   "dependencies": {
     "@emotion/react": "^11.14.0",
-    "@emotion/styled": "^11.14.0",
-    "@fontsource/roboto": "^5.1.1",
-    "@mui/icons-material": "^6.4.1",
-    "@mui/lab": "^6.0.0-beta.24",
-    "@mui/material": "^6.4.1",
-    "@reduxjs/toolkit": "^2.5.0",
+    "@emotion/styled": "^11.14.1",
+    "@fontsource/roboto": "^5.2.9",
+    "@mui/icons-material": "^7.3.7",
+    "@mui/lab": "^7.0.1-beta.21",
+    "@mui/material": "^7.3.7",
+    "@reduxjs/toolkit": "^2.11.2",
     "@types/swiper": "^6.0.0",
-    "axios": "^1.7.9",
+    "axios": "^1.13.2",
     "client": "file:",
-    "cra-template": "1.2.0",
-    "dayjs": "^1.11.13",
-    "formik": "^2.4.6",
-    "lodash": "^4.17.21",
-    "query-string": "^9.1.1",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "cra-template": "1.3.0",
+    "dayjs": "^1.11.19",
+    "formik": "^2.4.9",
+    "query-string": "^9.3.1",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
     "react-redux": "^9.2.0",
-    "react-router-dom": "^7.1.3",
+    "react-router-dom": "^7.12.0",
     "react-scripts": "5.0.1",
-    "react-toastify": "^11.0.3",
-    "swiper": "^11.2.5",
-    "yup": "^1.6.1"
+    "react-toastify": "^11.0.5",
+    "swiper": "^12.0.3",
+    "yup": "^1.7.1"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -52,7 +51,7 @@
     ]
   },
   "devDependencies": {
-    "@types/lodash": "^4.17.16",
-    "web-vitals": "^4.2.4"
+    "@types/lodash": "^4.17.22",
+    "web-vitals": "^5.1.0"
   }
 }

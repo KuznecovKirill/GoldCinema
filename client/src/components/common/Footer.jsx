@@ -1,4 +1,3 @@
-import React from 'react'
 import Container from './Container'
 import { Paper, Stack, Button, Box } from '@mui/material'
 import Logo from './Logo'

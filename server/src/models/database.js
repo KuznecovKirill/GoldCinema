@@ -11,6 +11,5 @@ try {
 } catch (e) {
   console.log("Невозможно выполнить подключение к БД: ", e);
 }
-// sequelize.close();
 
 module.exports = { sequelize };
