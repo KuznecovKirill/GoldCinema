@@ -8,114 +8,94 @@ const { Op } = require("sequelize");
  * Перевод текста на русский через Google Translate API
  */
 async function translateText(text, targetLanguage = 'ru') {
-    if (!text || text.length === 0) {
-        return '';
+  if (!text) return '';
+
+  try {
+    console.log(`Переводим: ${JSON.stringify(text.substring(0, 100))}`);
+    const encodedText = encodeURIComponent(text);
+    const googleUrl = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLanguage}&dt=t&q=${encodedText}`;
+
+    const response = await fetch(googleUrl, {
+      headers: { 'User-Agent': 'Mozilla/5.0' },
+      timeout: 10000
+    });
+
+    const data = await response.json();
+    let translated = '';
+    for (let item of data[0]) {
+      if (Array.isArray(item) && item[0]) {
+        translated += item[0];
+      }
     }
-    try {
-        console.log(`Перевод текста: "${text.substring(0, 50)}..."`);
 
-        const encodedText = encodeURIComponent(text);
-        const googleUrl = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${targetLanguage}&dt=t&q=${encodedText}`;
-
-        const response = await fetch(googleUrl, {
-            headers: {
-                'User-Agent': 'Mozilla/5.0'
-            },
-            timeout: 10000
-        });
-
-        if (!response.ok) {
-            console.warn('Google Translate недоступен');
-            return text;
-        }
-
-        const data = await response.json();
-
-        let translated = "";
-        
-        for (let item of data[0]){
-          if (Array.isArray(item) && item){
-            translated += item[0];
-          }
-        }
-        console.log(`Переведено: "${translated}"`);
-        if (translated)
-          return translated;
-        else
-          return text;
-
-    } catch (error) {
-        console.error('Ошибка перевода:', error.message);
-        return text;  // Возвращаем оригинальный текст если перевод не прошёл
-    }
+    console.log(`Переведено: ${JSON.stringify(translated)}`);
+    return translated.trim();
+  } catch (error) {
+    console.error('Ошибка перевода:', error.message);
+    return text;
+  }
 }
+
 
 /**
  * Анализ изображения с bakllava на английском
  * затем переводи результата на русский
  */
 async function analyzeImageWithVisionAndTranslate(imageUrl) {
-    try {
-        console.log(`Загрузка изображения: ${imageUrl}`);
-        
-        const imageResponse = await fetch(imageUrl);
-        const imageBuffer = await imageResponse.buffer();
-        const base64Image = imageBuffer.toString('base64');
+  try {
+    console.log(`Загрузка изображения: ${imageUrl}`);
+    const imageResponse = await fetch(imageUrl);
+    const imageBuffer = await imageResponse.buffer();
+    const base64Image = imageBuffer.toString('base64');
+    console.log(base64Image);
 
-        // Анализируем на английском (bakllava работает хорошо)
-        const promptEnglish = `Describe this image from a movie scene briefly using key words only:
-- who/characters
-- what's happening
-- objects/items
-- film genres
-- atmosphere
+    const promptEnglish = `Describe this image from a movie scene briefly. Key words only.`;
 
-Answer in 1-2 sentences, key words only.`;
+    console.log(`Анализ через Ollama (llava)`);
+    const response = await fetch('http://localhost:11434/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'bakllava:latest',
+        prompt: promptEnglish,
+        images: [base64Image],
+        stream: false,
+        // options: { temperature: 0, num_predict: 50 }
+      }),
+      timeout: 120000
+    });
 
-        console.log(`Анализ через Ollama (bakllava)`);
+    console.log(`HTTP статус: ${response.status}`);
 
-        const response = await fetch('http://localhost:11434/api/generate', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                model: 'bakllava',
-                prompt: promptEnglish,
-                images: [base64Image],
-                stream: false,
-                options: {
-                    temperature: 0.1,
-                    num_predict: 150
-                }
-            }),
-            timeout: 120000
-        });
-
-        if (!response.ok) {
-            throw new Error(`Ollama error: ${response.status}`);
-        }
-
-        const data = await response.json();
-        let englishDescription = (data.response || '').trim();
-
-        console.log(`Английский: "${englishDescription}"`);
-
-        if (!englishDescription || englishDescription.length === 0) {
-            console.warn('Пустой ответ от bakllava');
-            return '';
-        }
-
-        // Перевод на русский через Google Translate
-        const russianDescription = await translateText(englishDescription, 'ru');
-
-        console.log(`Русский: "${russianDescription}"`);
-        
-        return russianDescription;
-
-    } catch (error) {
-        console.error('Ошибка анализа:', error.message);
-        return '';
+    if (!response.ok) {
+      console.error(`Ollama вернул ${response.status}`);
+      return 'image analysis failed';
     }
+
+    const data = await response.json();
+    let rawResponse = data.response || '';
+
+    // Фильтр DC4 и control chars
+    rawResponse = rawResponse
+      .replace(/[\u0000-\u001F\u007F-\u009F]/g, '')  // убираем DC4 и подобные
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    console.log(`После фильтра: "${rawResponse}"`);
+
+    if (!rawResponse) {
+      console.warn('Модель не ответила');
+      return 'unknown movie scene';
+    }
+
+    const russianDescription = await translateText(rawResponse, 'ru');
+    return russianDescription;
+  } catch (error) {
+    console.error('Полная ошибка:', error.message);
+    return 'analysis error';
+  }
 }
+
 
 /**
  * Обработка непроанализированных изображений
