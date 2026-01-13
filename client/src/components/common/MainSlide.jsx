@@ -111,7 +111,7 @@ const MainSlide = ({ mediaType, mediaCategory }) => {
                 backgroundPosition: "top",
                 backgroundSize: "cover",
                 backgroundRepeat: "no-repeat",
-                // backgroundImage: `url(${configs.backdropPath(med.id_media)})`,
+               //backgroundImage: `url(${configs.backdropPath(med.id_media)})`,
                 backgroundImage: `url(${med.cover})`,
               }}
             />
