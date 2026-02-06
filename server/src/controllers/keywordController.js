@@ -153,6 +153,16 @@ function cosineSimilarity(vectorA, vectorB) {
 
   return dotProduct / (magnitudeA * magnitudeB);
 }
+//Функция-парсер
+function extractIdsFromLLMResponse(responseText) {
+  const idSet = new Set();
+  const regex = /id_media:\s*(\d+)/gi;
+  let match;
+  while ((match = regex.exec(responseText)) !== null) {
+    idSet.add(Number(match[1]));
+  }
+  return Array.from(idSet);
+}
 
 // После TF-IDF и получения массива results
 async function ragSearchByKeywords(userQuery, topResults) {
@@ -186,20 +196,25 @@ ${keywordList.map((item, idx) =>
 Ключевые слова: ${item.keywords}
 `).join('\n')}
 
-Ответь: какие фильмы наиболее соответствуют запросу? Ответ должен содержать только названия медиаконтентов из списка!
+Ответь: какие фильмы наиболее соответствуют запросу? Ответ должен содержать только названия медиаконтентов из списка! Ответ НЕ ДОЛЖЕН содержать ТОЛЬКО ОДНО медиа!
 `;
 
   const res = await fetch('http://localhost:11434/api/generate', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: 'qwen2:7b',
+      model: 'qwen3:1.7b',
       prompt,
       stream: false
     })
   });
   const data = await res.json();
-  return data.response;
+
+  // Новый шаг: вытащить id_media и вернуть их
+  const refinedIds = extractIdsFromLLMResponse(data.response);
+  console.log(refinedIds)
+
+  return refinedIds;
 }
 
 
@@ -259,20 +274,36 @@ async function search(userQuerry, idList) {
       id_media: keyword.id_media,
       score: keyword.score,
     }));
-    idMediaList.sort((a, b) => b.score - a.score);
-    const topResults = idMediaList.slice(0, 20);
+    // idMediaList.sort((a, b) => b.score - a.score);
+    // const topResults = idMediaList.slice(0, 20);
+    return idMediaList;
+    //Запускаем нейросеть
+    const llmSuggestedIds = await ragSearchByKeywords(userQuerry, idMediaList);
+    let finalList = idMediaList;
+    if (llmSuggestedIds.length > 0) {
+      // Берём только те ID из TF-IDF, которые подтвердила нейросеть
+      finalList = idMediaList.filter(item => llmSuggestedIds.includes(item.id_media));
+      // Сортировка
+      finalList.sort((a, b) => b.score - a.score);
+    }
+
+    console.log('Final refined list:', finalList);
+
+    // Возвращаем точно тот же формат: массив [{id_media, score}]
+    return finalList;
 
     // Запускаем нейросетевую модель асинхронно, не дожидаясь результата
     // ragSearchByKeywords(userQuerry, topResults)
     //   .then((llmSuggestion) => {
-    //     console.log('Qwen2:7b уточнил:', llmSuggestion);
+    //     console.log('Qwen3:', llmSuggestion);
     //   })
     //   .catch((err) => {
-    //     console.error('Ошибка Qwen2:7b:', err);
+    //     console.error('Ошибка Qwen3:', err);
     //   });
 
     // Сразу возвращаем результат поиска
-    return idMediaList;
+    console.log(topResults)
+    return topResults;
   } catch (error) {
     console.error(error);
     throw error;

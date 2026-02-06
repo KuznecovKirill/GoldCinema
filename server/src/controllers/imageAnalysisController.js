@@ -47,7 +47,6 @@ async function analyzeImageWithVisionAndTranslate(imageUrl) {
     const imageResponse = await fetch(imageUrl);
     const imageBuffer = await imageResponse.buffer();
     const base64Image = imageBuffer.toString('base64');
-    console.log(base64Image);
 
     const promptEnglish = `Describe this image from a movie scene briefly. Key words only.`;
 
@@ -60,7 +59,7 @@ async function analyzeImageWithVisionAndTranslate(imageUrl) {
         prompt: promptEnglish,
         images: [base64Image],
         stream: false,
-        // options: { temperature: 0, num_predict: 50 }
+        options: { temperature: 0, num_predict: 50 }
       }),
       timeout: 120000
     });
