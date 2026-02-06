@@ -1,23 +1,22 @@
 require('dotenv').config();
-const express = require('express');
-const mysql = require('mysql2');
-const cors = require('cors');
-const bodyParser = require('body-parser');
-const cookieParser = require('cookie-parser');
-const http = require('http');
-const routes = require('./src/routes/routes');
+import express from 'express';
+import mysql from 'mysql2';
+import cors from 'cors';
+import bodyParser from 'body-parser';
+import cookieParser from 'cookie-parser';
+import http from "http";
+import routes from './src/routes/routes';
 
-const userController = require('./src/controllers/userController');
+import userController from './src/controllers/userController';
 
-const mediaController = require('./src/controllers/mediaController');
+import mediaController from './src/controllers/mediaController';
 
-const favoriteController = require('./src/controllers/favoriteController');
+import favoriteController from './src/controllers/favoriteController';
 
-const keywordController = require('./src/controllers/keywordController');
+import keywordController from './src/controllers/keywordController';
 
-const { setupAssociations } = require('./src/models/associations');
+import { setupAssociations } from './src/models/associations';
 
-//const PlayGround = require('./src/models/PlayGround');
 
 const app = express();
 
@@ -29,12 +28,13 @@ app.use(bodyParser.json());
 app.use("/goldcinema/v1", routes);
 ///goldcinema/v1
 
-const port = process.env.PORT;
+const port = process.env.PORT || 8000;
 console.log(process.env.PORT);
 
 const server = http.createServer(app);
 
 //Создание коннекта
+//TODO: Нужно будет сделать dbConfig перед этим
 const connection = mysql.createConnection({
     host: 'MySQL-8.0',
     user: "root",
@@ -59,6 +59,8 @@ connection.connect(err => {
         console.log(`Сервер слушает порт ${port}`);
     });
 });
+
+export {app, connection};
 
 //connection.end();
 
