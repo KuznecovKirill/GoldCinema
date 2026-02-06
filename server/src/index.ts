@@ -5,17 +5,17 @@ import cors from 'cors';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import http from "http";
-import routes from './src/routes/routes';
+import routes from './routes/routes';
 
-import userController from './src/controllers/userController';
+import userController from './controllers/userController';
 
-import mediaController from './src/controllers/mediaController';
+import mediaController from './controllers/mediaController';
 
-import favoriteController from './src/controllers/favoriteController';
+import favoriteController from './controllers/favoriteController';
 
-import keywordController from './src/controllers/keywordController';
+import keywordController from './controllers/keywordController';
 
-import { setupAssociations } from './src/models/associations';
+import { setupAssociations } from './models/associations';
 
 
 const app = express();
