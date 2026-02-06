@@ -6,7 +6,9 @@
   "scripts": {
     "start": "nodemon index.js",
     "build": "tsc",
-    "dev": "ts-node-dev --respawn --transpile-only src/index.ts"
+    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "dev:watch": "nodemon --exec ts-node src/index.ts",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "axios": "^1.13.2",
@@ -45,6 +47,7 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^25.2.1",
     "ts-node-dev": "^2.0.0",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^5.9.3"
   }
 }
