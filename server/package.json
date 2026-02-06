@@ -6,7 +6,7 @@
   "scripts": {
     "start": "nodemon dist/index.js",
     "build": "tsc",
-    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "dev": "ts-node src/index.ts",
     "dev:watch": "nodemon --exec ts-node src/index.ts",
     "typecheck": "tsc --noEmit"
   },
