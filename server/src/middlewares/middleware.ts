@@ -1,4 +1,4 @@
-import { CanActivate, ExecutionContext, Injectable, NestMiddleware, UnauthorizedException } from "@nestjs/common";
+import { CanActivate, ExecutionContext, ForbiddenException, Injectable, NestMiddleware, UnauthorizedException } from "@nestjs/common";
 import { NextFunction, Request, Response } from "express";
 import * as jwt from "jsonwebtoken";
 import * as jose from "jose";
@@ -8,6 +8,13 @@ import * as jose from "jose";
 import { modelUser } from "../models/modelUser";
 import responseHandler from "../handlers/response.handler";
 import { ConfigService } from "@nestjs/config";
+
+const checkClockTime = (expireTime: number) => {
+  const currentTime = Math.floor(Date.now() / 1000);
+  if (currentTime >= expireTime) return true;
+  return false
+};
+
 @Injectable()
 export class CheckToken implements CanActivate {
   constructor(private configService: ConfigService) {}
@@ -20,6 +27,8 @@ export class CheckToken implements CanActivate {
     }
     try {
       const {exp} = jose.decodeJwt(authHeader);
+      if (checkClockTime(exp)) throw new ForbiddenException("Истёк срок жизни токена");
+      
       const token = authHeader.split(" ")[1];
         const jwtToken = this.configService.get("TOKEN_SECRET");
         const decoded = jwt.verify(token, jwtToken);
