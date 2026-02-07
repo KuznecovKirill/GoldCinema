@@ -23,6 +23,7 @@
     "express": "^4.21.1",
     "express-validator": "^7.2.0",
     "gold-cinema": "file:",
+    "jose": "^6.1.3",
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.16.3",
     "mystem3": "^1.2.1",
