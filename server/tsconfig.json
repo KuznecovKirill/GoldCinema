@@ -22,6 +22,7 @@
       "@/*": ["src/*"],
       "@controllers/*": ["src/controllers/*"],
       "@models/*": ["src/models/*"],
+      "@modules/*": ["modules/*"],
       "@routes/*": ["src/routes/*"],
     }
   },
