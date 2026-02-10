@@ -7,3 +7,6 @@ export * from "./image.schema";
 export * from "./keyword.schema";
 export * from "./media-genre.schema";
 export * from "./review.schema";
+export * from "./popular-movie.schema";
+export * from "./popular-series.schema";
+export * from "./similar.schema";
