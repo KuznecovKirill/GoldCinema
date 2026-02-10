@@ -1,5 +1,3 @@
-const sequelize = require("./database").sequelize;
-import crypto from "crypto";
 
 import {
     int,

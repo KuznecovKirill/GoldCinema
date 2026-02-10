@@ -22,7 +22,7 @@
       "@/*": ["src/*"],
       "@controllers/*": ["src/controllers/*"],
       "@models/*": ["src/models/*"],
-      "@routes/*": ["src/routes/*"]
+      "@routes/*": ["src/routes/*"],
     }
   },
   "include": ["src/**/*"],

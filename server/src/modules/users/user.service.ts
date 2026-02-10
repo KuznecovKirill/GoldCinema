@@ -166,7 +166,7 @@ export class UserService {
     } catch {}
   }
 
-  private async getUserInfo(username: string) {
+   async getUserInfo(username: string) {
     const result = await this.db
       .select({
         id_user: userTable.idUser,

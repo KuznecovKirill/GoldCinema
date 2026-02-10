@@ -12,7 +12,7 @@ export class DrizzleService implements OnModuleInit, OnModuleDestroy {
     constructor(private readonly configService: ConfigService) {}
 
     async onModuleInit() {
-        this.pool = await mysql.createPool({
+        this.pool = mysql.createPool({
             host: this.configService.get<string>("DB_HOST", "MySQL-8.0"),
             port: this.configService.get<number>("DB_PORT", 3306),
             user: this.configService.get<string>("DB_USER", "root"),

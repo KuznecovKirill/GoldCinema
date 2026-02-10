@@ -1,23 +1,8 @@
 require('dotenv').config();
 import express from 'express';
-import mysql from 'mysql2';
-import cors from 'cors';
-import bodyParser from 'body-parser';
-import cookieParser from 'cookie-parser';
-import http from "http";
-import routes from './routes/routes';
 import {NestFactory} from "@nestjs/core";
 import {DocumentBuilder, SwaggerModule} from "@nestjs/swagger"
 
-import userController from './controllers/userController';
-
-import mediaController from './controllers/mediaController';
-
-import favoriteController from './controllers/favoriteController';
-
-import keywordController from './controllers/keywordController';
-
-import { setupAssociations } from './models/associations';
 import { AppModule } from './app.module';
 import { ErrorMiddleware } from './middlewares/errorMiddleware';
 
@@ -47,7 +32,7 @@ async function bootstrap() {
 
     console.log(`Server is running on ${PORT}`);
 }
-await bootstrap();
+bootstrap();
 
 // const app = express();
 
