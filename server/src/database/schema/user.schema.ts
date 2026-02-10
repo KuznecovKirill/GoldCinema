@@ -8,7 +8,7 @@ import {
 import { relations } from "drizzle-orm";
 import { roleTable } from "./role.schema";
 
-export const userTable = mysqlTable("user", {
+export const userTable = mysqlTable("User", {
   idUser: int("id_user").primaryKey().autoincrement(),
   username: varchar("username", { length: 255 }).notNull(),
   password: varchar("password", { length: 255 }).notNull(),

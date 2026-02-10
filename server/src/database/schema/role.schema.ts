@@ -2,7 +2,7 @@ import { mysqlTable, smallint, varchar } from "drizzle-orm/mysql-core";
 import { relations } from "drizzle-orm";
 import { userTable } from "./user.schema";
 
-export const roleTable = mysqlTable("role", {
+export const roleTable = mysqlTable("Role", {
   idRole: smallint("id_role").primaryKey().autoincrement(),
   nameRole: varchar("name_role", { length: 255 }).notNull(),
 });
