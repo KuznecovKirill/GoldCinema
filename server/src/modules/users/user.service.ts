@@ -15,7 +15,7 @@ export interface User {
   id_user: number;
   username: string;
   password: string;
-  salt: string;
+  pass_token: string;
   role: string;
 }
 @Injectable()
@@ -42,14 +42,14 @@ export class UserService {
       //       "Такой пользователь уже зарегестрирован!",
       //     );
       // }
-      const salt = crypto.randomBytes(16).toString("hex");
+      const salt = crypto.randomBytes(8).toString("hex");
       const pass = crypto
         .pbkdf2Sync(password, salt, 1000, 32, "sha512")
         .toString("hex");
       await this.db.insert(userTable).values({
         username,
-        password: pass,
-        salt: salt,
+        password: password,
+        passToken: pass,
         idRole: role === "Пользователь" ? 1 : 2,
       });
       return { success: true, msg: "Учётная запись создана" };
@@ -65,7 +65,7 @@ export class UserService {
           "Такой пользователь уже зарегестрирован!",
         );
       }
-      const isMatch = this.isMatchPassword(password, user.password, user.salt);
+      const isMatch = this.isMatchPassword(password, user.password, user.pass_token);
       if (!isMatch) {
         throw new UnauthorizedException(
           "Неккоректное имя пользователя или пароль",
@@ -79,7 +79,7 @@ export class UserService {
       const secret = this.configService.get("TOKEN_SECRET") || "12345";
       const authToken = jwt.sign(payload, secret, { expiresIn: "24h" });
 
-      const { password: _, salt: __, ...safeUser } = user;
+      const { password: _, pass_token: __, ...safeUser } = user;
 
       await this.createUser(username, password, role);
 
@@ -98,7 +98,7 @@ export class UserService {
       if (!user) {
         throw new NotFoundException("Такой пользователь не найден!");
       }
-      const isMatch = this.isMatchPassword(password, user.password, user.salt);
+      const isMatch = this.isMatchPassword(password, user.password, user.pass_token);
       if (!isMatch) {
         throw new UnauthorizedException(
           "Неккоректное имя пользователя или пароль",
@@ -113,7 +113,7 @@ export class UserService {
       const secret = this.configService.get("TOKEN_SECRET") || "12345";
       const authToken = jwt.sign(payload, secret, { expiresIn: "24h" });
 
-      const { password: _, salt: __, ...safeUser } = user;
+      const { password: _, pass_token: __, ...safeUser } = user;
 
       return {
         success: true,
@@ -142,10 +142,10 @@ export class UserService {
       // .limit(1);
       // if (!user) return responseHandler.notauthorized(res);
 
-      if (this.isMatchPassword(password, user.password, user.salt)) {
+      if (this.isMatchPassword(password, user.password, user.pass_token)) {
         throw new BadRequestException("Неверный пароль!");
       }
-      const newSalt = crypto
+      const newPass = crypto
         .pbkdf2Sync(
           newPassword,
           crypto.randomBytes(8).toString("hex"),
@@ -159,7 +159,7 @@ export class UserService {
         .update(userTable)
         .set({
           password: newPassword,
-          salt: newSalt,
+          passToken: newPass,
         })
         .where(eq(userTable.username, username));
       return { success: true, msg: "Пароль обновлён" };
@@ -172,7 +172,7 @@ export class UserService {
         id_user: userTable.idUser,
         username: userTable.username,
         password: userTable.password,
-        salt: userTable.salt,
+        pass_token: userTable.passToken,
         role: roleTable.nameRole,
       })
       .from(userTable)
