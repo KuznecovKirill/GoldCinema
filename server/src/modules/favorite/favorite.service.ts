@@ -17,7 +17,7 @@ export interface FavoriteItem {
   id_favorite: number;
   id_user: number;
   id_media: number;
-  media?: any
+  media?: any;
 }
 export interface FavoriteResponse {
   success: boolean;
@@ -35,44 +35,46 @@ export class FavoriteService {
   }
 
   async getFavoritesOfUser(idUser: number): Promise<FavoriteResponse> {
-  try {
-    const favorites = await this.db
-      .select({
-        id_favorite: favoriteTable.idFavorite,
-        id_user: favoriteTable.idUser,
-        id_media: favoriteTable.idMedia,
-        media: {
-          id_media: mediaTable.idMedia,
-          title: mediaTable.title,
-          media_type: mediaTable.mediaType, 
-          country: mediaTable.country, 
-          year: mediaTable.year,
-          running_time: mediaTable.runningTime, 
-          rars: mediaTable.rars, 
-          rating: mediaTable.rating, 
-          description: mediaTable.descrition, 
-          cover: mediaTable.cover, 
-        },
-      })
-      .from(favoriteTable)
-      .leftJoin(mediaTable, eq(favoriteTable.idMedia, mediaTable.idMedia))
-      .where(eq(favoriteTable.idUser, idUser))
-      .orderBy(desc(favoriteTable.idFavorite));
+    try {
+      const favorites = await this.db
+        .select({
+          id_favorite: favoriteTable.idFavorite,
+          id_user: favoriteTable.idUser,
+          id_media: favoriteTable.idMedia,
+          media: {
+            id_media: mediaTable.idMedia,
+            title: mediaTable.title,
+            media_type: mediaTable.mediaType,
+            year: mediaTable.year,
+            running_time: mediaTable.runningTime,
+            rars: mediaTable.rars,
+            rating: mediaTable.rating,
+            description: mediaTable.descrition,
+            cover: mediaTable.cover,
+          },
+        })
+        .from(favoriteTable)
+        .leftJoin(mediaTable, eq(favoriteTable.idMedia, mediaTable.idMedia))
+        .where(eq(favoriteTable.idUser, idUser))
+        .orderBy(desc(favoriteTable.idFavorite));
 
-    return {
-      success: true,
-      msg: "Список избранного получен",
-      favorites,
-    };
-  } catch (error) {
-    console.error("Get favorites error:", error);
-    throw new InternalServerErrorException(
-      "Ошибка при получении списка избранного",
-    );
+      return {
+        success: true,
+        msg: "Список избранного получен",
+        favorites,
+      };
+    } catch (error) {
+      console.error("Get favorites error:", error);
+      throw new InternalServerErrorException(
+        "Ошибка при получении списка избранного",
+      );
+    }
   }
-}
 
-  async addFavorite(id_user: number, id_media: number): Promise<FavoriteResponse> {
+  async addFavorite(
+    id_user: number,
+    id_media: number,
+  ): Promise<FavoriteResponse> {
     try {
       // Проверяем существует ли медиа
       const mediaExists = await this.db
@@ -112,27 +114,26 @@ export class FavoriteService {
 
       // Получаем полную информацию о добавленном избранном
       const favoriteWithMedia = await this.db
-  .select({
-    id_favorite: favoriteTable.idFavorite,
-    id_user: favoriteTable.idUser,
-    id_media: favoriteTable.idMedia,
-    media: {
-      id_media: mediaTable.idMedia,
-      title: mediaTable.title,
-      media_type: mediaTable.mediaType,
-      country: mediaTable.country,
-      year: mediaTable.year,
-      running_time: mediaTable.runningTime,
-      rars: mediaTable.rars,
-      rating: mediaTable.rating,
-      description: mediaTable.descrition,
-      cover: mediaTable.cover,
-    },
-  })
-  .from(favoriteTable)
-  .leftJoin(mediaTable, eq(favoriteTable.idMedia, mediaTable.idMedia))
-  .where(eq(favoriteTable.idFavorite, newFavorite.idFavorite))
-  .limit(1);
+        .select({
+          id_favorite: favoriteTable.idFavorite,
+          id_user: favoriteTable.idUser,
+          id_media: favoriteTable.idMedia,
+          media: {
+            id_media: mediaTable.idMedia,
+            title: mediaTable.title,
+            media_type: mediaTable.mediaType,
+            year: mediaTable.year,
+            running_time: mediaTable.runningTime,
+            rars: mediaTable.rars,
+            rating: mediaTable.rating,
+            description: mediaTable.descrition,
+            cover: mediaTable.cover,
+          },
+        })
+        .from(favoriteTable)
+        .leftJoin(mediaTable, eq(favoriteTable.idMedia, mediaTable.idMedia))
+        .where(eq(favoriteTable.idFavorite, newFavorite.idFavorite))
+        .limit(1);
 
       return {
         success: true,
@@ -171,7 +172,9 @@ export class FavoriteService {
         .limit(1);
 
       if (!favorite.length) {
-        throw new NotFoundException("Запись избранного не найдена или не принадлежит пользователю");
+        throw new NotFoundException(
+          "Запись избранного не найдена или не принадлежит пользователю",
+        );
       }
 
       // Удаляем запись
