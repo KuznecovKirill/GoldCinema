@@ -8,12 +8,13 @@ import { popularMovieTable } from "./popular-movie.schema";
 import { popularSeriesTable } from "./popular-series.schema";
 import { similarTable } from "./similar.schema";
 import { relations } from "drizzle-orm";
+import { mediaCountryTable } from "./media-country.schema";
 
 export const mediaTable = mysqlTable("Media", {
   idMedia: int("id_media").primaryKey(),
   title: varchar("title", { length: 255 }).notNull(),
   mediaType: varchar("media_type", { length: 50 }).notNull(),
-  country: varchar("country", { length: 100 }).notNull(),
+  // country: varchar("country", { length: 100 }).notNull(),
   year: varchar("year", { length: 4 }),
   runningTime: int("running_time"),
   rars: varchar("rars", { length: 10 }),
@@ -25,8 +26,9 @@ export const mediaTable = mysqlTable("Media", {
 export const mediaRelations = relations(mediaTable, ({ many, one }) => ({
   // Many-to-Many с жанрами через связующую таблицу
   genres: many(mediaGenreTable),
+  countries: many(mediaCountryTable),
   //One-to-One
-  keywords: one(keywordTable),
+  keywords: many(keywordTable),
   // One-to-Many отношения
   reviews: many(reviewTable),
   images: many(imageTable),

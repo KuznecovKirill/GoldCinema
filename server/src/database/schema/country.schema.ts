@@ -8,10 +8,10 @@ export const countryTable = mysqlTable("Country", {
   nameCountry: varchar("name_country", { length: 50 }),
 });
 
-export const genreRelations = relations(countryTable, ({ many }) => ({
+export const countryRelations = relations(countryTable, ({ many }) => ({
   // Many-to-Many с медиа через связующую таблицу
   media: many(mediaCountryTable),
 }));
 
-export type Genre = typeof countryTable.$inferSelect;
-export type NewGenre = typeof countryTable.$inferInsert;
+export type Country = typeof countryTable.$inferSelect;
+export type NewCountry = typeof countryTable.$inferInsert;

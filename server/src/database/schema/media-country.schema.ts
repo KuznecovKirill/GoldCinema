@@ -2,7 +2,6 @@
 import { mysqlTable, int } from "drizzle-orm/mysql-core";
 import { relations } from "drizzle-orm";
 import { mediaTable } from "./media.schema";
-import { genreTable } from "./genre.schema";
 import { countryTable } from "./country.schema";
 
 export const mediaCountryTable = mysqlTable("Media_Country", {
@@ -11,7 +10,7 @@ export const mediaCountryTable = mysqlTable("Media_Country", {
   idCountry: int("id_country").notNull(),
 });
 
-export const mediaGenreRelations = relations(mediaCountryTable, ({ one }) => ({
+export const mediaCountryRelations = relations(mediaCountryTable, ({ one }) => ({
   media: one(mediaTable, {
     fields: [mediaCountryTable.idMedia],
     references: [mediaTable.idMedia],
@@ -22,5 +21,5 @@ export const mediaGenreRelations = relations(mediaCountryTable, ({ one }) => ({
   }),
 }));
 
-export type MediaGenre = typeof mediaCountryTable.$inferSelect;
-export type NewMediaGenre = typeof mediaCountryTable.$inferInsert;
+export type MediaCountry = typeof mediaCountryTable.$inferSelect;
+export type NewMediaCountry = typeof mediaCountryTable.$inferInsert;
