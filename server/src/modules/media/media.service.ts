@@ -2,11 +2,15 @@ import { DrizzleService } from "@/database/drizzle.service";
 import { SwaggerApiService } from "@/swagger/swagger.api";
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from "@nestjs/common";
 import { UserService } from "../users/user.service";
-import { Genre, genreTable, Image, Keyword, Media, mediaGenreTable, mediaTable, popularMovieTable, popularSeriesTable, Review, reviewTable, userTable } from "@/database/schema";
+import { Genre, genreTable, Image, imageTable, Keyword, keywordTable, Media, mediaGenreTable, mediaTable, popularMovieTable, popularSeriesTable, Review, reviewTable, similarTable, userTable } from "@/database/schema";
 import { count, desc, eq, inArray } from "drizzle-orm";
 import { Country, countryTable } from "@/database/schema/country.schema";
 import { mediaCountryTable } from "@/database/schema/media-country.schema";
 import { ImageService } from "../image/image.service";
+import { KeywordService } from "../keyword/keyword.service";
+import { SimilarService } from "../similar/similar.service";
+import { ReviewService } from "../review/review.service";
+import { FavoriteService } from "../favorite/favorite.service";
 
 export interface MediaKinopoisk {
      kinopoiskId: number;
@@ -28,8 +32,8 @@ export interface MediaWithDetails extends Media {
   genres?: Genre[];
   countries?: Country[];
   images?: Image[];
-  reviews?: Review[];
-  keywords?: Keyword[];
+  reviews?: any[];
+  keywords?: string | null;
   isFavorite?: boolean;
   similar?: Media[];
 }
@@ -46,20 +50,86 @@ export class MediaService {
   constructor(
     private readonly drizzleService: DrizzleService,
     private readonly swaggerApi: SwaggerApiService,
-    // private keywordService: KeywordService,
-    private imageService: ImageService,
-    // private similarService: SimilarService,
-    // private reviewService: ReviewService,
-    // private favoriteService: FavoriteService,
-    private userService: UserService,
+    private readonly keywordService: KeywordService,
+    private readonly imageService: ImageService,
+    private readonly similarService: SimilarService,
+    private readonly reviewService: ReviewService,
+    private readonly favoriteService: FavoriteService,
   ) {}
 
   private get db() {
     return this.drizzleService.db;
   }
 
+   // ---------- Вспомогательные методы для получения связанных данных ----------
+  private async getMediaGenres(idMedia: number): Promise<{ idGenre: number; nameGenre: string }[]> {
+    return await this.db
+      .select({
+        idGenre: genreTable.idGenre,
+        nameGenre: genreTable.nameGenre,
+      })
+      .from(mediaGenreTable)
+      .innerJoin(genreTable, eq(mediaGenreTable.idGenre, genreTable.idGenre))
+      .where(eq(mediaGenreTable.idMedia, idMedia));
+  }
+
+  private async getMediaCountries(idMedia: number): Promise<{ idCountry: number; nameCountry: string }[]> {
+    return await this.db
+      .select({
+        idCountry: countryTable.idCountry,
+        nameCountry: countryTable.nameCountry,
+      })
+      .from(mediaCountryTable)
+      .innerJoin(countryTable, eq(mediaCountryTable.idCountry, countryTable.idCountry))
+      .where(eq(mediaCountryTable.idMedia, idMedia));
+  }
+
+  private async getMediaImages(idMedia: number) {
+    return await this.db
+      .select()
+      .from(imageTable)
+      .where(eq(imageTable.idMedia, idMedia))
+      .orderBy(imageTable.idImage);
+  }
+
+  private async getMediaKeywords(idMedia: number) {
+    const [kw] = await this.db
+      .select()
+      .from(keywordTable)
+      .where(eq(keywordTable.idMedia, idMedia))
+      .limit(1);
+    return kw || null;
+  }
+
+  private async getMediaReviews(idMedia: number) {
+    return await this.db
+      .select({
+        idReview: reviewTable.idReview,
+        ratingUser: reviewTable.ratingUser,
+        commentText: reviewTable.commentText,
+        createdAt: reviewTable.createdAt,
+        user: {
+          idUser: userTable.idUser,
+          username: userTable.username,
+        },
+      })
+      .from(reviewTable)
+      .innerJoin(userTable, eq(reviewTable.idUser, userTable.idUser))
+      .where(eq(reviewTable.idMedia, idMedia))
+      .orderBy(desc(reviewTable.createdAt));
+  }
+
+  private async getMediaSimilar(idMedia: number) {
+    const rows = await this.db
+      .select({ similarMedia: mediaTable })
+      .from(similarTable)
+      .innerJoin(mediaTable, eq(similarTable.idMedia, mediaTable.idMedia))
+      .where(eq(similarTable.idOrigin, idMedia));
+    return rows.map(r => r.similarMedia);
+  }
+
     // Создание медиа из данных Kinopoisk
-  async createMediaFromKinopoisk(kinopoiskData: MediaKinopoisk) {
+  async createMediaFromKinopoisk(kinopoiskData: any) {
     const {
       kinopoiskId,
       nameRu,
@@ -99,64 +169,55 @@ export class MediaService {
 
     // Добавляем жанры
     if (genres && genres.length > 0) {
-      await this.addGenresToMedia(kinopoiskId, genres);
+      for (const { genre: genreName } of genres) {
+        // Ищем или создаем жанр
+        let [genre] = await this.db
+          .select()
+          .from(genreTable)
+          .where(eq(genreTable.nameGenre, genreName))
+          .limit(1);
+        if (!genre) {
+          const [newGenre] = await this.db
+            .insert(genreTable)
+            .values({ nameGenre: genreName })
+            .$returningId();
+          genre = { idGenre: newGenre.idGenre, nameGenre: genreName };
+        }
+        await this.db.insert(mediaGenreTable).values({
+          idMedia: kinopoiskId,
+          idGenre: genre.idGenre,
+        }).onDuplicateKeyUpdate({ set: { idMedia: kinopoiskId } });
+      }
     }
 
     // Добавляем страны
     if (countries && countries.length > 0) {
-      await this.addCountriesToMedia(kinopoiskId, countries);
+      for (const { country: countryName } of countries) {
+        let [country] = await this.db
+          .select()
+          .from(countryTable)
+          .where(eq(countryTable.nameCountry, countryName))
+          .limit(1);
+        if (!country) {
+          const [newCountry] = await this.db
+            .insert(countryTable)
+            .values({ nameCountry: countryName })
+            .$returningId();
+          country = { idCountry: newCountry.idCountry, nameCountry: countryName };
+        }
+        await this.db.insert(mediaCountryTable).values({
+          idMedia: kinopoiskId,
+          idCountry: country.idCountry,
+        }).onDuplicateKeyUpdate({ set: { idMedia: kinopoiskId } });
+      }
     }
+
+    // Запускаем фоновые задачи
+    this.keywordService.addInfo(kinopoiskId).catch(console.error);
+    this.imageService.fetchAndSaveImages(kinopoiskId).catch(console.error);
 
     return this.getMediaById(kinopoiskId);
   }
-
-  // Добавление жанров
-  private async addGenresToMedia(idMedia: number, genres: { genre: string }[]) {
-    for (const { genre: genreName } of genres) {
-      // Ищем или создаем жанр
-      let [genre] = await this.db
-        .select()
-        .from(genreTable)
-        .where(eq(genreTable.nameGenre, genreName))
-        .limit(1);
-      if (!genre) {
-        const [newGenre] = await this.db
-          .insert(genreTable)
-          .values({ nameGenre: genreName })
-          .$returningId();
-        genre = { idGenre: newGenre.idGenre, nameGenre: genreName };
-      }
-      // Связываем
-      await this.db.insert(mediaGenreTable).values({
-        idMedia,
-        idGenre: genre.idGenre,
-      }).onDuplicateKeyUpdate({ set: { idMedia } }); // игнорируем дубликаты
-    }
-  }
-
-
-  // Добавление стран
-  private async addCountriesToMedia(idMedia: number, countries: { country: string }[]) {
-    for (const { country: countryName } of countries) {
-      let [country] = await this.db
-        .select()
-        .from(countryTable)
-        .where(eq(countryTable.nameCountry, countryName))
-        .limit(1);
-      if (!country) {
-        const [newCountry] = await this.db
-          .insert(countryTable)
-          .values({ nameCountry: countryName })
-          .$returningId();
-        country = { idCountry: newCountry.idCountry, nameCountry: countryName };
-      }
-      await this.db.insert(mediaCountryTable).values({
-        idMedia,
-        idCountry: country.idCountry,
-      }).onDuplicateKeyUpdate({ set: { idMedia } });
-    }
-  }
-
 
     // Получение медиа по ID с деталями
   async getMediaById(idMedia: number, userId?: number): Promise<MediaWithDetails> {
@@ -167,56 +228,26 @@ export class MediaService {
       .limit(1);
     if (!media) throw new NotFoundException("Медиа не найдено");
 
-    // Получаем жанры
-    const genres = await this.db
-      .select({ idGenre: genreTable.idGenre, nameGenre: genreTable.nameGenre })
-      .from(mediaGenreTable)
-      .innerJoin(genreTable, eq(mediaGenreTable.idGenre, genreTable.idGenre))
-      .where(eq(mediaGenreTable.idMedia, idMedia));
+    const [genres, countries, images, keywords, reviews, similar] = await Promise.all([
+      this.getMediaGenres(idMedia),
+      this.getMediaCountries(idMedia),
+      this.getMediaImages(idMedia),
+      this.getMediaKeywords(idMedia),
+      this.getMediaReviews(idMedia),
+      this.getMediaSimilar(idMedia),
+    ]);
 
-    // Получаем страны
-    const countries = await this.db
-      .select({ idCountry: countryTable.idCountry, nameCountry: countryTable.nameCountry })
-      .from(mediaCountryTable)
-      .innerJoin(countryTable, eq(mediaCountryTable.idCountry, countryTable.idCountry))
-      .where(eq(mediaCountryTable.idMedia, idMedia));
-
-    // Получаем изображения (если нет, запускаем фоновую загрузку)
-    let images = await this.imageService.getImages(idMedia);
+    // Проверка и запуск фоновой загрузки недостающих данных
     if (images.length === 0) {
-      // Асинхронно, не ждем
       this.imageService.fetchAndSaveImages(idMedia).catch(console.error);
     }
-
-    // Получаем похожие (если нет, загружаем)
-    let similar = await this.similarService.getSimilar(idMedia);
     if (similar.length === 0) {
-      this.similarService.fetchAndSaveSimilar(idMedia).catch(console.error);
+      this.similarService.setSimilar(idMedia).catch(console.error);
     }
-
-    // Получаем ключевые слова (если нет, создаем)
-    let keywords = await this.keywordService.getKeywords(idMedia);
     if (!keywords) {
-      this.keywordService.addKeywords(idMedia, media.description).catch(console.error);
+      this.keywordService.addInfo(idMedia).catch(console.error);
     }
 
-    // Получаем отзывы
-    const reviews = await this.db
-      .select({
-        idReview: reviewTable.idReview,
-        idMedia: reviewTable.idMedia,
-        idUser: userTable.idUser,
-        username: userTable.username,
-        ratingUser: reviewTable.ratingUser,
-        commentText: reviewTable.commentText,
-        createdAt: reviewTable.createdAt,
-      })
-      .from(reviewTable)
-      .innerJoin(userTable, eq(reviewTable.idUser, userTable.idUser))
-      .where(eq(reviewTable.idMedia, idMedia))
-      .orderBy(desc(reviewTable.createdAt));
-
-    // Проверяем, добавлено ли в избранное для данного пользователя
     let isFavorite = false;
     if (userId) {
       isFavorite = await this.favoriteService.checkIfFavorite(userId, idMedia);
@@ -235,7 +266,7 @@ export class MediaService {
   }
 
   // Получение списка медиа с пагинацией и категориями
-  async getMedias(
+ async getMedias(
     mediaType?: string,
     mediaCategory?: string,
     page: number = 1,
@@ -256,7 +287,6 @@ export class MediaService {
     if (mediaCategory === 'top') {
       orderBy = desc(mediaTable.rating);
     } else if (mediaCategory === 'popular') {
-      // Для популярных нужно отфильтровать по id из таблиц popular
       const popularModel = mediaType === 'FILM' ? popularMovieTable : popularSeriesTable;
       const popularIds = await this.db
         .select({ idMedia: popularModel.idMedia })
@@ -277,24 +307,22 @@ export class MediaService {
       .limit(limit)
       .offset(offset);
 
-    // Для каждого медиа получаем жанры и страны (можно оптимизировать через отдельные запросы)
+    // Для каждого медиа получаем жанры и страны
     const mediaWithDetails = await Promise.all(
       medias.map(async (m) => {
-        const genres = await this.db
-          .select({ nameGenre: genreTable.nameGenre })
-          .from(mediaGenreTable)
-          .innerJoin(genreTable, eq(mediaGenreTable.idGenre, genreTable.idGenre))
-          .where(eq(mediaGenreTable.idMedia, m.idMedia));
-        const countries = await this.db
-          .select({ nameCountry: countryTable.nameCountry })
-          .from(mediaCountryTable)
-          .innerJoin(countryTable, eq(mediaCountryTable.idCountry, countryTable.idCountry))
-          .where(eq(mediaCountryTable.idMedia, m.idMedia));
+        const genres = await this.getMediaGenres(m.idMedia);
+        const countries = await this.getMediaCountries(m.idMedia);
         return {
           ...m,
-          genres: genres.map(g => g.nameGenre).join(', '),
-          countries: countries.map(c => c.nameCountry).join(', '),
-        };
+          genres,
+          countries,
+          
+          images: [],
+          reviews: [],
+          keywords: null,
+          similar: [],
+          isFavorite: false,
+        } as MediaWithDetails;
       }),
     );
 
@@ -308,38 +336,34 @@ export class MediaService {
   }
 
   // Получить все медиа (без пагинации)
-  async getAllMedias() {
+  async getAllMedias(): Promise<MediaWithDetails[]> {
     const medias = await this.db.select().from(mediaTable);
-    return Promise.all(
+    return await Promise.all(
       medias.map(async (m) => {
-        const genres = await this.db
-          .select({ nameGenre: genreTable.nameGenre })
-          .from(mediaGenreTable)
-          .innerJoin(genreTable, eq(mediaGenreTable.idGenre, genreTable.idGenre))
-          .where(eq(mediaGenreTable.idMedia, m.idMedia));
-        const countries = await this.db
-          .select({ nameCountry: countryTable.nameCountry })
-          .from(mediaCountryTable)
-          .innerJoin(countryTable, eq(mediaCountryTable.idCountry, countryTable.idCountry))
-          .where(eq(mediaCountryTable.idMedia, m.idMedia));
+        const genres = await this.getMediaGenres(m.idMedia);
+        const countries = await this.getMediaCountries(m.idMedia);
         return {
           ...m,
-          genres: genres.map(g => g.nameGenre).join(', '),
-          countries: countries.map(c => c.nameCountry).join(', '),
+          genres,
+          countries,
+          images: [],
+          reviews: [],
+          keywords: null,
+          similar: [],
+          isFavorite: false,
         };
       }),
     );
   }
-
    // Добавить медиа по ID из Kinopoisk
-  async addMediaFromKinopoisk(idMedia: number) {
+  async addMediaFromKinopoisk(idMedia: number): Promise<MediaWithDetails> {
     const exists = await this.checkMediaExists(idMedia);
     if (exists) throw new ConflictException("Медиа уже существует");
     const kinopoiskData = await this.swaggerApi.mediaByID(idMedia);
     return this.createMediaFromKinopoisk(kinopoiskData);
   }
 
-  async checkMediaExists(idMedia: number): Promise<boolean> {
+   async checkMediaExists(idMedia: number): Promise<boolean> {
     const [media] = await this.db
       .select({ idMedia: mediaTable.idMedia })
       .from(mediaTable)
@@ -349,7 +373,7 @@ export class MediaService {
   }
 
     // Получить все жанры для заданного типа медиа
-  async getGenres(mediaType?: string): Promise<string[]> {
+ async getGenres(mediaType?: string): Promise<string[]> {
     let query = this.db
       .selectDistinct({ nameGenre: genreTable.nameGenre })
       .from(genreTable)
@@ -363,7 +387,7 @@ export class MediaService {
   }
 
   // Поиск по ключевым словам
-  async search(query: string, mediaType: string = 'ALL') {
+   async search(query: string, mediaType: string = 'ALL'): Promise<any[]> {
     let mediaIds: number[] | undefined;
     if (mediaType !== 'ALL') {
       const medias = await this.db
@@ -386,7 +410,7 @@ export class MediaService {
   }
 
   // Обновление популярных медиа из API
-  async setPopularMedia(
+async setPopularMedia(
     collectionType: string,
     popularModel: typeof popularMovieTable | typeof popularSeriesTable,
     mediaTypeLabel: string,
@@ -418,7 +442,6 @@ export class MediaService {
       }
     }
 
-    // Очищаем старые популярные и добавляем новые (только первые 10)
     await this.db.delete(popularModel);
     for (const id of addedIds.slice(0, limit)) {
       await this.db.insert(popularModel).values({ idMedia: id });
@@ -428,17 +451,16 @@ export class MediaService {
   }
 
    // Установка популярных фильмов
-  async setPopularMovies() {
+ async setPopularMovies() {
     return this.setPopularMedia('TOP_POPULAR_MOVIES', popularMovieTable, 'фильм');
   }
 
-  // Установка популярных сериалов
   async setPopularSeries() {
     return this.setPopularMedia('POPULAR_SERIES', popularSeriesTable, 'сериал');
   }
 
   // Установка топ-250 (без сохранения в отдельную таблицу, просто создаем медиа)
-  async setTopMedia(collectionType: string, mediaType: string, page: number = 1) {
+ async setTopMedia(collectionType: string, mediaType: string, page: number = 1) {
     const data = await this.swaggerApi.mediaCollections({ type: collectionType, page });
     if (!data?.items) throw new BadRequestException("Не удалось получить данные из API");
 
@@ -457,7 +479,7 @@ export class MediaService {
     return { added: addedIds, errors: [] };
   }
 
-  async setTopMovies(page: number = 1) {
+async setTopMovies(page: number = 1) {
     return this.setTopMedia('TOP_250_MOVIES', 'FILM', page);
   }
 
