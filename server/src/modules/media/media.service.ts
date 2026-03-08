@@ -6,6 +6,7 @@ import { Genre, genreTable, Image, Keyword, Media, mediaGenreTable, mediaTable, 
 import { count, desc, eq, inArray } from "drizzle-orm";
 import { Country, countryTable } from "@/database/schema/country.schema";
 import { mediaCountryTable } from "@/database/schema/media-country.schema";
+import { ImageService } from "../image/image.service";
 
 export interface MediaKinopoisk {
      kinopoiskId: number;
@@ -41,12 +42,12 @@ export interface PaginatedMediasResponse {
   mediaType?: string;
 }
 @Injectable()
-export class mediaService {
+export class MediaService {
   constructor(
-    private drizzleService: DrizzleService,
-    private swaggerApi: SwaggerApiService,
+    private readonly drizzleService: DrizzleService,
+    private readonly swaggerApi: SwaggerApiService,
     // private keywordService: KeywordService,
-    // private imageService: ImageService,
+    private imageService: ImageService,
     // private similarService: SimilarService,
     // private reviewService: ReviewService,
     // private favoriteService: FavoriteService,
