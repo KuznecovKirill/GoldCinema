@@ -23,7 +23,7 @@ import { UserDecorator } from "@/decorators/user.decorator";
 import { User } from "../users/user.service";
 
 @ApiTags("FAVORITES")
-@Controller("api/favorites")
+@Controller("api/user/favorites")
 export class FavoriteController {
   constructor(private readonly favoriteService: FavoriteService) {}
 

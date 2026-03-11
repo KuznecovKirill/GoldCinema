@@ -25,7 +25,7 @@ const REPLACEMENTS: Record<string, string> = {
 @Injectable()
 export class KeywordService {
   private readonly logger = new Logger(KeywordService.name);
-  private globalVocabulary: Set<string> = new Set();
+  private readonly globalVocabulary: Set<string> = new Set();
 
   constructor(private readonly drizzleService: DrizzleService) {}
 
