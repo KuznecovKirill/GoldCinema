@@ -1,7 +1,3 @@
-const  axiosClient = require("../axios/axiosClient");
-const {swaggerRequest} = require("./swagger.request");
-
-
 // src/modules/external-api/swagger.api.service.ts
 import { Injectable } from "@nestjs/common";
 

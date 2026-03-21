@@ -1,6 +1,6 @@
 import { DrizzleService } from "@/database/drizzle.service";
 import { SwaggerApiService } from "@/swagger/swagger.api";
-import { BadRequestException, ConflictException, Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, ConflictException, forwardRef, Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { UserService } from "../users/user.service";
 import { Genre, genreTable, Image, imageTable, Keyword, keywordTable, Media, mediaGenreTable, mediaTable, popularMovieTable, popularSeriesTable, Review, reviewTable, similarTable, userTable } from "@/database/schema";
 import { count, desc, eq, inArray } from "drizzle-orm";
@@ -52,8 +52,8 @@ export class MediaService {
     private readonly swaggerApi: SwaggerApiService,
     private readonly keywordService: KeywordService,
     private readonly imageService: ImageService,
+    @Inject(forwardRef(() => SimilarService))
     private readonly similarService: SimilarService,
-    private readonly reviewService: ReviewService,
     private readonly favoriteService: FavoriteService,
   ) {}
 

@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { DrizzleService } from '@/database/drizzle.service';
 
 import { MediaService } from '@/modules/media/media.service'; // предположим, есть
@@ -13,6 +13,7 @@ export class SimilarService {
   constructor(
     private readonly drizzleService: DrizzleService,
     private readonly swaggerApi: SwaggerApiService,
+    @Inject(forwardRef(() => MediaService))
     private readonly mediaService: MediaService,
   ) {}
 

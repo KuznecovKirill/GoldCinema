@@ -44,7 +44,7 @@ export class AxiosClient {
       if (!response.ok) {
         throw new Error(`API request failed: ${response.statusText}`);
       }
-      return await response.json() as T;
+      return await response.json() as Promise<T>;
     } catch (error) {
       console.error("AxiosClient error:", error);
       throw error;
