@@ -19,7 +19,7 @@ export const mediaTable = mysqlTable("Media", {
   runningTime: int("running_time"),
   rars: varchar("rars", { length: 10 }),
   rating: decimal("rating", { precision: 3, scale: 1 }),
-  descrition: text("descrition"),
+  description: text("description"),
   cover: varchar("cover", { length: 500 }).notNull(),
 });
 

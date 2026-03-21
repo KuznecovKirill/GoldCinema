@@ -38,7 +38,7 @@ const modelMedia = sequelize.define(
       type: DataTypes.FLOAT,
       allowNull: true,
     },
-    descrition: {
+    description: {
       type: DataTypes.TEXT,
       allowNull: true,
     },

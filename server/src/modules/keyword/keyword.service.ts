@@ -62,7 +62,7 @@ export class KeywordService {
       const reviewsText = reviews.map(r => r.commentText).join(' ');
 
       // 4. Формируем исходный текст
-      let combine = `${media.title} ${genresString} ${media.mediaType} ${media.year || ''} ${media.descrition || ''} ${media.rars || ''} ${reviewsText}`;
+      let combine = `${media.title} ${genresString} ${media.mediaType} ${media.year || ''} ${media.description || ''} ${media.rars || ''} ${reviewsText}`;
       combine = this.replaceWords(combine);
 
       // 5. Лемматизация и фильтрация

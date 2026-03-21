@@ -3,7 +3,7 @@ const sequelize = require("./database").sequelize;
 const { modelMedia } = require("./modelMedia");
 //Модель для популярных сериалов
 const modelPopularSeries = sequelize.define(
-  "PopularSeries",
+  "Popular_Series",
   {
     id_popular_series: {
       type: DataTypes.INTEGER,

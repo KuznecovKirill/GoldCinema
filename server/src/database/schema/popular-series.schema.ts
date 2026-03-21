@@ -2,7 +2,7 @@ import { mysqlTable, int } from "drizzle-orm/mysql-core";
 import { relations } from "drizzle-orm";
 import { mediaTable } from "./media.schema";
 
-export const popularSeriesTable = mysqlTable("popular_series", {
+export const popularSeriesTable = mysqlTable("Popular_Series", {
   idPopularSeries: int("id_popular_series").primaryKey().autoincrement(),
   idMedia: int("id_media").notNull(),
 });

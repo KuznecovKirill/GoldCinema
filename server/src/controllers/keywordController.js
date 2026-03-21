@@ -309,7 +309,7 @@ async function addInfo(id_media) {
     // Получаем текст из картинок
  
 
-    const combine = `${media.title} ${genresString} ${media.mediaType} ${media.country} ${media.descrition} ${media.rars} ${reviewsText}`;
+    const combine = `${media.title} ${genresString} ${media.mediaType} ${media.country} ${media.description} ${media.rars} ${reviewsText}`;
 
     const combineText = replaceWords(combine, replacements); //Замена слов
     console.log(combineText);

@@ -96,7 +96,7 @@ const MediaPage = () => {
       running_time: media.running_time,
       rars: media.rars,
       rating: media.rating,
-      descrition: media.descrition,
+      description: media.description,
       cover: media.cover,
     };
 
@@ -204,7 +204,7 @@ const MediaPage = () => {
 
               {/* Описание */}
               <Typography variant="body1" sx={{ ...UI.style.typoLines(5) }}>
-                {media.descrition}
+                {media.description}
               </Typography>
               {/* Описание */}
 

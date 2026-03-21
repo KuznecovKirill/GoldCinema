@@ -209,7 +209,7 @@ const MainSlide = ({ mediaType, mediaCategory }) => {
                       ...uiConfigs.style.typoLines(3),
                     }}
                   >
-                    {med.descrition}
+                    {med.description}
                   </Typography>
                   {/* Описание */}
                   {/* Кнопка */}

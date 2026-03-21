@@ -35,7 +35,7 @@ const modelMediaCreate = async (newMedia) => {
         ? `${newMedia.ratingAgeLimits.replace(/\D/g, "")}+`
         : null, //удаление всех нечисловых символов и добавление плюса на конце
       rating: newMedia.ratingImdb || null,
-      descrition: newMedia.description || null,
+      description: newMedia.description || null,
       cover: newMedia.coverUrl || newMedia.posterUrl,
     });
     addGenres(result.id_media, newMedia.genres);

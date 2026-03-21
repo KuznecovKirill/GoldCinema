@@ -151,7 +151,6 @@ export class MediaController {
       pageNum,
       limitNum,
     );
-    console.log('Response from service:', result);
     return result;
   }
 

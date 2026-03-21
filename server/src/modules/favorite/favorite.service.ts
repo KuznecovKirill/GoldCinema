@@ -49,7 +49,7 @@ export class FavoriteService {
             running_time: mediaTable.runningTime,
             rars: mediaTable.rars,
             rating: mediaTable.rating,
-            description: mediaTable.descrition,
+            description: mediaTable.description,
             cover: mediaTable.cover,
           },
         })
@@ -126,7 +126,7 @@ export class FavoriteService {
             running_time: mediaTable.runningTime,
             rars: mediaTable.rars,
             rating: mediaTable.rating,
-            description: mediaTable.descrition,
+            description: mediaTable.description,
             cover: mediaTable.cover,
           },
         })

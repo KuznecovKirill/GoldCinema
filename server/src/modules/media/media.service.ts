@@ -272,7 +272,8 @@ export class MediaService {
     page: number = 1,
     limit: number = 10,
   ): Promise<PaginatedMediasResponse> {
-    const offset = (page - 1) * limit;
+    try {
+       const offset = (page - 1) * limit;
 
     let baseQuery = this.db.select().from(mediaTable).$dynamic();
     let countQuery = this.db.select({ count: count() }).from(mediaTable).$dynamic();
@@ -325,7 +326,7 @@ export class MediaService {
         } as MediaWithDetails;
       }),
     );
-
+    
     return {
       total,
       page,
@@ -333,11 +334,17 @@ export class MediaService {
       medias: mediaWithDetails,
       mediaType,
     };
+    } catch (error) {
+      console.error('Detailed error in getAllMedias:', error);
+    throw error;
+    }
+   
   }
 
   // Получить все медиа (без пагинации)
   async getAllMedias(): Promise<MediaWithDetails[]> {
-    const medias = await this.db.select().from(mediaTable);
+    try {
+      const medias = await this.db.select().from(mediaTable);
     return await Promise.all(
       medias.map(async (m) => {
         const genres = await this.getMediaGenres(m.idMedia);
@@ -354,6 +361,11 @@ export class MediaService {
         };
       }),
     );
+    } catch (error) {
+      console.error('Detailed error in getAllMedias:', error);
+    throw error;
+    }
+    
   }
    // Добавить медиа по ID из Kinopoisk
   async addMediaFromKinopoisk(idMedia: number): Promise<MediaWithDetails> {
