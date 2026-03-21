@@ -1,4 +1,3 @@
-import React from 'react'
 import publicClient from '../client/publicClient';
 const genreEndpoints = {
     list: ({ mediaType }) => `/medias/genres?mediaType=${mediaType}`,

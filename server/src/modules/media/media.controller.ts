@@ -3,7 +3,6 @@ import {
   Controller,
   Get,
   Post,
-  Delete,
   Body,
   Param,
   Query,
@@ -18,8 +17,6 @@ import {
   ApiParam,
   ApiQuery,
   ApiBearerAuth,
-  ApiBody,
-  ApiPropertyOptional,
 } from "@nestjs/swagger";
 import { MediaService } from "./media.service";
 import { CheckToken } from "@/middlewares/middleware";
@@ -43,7 +40,7 @@ const SearchQuerySchema = z.object({
 export class SearchQueryDto extends createZodDto(SearchQuerySchema) {}
 
 @ApiTags("MEDIA")
-@Controller("api/media")
+@Controller("medias")
 export class MediaController {
   constructor(private readonly mediaService: MediaService) {}
 
@@ -134,6 +131,28 @@ export class MediaController {
   @ApiQuery({ name: "page", required: false, type: Number })
   async updateTopSeries(@Query("page", new ParseIntPipe({ optional: true })) page: number = 1) {
     return this.mediaService.setTopSeries(page);
+  }
+
+  @Get(':mediaType/:mediaCategory')
+  @ApiOperation({ summary: 'Получить список медиа с категорией (top/popular)' })
+  async getMediasByCategory(
+    @Param('mediaType') mediaType: string,
+    @Param('mediaCategory') mediaCategory: string,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ) {
+    // Преобразуем page и limit в числа
+    const pageNum = Number(page);
+    const limitNum = Number(limit);
+
+    const result = await this.mediaService.getMedias(
+      mediaType,
+      mediaCategory,
+      pageNum,
+      limitNum,
+    );
+    console.log('Response from service:', result);
+    return result;
   }
 
   private decodeToken(token: string): any {

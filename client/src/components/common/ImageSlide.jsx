@@ -2,7 +2,6 @@ import React from 'react'
 import NavigationSwiper from "./NavigationSwiper"
 import { SwiperSlide } from 'swiper/react'
 import { Box } from '@mui/material'
-import configs from "../../api/configs/configs";
 const ImageSlide = ({images}) => {
   return (
     <NavigationSwiper>

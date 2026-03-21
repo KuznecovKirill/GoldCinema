@@ -1,6 +1,4 @@
-import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import {
-  Badge,
   Box,
   Button,
   Chip,
@@ -12,7 +10,6 @@ import {
 
 import { Link } from "react-router-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
-import SwiperCore, { Autoplay } from "swiper/modules";
 
 import { toast } from "react-toastify";
 
@@ -23,7 +20,6 @@ import { setGlobalLoading } from "../../redux/slices/globalLoadingSlice";
 import { routesGen } from "../../routes/routes";
 import uiConfigs from "../../configs/UI";
 import CircleRate from "./CircleRate";
-import configs from "../../api/configs/configs";
 
 import genreModule from "../../api/modules/genreModule";
 import mediaModule from "../../api/modules/mediaModule";

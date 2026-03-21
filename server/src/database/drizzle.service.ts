@@ -23,6 +23,8 @@ export class DrizzleService implements OnModuleInit, OnModuleDestroy {
         this.db = drizzle(this.pool, {schema, mode: "default"});
 
         await this.pool.query("SELECT 1");
+        const result = await this.pool.query('SELECT * FROM Genre');
+        //console.log(result);
         console.log("Database connected successfully");
     }
 

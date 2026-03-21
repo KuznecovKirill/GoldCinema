@@ -8,7 +8,7 @@ import {
   Typography,
   Rating,
 } from "@mui/material";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import SendOutlinedIcon from "@mui/icons-material/SendOutlined";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { toast } from "react-toastify";
