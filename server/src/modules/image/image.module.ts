@@ -6,7 +6,7 @@ import { SwaggerModule } from '@/swagger/swagger.module';
 
 @Module({
   imports: [SwaggerModule],
-  providers: [ImageService, DrizzleService],
+  providers: [ImageService],
   exports: [ImageService],
 })
 export class ImageModule {}

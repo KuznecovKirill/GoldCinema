@@ -23,7 +23,7 @@ import { ImageModule } from "../image/image.module";
     UserModule,
   ],
   controllers: [MediaController],
-  providers: [MediaService, DrizzleService],
+  providers: [MediaService],
   exports: [MediaService],
 })
 export class MediaModule {}
