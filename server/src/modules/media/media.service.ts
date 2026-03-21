@@ -37,12 +37,24 @@ export interface MediaWithDetails extends Media {
   isFavorite?: boolean;
   similar?: Media[];
 }
-
+export interface FrontendMedia {
+  id_media: number;
+  title: string;
+  mediaType: string;
+  year: string | null;
+  running_time: number | null;
+  rars: string | null;
+  rating: string | number | null;
+  descrition: string | null;
+  cover: string;
+  genres: string; // строка, а не массив
+  countries?: string; // если нужно для фронта
+}
 export interface PaginatedMediasResponse {
   total: number;
   page: number;
   limit: number;
-  medias: MediaWithDetails[];
+  medias: FrontendMedia[];
   mediaType?: string;
 }
 @Injectable()
@@ -326,12 +338,25 @@ export class MediaService {
         } as MediaWithDetails;
       }),
     );
+    const frontendMedias: FrontendMedia[] = mediaWithDetails.map(m => ({
+    id_media: m.idMedia,
+    title: m.title,
+    mediaType: m.mediaType,
+    year: m.year,
+    running_time: m.runningTime,
+    rars: m.rars,
+    rating: m.rating,
+    descrition: m.description,
+    cover: m.cover,
+    genres: m.genres.map(g => g.nameGenre).join(', '),
+    countries: m.countries.map(c => c.nameCountry).join(', '),
+  }));
     
     return {
       total,
       page,
       limit,
-      medias: mediaWithDetails,
+      medias: frontendMedias,
       mediaType,
     };
     } catch (error) {
