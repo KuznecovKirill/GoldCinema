@@ -27,7 +27,7 @@ export class SignUp extends createZodDto(SignUpSchema) {}
 export class UpdatePassword extends createZodDto(UpdatePasswordSchema) {}
 
 @ApiTags("USERS")
-@Controller("api/users")
+@Controller("user")
 export class UserController {
     constructor(private userService: UserService) {}
 
