@@ -23,7 +23,7 @@ async function addMovie(newMedia) {
       running_time: newMedia.filmLength,
       rars: `${newMedia.ratingAgeLimits.replace(/\D/g, "")}+`, //удаление всех нечисловых символов и добавление плюса на конце
       rating: newMedia.ratingImdb || null,
-      descrition: newMedia.description || null,
+      description: newMedia.description || null,
       poster: newMedia.coverUrl || null,
     });
   } catch (error) {
@@ -56,7 +56,7 @@ async function getCollection(type, page) {
             ? `${item.ratingAgeLimits.replace(/\D/g, "")}+`
             : null,
           rating: item.ratingImdb || null,
-          descrition: item.description || null,
+          description: item.description || null,
           cover: item.coverUrl || item.posterUrl,
         });
         console.log("медиа добавлен!");
@@ -118,8 +118,8 @@ async function getWords(id_media) {
   const media = await modelMedia.findByPk(id_media);
   const mediaJSON = media.toJSON();
   console.log(mediaJSON);
-  const { title, descrition, genre } = mediaJSON;
-  const combinedText = `${title || ''} ${descrition || ''} ${genre || ''}`;
+  const { title, description, genre } = mediaJSON;
+  const combinedText = `${title || ''} ${description || ''} ${genre || ''}`;
   console.log(combinedText);
   // Разделяем строку на слова с помощью регулярного выражения
   const wordsArray = combinedText

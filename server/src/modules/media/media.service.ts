@@ -45,7 +45,7 @@ export interface FrontendMedia {
   running_time: number | null;
   rars: string | null;
   rating: string | number | null;
-  descrition: string | null;
+  description: string | null;
   cover: string;
   genres: string; // строка, а не массив
   countries?: string; // если нужно для фронта
@@ -346,7 +346,7 @@ export class MediaService {
     running_time: m.runningTime,
     rars: m.rars,
     rating: m.rating,
-    descrition: m.description,
+    description: m.description,
     cover: m.cover,
     genres: m.genres.map(g => g.nameGenre).join(', '),
     countries: m.countries.map(c => c.nameCountry).join(', '),
