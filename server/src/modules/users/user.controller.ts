@@ -11,11 +11,14 @@ const SignInSchema = z.object({
 })
 
 const SignUpSchema = z.object({
-    username: z.string().min(1),
+    username: z.string().min(3),
     password: z.string().min(8),
     role: z.string().min(1),
-    confirmPassword: z.string().min(8)
-})
+    confirmPassword: z.string().min(8),
+}).refine(data => data.password === data.confirmPassword, {
+  message: "Пароли не совпадают",
+  path: ["confirmPassword"],
+});
 
 const UpdatePasswordSchema = z.object({
     password: z.string().min(8),
@@ -29,7 +32,7 @@ export class UpdatePassword extends createZodDto(UpdatePasswordSchema) {}
 @ApiTags("USERS")
 @Controller("user")
 export class UserController {
-    constructor(private userService: UserService) {}
+    constructor(private readonly userService: UserService) {}
 
     @Post("signUp")
     @HttpCode(200)
@@ -45,6 +48,7 @@ export class UserController {
     }
 
     @Post("signIn")
+    @HttpCode(200)
     @ApiOperation({summary: "Вход пользователя"})
     @ApiBody({ type: SignIn })
     async signIn(@Body(ValidationPipe) signInDto: SignIn) {

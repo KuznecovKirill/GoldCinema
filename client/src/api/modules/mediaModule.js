@@ -24,7 +24,7 @@ const mediaModule = {
       const response = await publicClient.get(
         mediaEndpoints.medias({ mediaType,mediaCategory, page, limit })
       );
-      console.log(response);
+      // console.log(response);
       return { response };
     } catch (err) { return { err }; }
   },

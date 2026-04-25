@@ -22,7 +22,7 @@ publicClient.interceptors.response.use((response) => {
     if (response?.data) return response.data;
     return response;
   }, (error) => {
-    throw error.response.data;
+    throw error.response?.data || error;
   });
   export default publicClient;
   //if (response?.data)

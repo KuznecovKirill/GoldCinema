@@ -22,7 +22,7 @@ export interface User {
 export class UserService {
   constructor(
     private readonly drizzleService: DrizzleService,
-    private configService: ConfigService,
+    private readonly configService: ConfigService,
   ) {}
 
   private get db() {
@@ -30,30 +30,20 @@ export class UserService {
   }
   async createUser(username: string, password: string, role: string) {
     try {
-      //      const checkUser = this.db
-      //     .select({
-      //       username: userTable.username,
-      //     })
-      //     .from(userTable)
-      //     .where(eq(userTable.username, username));
-
-      //   if (checkUser) {
-      //     throw new BadRequestException(
-      //       "Такой пользователь уже зарегестрирован!",
-      //     );
-      // }
       const salt = crypto.randomBytes(8).toString("hex");
       const pass = crypto
         .pbkdf2Sync(password, salt, 1000, 32, "sha512")
         .toString("hex");
       await this.db.insert(userTable).values({
         username,
-        password: password,
-        passToken: pass,
+        password: pass,
+        passToken: salt,
         idRole: role === "Пользователь" ? 1 : 2,
       });
       return { success: true, msg: "Учётная запись создана" };
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   async signUp(username: string, password: string, role: string) {
@@ -65,23 +55,28 @@ export class UserService {
           "Такой пользователь уже зарегестрирован!",
         );
       }
-      const isMatch = this.isMatchPassword(password, user.password, user.pass_token);
-      if (!isMatch) {
-        throw new UnauthorizedException(
-          "Неккоректное имя пользователя или пароль",
-        );
+  
+      // const isMatch = this.isMatchPassword(password, user.password, user.pass_token);
+      // if (!isMatch) {
+      //   throw new UnauthorizedException(
+      //     "Неккоректное имя пользователя или пароль",
+      //   );
+      // }
+      await this.createUser(username, password, role);
+      const newUser = await this.getUserInfo(username);
+      if (!newUser) {
+        throw new BadRequestException("Не удалось создать пользователя");
       }
+
       const payload = {
-        displayname: user.username,
-        role: user.role,
-        id_user: user.id_user,
+        displayname: newUser.username,
+        role: newUser.role,
+        id_user: newUser.id_user,
       };
       const secret = this.configService.get("TOKEN_SECRET") || "12345";
       const authToken = jwt.sign(payload, secret, { expiresIn: "24h" });
 
-      const { password: _, pass_token: __, ...safeUser } = user;
-
-      await this.createUser(username, password, role);
+      const { password: _, pass_token: __, ...safeUser } = newUser;
 
       return {
         success: true,
@@ -89,7 +84,9 @@ export class UserService {
         authToken,
         user: safeUser,
       };
-    } catch (err) {}
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   async signIn(username: string, password: string) {
@@ -104,7 +101,6 @@ export class UserService {
           "Неккоректное имя пользователя или пароль",
         );
       }
-
       const payload = {
         displayname: user.username,
         role: user.role,
@@ -121,7 +117,9 @@ export class UserService {
         authToken,
         user: safeUser,
       };
-    } catch {}
+    } catch(err) {
+      console.log(err);
+    }
   }
   async updatePassword(
     username: string,
@@ -163,7 +161,9 @@ export class UserService {
         })
         .where(eq(userTable.username, username));
       return { success: true, msg: "Пароль обновлён" };
-    } catch {}
+    } catch(err) {
+      console.log(err);
+    }
   }
 
    async getUserInfo(username: string) {
@@ -190,6 +190,8 @@ export class UserService {
     const hash = crypto
       .pbkdf2Sync(pasword, salt, 1000, 32, "sha512")
       .toString("hex");
+    console.log(hash);
+    console.log(storedHash);
     return hash === storedHash;
   }
 }

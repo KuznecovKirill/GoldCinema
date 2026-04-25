@@ -22,8 +22,7 @@ const userModule = {
           userEndpoints.signIn,
           { username, password }
         );
-        console.log(response);
-        return { response };
+        return {response};
       } catch (err) { console.log("err"); return { err }; }
     },
     signUp: async ({ username, password, confirmPassword, role}) => {
