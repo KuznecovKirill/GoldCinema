@@ -22,9 +22,18 @@ const Layout = () => {
   useEffect(() => {
     const authUser = async () => {
       const { response, err } = await userModule.getInfo();
-
-      if (response) dispatch(setUser(response));
-      if (err) dispatch(setUser(null));
+      const response1 = {
+        user: response,
+        authToken: localStorage.getItem("abcde"),
+        success: true
+      }
+      console.log(response1);
+       if (response) {
+      dispatch(setUser(response1));
+    } else {
+      console.warn("Не удалось восстановить сеанс:", err?.message);
+    }
+      //if (err) dispatch(setUser(null));
     };
 
     authUser();

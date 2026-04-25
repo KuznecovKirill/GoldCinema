@@ -11,6 +11,7 @@ const privateClient = axios.create({
 })
 
 privateClient.interceptors.request.use(async config => {
+    console.log(localStorage.getItem("abcde"));
     return {
         ...config,
         headers: {
@@ -20,7 +21,6 @@ privateClient.interceptors.request.use(async config => {
     }
 })
 privateClient.interceptors.response.use((response) => {
-
     if (response?.data) return response.data;
     return response;
   }, (error) => {

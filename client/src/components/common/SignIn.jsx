@@ -29,11 +29,12 @@ const SignIn = ({ switchAuthState }) => {
             setErrorMessage(undefined);
             setIsLoginRequest(true);
             const {response, err} = await userModule.signIn(values);
+            console.log(response);
             setIsLoginRequest(false);
 
             if (response) {
                 SignIn.resetForm();
-                dispatch(setUser(response.user));
+                dispatch(setUser(response));
                 dispatch(setAuthModalOpen(false));
                 toast.success("Вход успешен");
             }

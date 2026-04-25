@@ -26,7 +26,6 @@ const userModule = {
     },
     signUp: async ({ username, password, confirmPassword, role}) => {
       try {
-        console.log(role);
         const response = await publicClient.post(
           userEndpoints.signUp,
           { username, password, confirmPassword, role }
@@ -37,6 +36,7 @@ const userModule = {
     getInfo: async () => {
       try {
         const response = await privateClient.get(userEndpoints.getInfo);
+        console.log(response);
         return { response };
       } catch (err) { return { err }; }
     },
@@ -46,8 +46,12 @@ const userModule = {
           userEndpoints.updatePassword,
           { password, newPassword}
         );
+        console.log("getInfo raw response:", response);
         return { response };
-      } catch (err) { return { err }; }
+      } catch (err) { 
+        console.error("getInfo error:", err);
+        return { err }; 
+      }
     }
   };
   export default userModule;

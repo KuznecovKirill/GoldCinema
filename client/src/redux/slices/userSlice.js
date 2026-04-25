@@ -3,31 +3,29 @@ import privateClient from "../../api/client/privateClient";
 //Создание среза для User
 export const userSlice = createSlice({
   name: "User",
-  initialState: { //начальное состояние
+  initialState: {
+    //начальное состояние
     user: null,
-    listFavorites: []
+    listFavorites: [],
   },
   reducers: {
     setUser: (state, action) => {
-      if (action.payload === null) {
+      const payload = action.payload;
+      console.log(payload)
+      const oldToken = localStorage.getItem("abcde");
+      if (payload === null) {
         localStorage.removeItem("abcde");
         state.user = null;
-      } else {
-        const { authToken, ...userData } = action.payload;
-        if (authToken) {
-          localStorage.setItem("abcde", authToken);
-        }
-        state.user = userData;
+        return;
+      } else if (payload.authToken){
+        localStorage.setItem("abcde", payload.authToken);
+        state.user = payload.user;
+      } else if (oldToken) {
+        localStorage.setItem("abcde", oldToken);
+        state.user = payload.user;
       }
+      //state.user = payload;
     },
-    // setUser: (state, action) => {
-    //   if (action.payload === null) {
-    //     localStorage.removeItem("abcde");
-    //     state.user = null;
-    //   } else if (action.payload.token) localStorage.setItem("abcde", action.payload.token);
-    //   console.log(action.payload);
-    //   state.user = action.payload;
-    // },
     setListFavorites: (state, action) => {
       state.listFavorites = action.payload;
     },
@@ -36,31 +34,28 @@ export const userSlice = createSlice({
     },
     removeFavorite: (state, action) => {
       const { id_media } = action.payload;
-      state.listFavorites = [...state.listFavorites].filter(e => e.id_media.toString() !== id_media.toString());
+      state.listFavorites = [...state.listFavorites].filter(
+        (e) => e.id_media.toString() !== id_media.toString(),
+      );
     },
-    
-  }
+  },
 });
 
-export const {
-  setUser,
-  setListFavorites,
-  addFavorite,
-  removeFavorite
-} = userSlice.actions;
+export const { setUser, setListFavorites, addFavorite, removeFavorite } =
+  userSlice.actions;
 
 export default userSlice.reducer;
 
 // Функция для восстановления состояния пользователя
-export const restoreUserState = async() => {
+export const restoreUserState = async () => {
   console.log("Восстановление");
   const token = localStorage.getItem("abcde");
   if (token) {
     try {
-      const response = await privateClient.get('/user/info');
+      const response = await privateClient.get("/user/info");
       return setUser(response);
     } catch (error) {
-      console.error('Ошибка при восстановлении данных пользователя:', error);
+      console.error("Ошибка при восстановлении данных пользователя:", error);
       return setUser(null);
     }
   } else {

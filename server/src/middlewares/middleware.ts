@@ -1,4 +1,4 @@
-import { CanActivate, ExecutionContext, ForbiddenException, Injectable, UnauthorizedException } from "@nestjs/common";
+import { CanActivate, createParamDecorator, ExecutionContext, ForbiddenException, Injectable, UnauthorizedException } from "@nestjs/common";
 import * as jwt from "jsonwebtoken";
 
 //Файл для проверки авторизированных пользователей
@@ -17,7 +17,7 @@ export class CheckToken implements CanActivate {
 
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest();
-    const authHeader = request.header("authorization")?.split(" ")[1];
+    const authHeader = request.header("Authorization")?.split(" ")[1];
     if (!authHeader){
       throw new UnauthorizedException("Нет токена, авторизация отклонена");
     }
@@ -33,12 +33,17 @@ export class CheckToken implements CanActivate {
         throw new ForbiddenException("Истёк срок жизни токена");
       }
       
-      const token = authHeader.split(" ")[1];
-        const jwtToken = this.configService.get("TOKEN_SECRET");
-        const decoded = jwt.verify(token, jwtToken);
-      request.user = (decoded as any).user;
-      return true;
+      //const token = authHeader.split(" ")[1];
+      const jwtToken = this.configService.get("TOKEN_SECRET") || "12345";
+      const decoded = jwt.verify(authHeader, jwtToken);
+      console.log(decoded)
+      if (decoded) {
+        request.user = decoded;
+        return true;
+      }
+      return false;
     } catch (err: any) {
+      console.log(err);
       if (err.name === "JsonWebTokenError"){
         throw new UnauthorizedException("Неккоректный токен. Повторно авторизуйтесь в системе.");
       }
@@ -72,6 +77,7 @@ export class CheckAdmin implements CanActivate {
     return true;
   }
 }
+
 
 // const user = async (req, res, next) => {
 //   const token = decode(req);

@@ -69,7 +69,7 @@ export class UserService {
       }
 
       const payload = {
-        displayname: newUser.username,
+        username: newUser.username,
         role: newUser.role,
         id_user: newUser.id_user,
       };
@@ -102,7 +102,7 @@ export class UserService {
         );
       }
       const payload = {
-        displayname: user.username,
+        username: user.username,
         role: user.role,
         id_user: user.id_user,
       };
@@ -197,4 +197,3 @@ export class UserService {
   }
 }
 
-// module.exports = { signUp, signIn, updatePassword, getInfo };
