@@ -11,10 +11,23 @@ export const userSlice = createSlice({
     setUser: (state, action) => {
       if (action.payload === null) {
         localStorage.removeItem("abcde");
-      } else if (action.payload.token) localStorage.setItem("abcde", action.payload.token);
-
-      state.user = action.payload;
+        state.user = null;
+      } else {
+        const { authToken, ...userData } = action.payload;
+        if (authToken) {
+          localStorage.setItem("abcde", authToken);
+        }
+        state.user = userData;
+      }
     },
+    // setUser: (state, action) => {
+    //   if (action.payload === null) {
+    //     localStorage.removeItem("abcde");
+    //     state.user = null;
+    //   } else if (action.payload.token) localStorage.setItem("abcde", action.payload.token);
+    //   console.log(action.payload);
+    //   state.user = action.payload;
+    // },
     setListFavorites: (state, action) => {
       state.listFavorites = action.payload;
     },

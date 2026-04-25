@@ -8,9 +8,9 @@ import { Link } from 'react-router-dom';
 
 const UserMenu = () => {
   const { user } = useSelector((state) => state.user);
+  console.log(user);
 
   const dispatch =  useDispatch();
-
   const [anchorEl, setAnchorEl] = useState(null);
 
     // Фильтруем меню

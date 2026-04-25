@@ -49,7 +49,7 @@ const SignUp = ({ switchAuthState }) => {
 
       if (response) {
         SignIn.resetForm();
-        dispatch(setUser(response));
+        dispatch(setUser(response.user));
         dispatch(setAuthModalOpen(false));
         toast.success("Вход успешен");
       }

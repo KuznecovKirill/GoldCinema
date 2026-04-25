@@ -174,6 +174,7 @@ export class UserService {
         password: userTable.password,
         pass_token: userTable.passToken,
         role: roleTable.nameRole,
+        id_role: userTable.idRole,
       })
       .from(userTable)
       .leftJoin(roleTable, eq(userTable.idRole, roleTable.idRole))
