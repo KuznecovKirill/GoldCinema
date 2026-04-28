@@ -1,7 +1,9 @@
 import { DrizzleService } from "@/database/drizzle.service";
+import { keywordTable, Media, mediaTable } from "@/database/schema";
 import { HttpServer, Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import axios from "axios";
+import { eq } from "drizzle-orm";
 
 @Injectable()
 export class MultimodalService {
@@ -45,4 +47,39 @@ export class MultimodalService {
       return "";
     }
   }
+
+  //Поиск медиа
+  async searchMedia(query: string, mediaType?: string): Promise<any[]> {
+
+    let medias = await this.db.select().from(mediaTable); //Берётся список медиа из БД
+
+    //Фильтрация медиа
+    if (mediaType && mediaType !== 'ALL') {
+      medias = medias.filter(m => m.mediaType === mediaType);
+    }
+    //Для теста возьму 20, чтобы не нагружать сейчас сильно систему
+    const limited: Media[] = medias.slice(0, 20);
+
+    const items = [];
+    for (const media of limited) {
+      const kw = await this.db.select().from(keywordTable).where(eq(keywordTable.idMedia, media.idMedia)).limit(1);
+      items.push({
+        id_media: media.idMedia,
+        title: media.title,
+        description: media.description,
+        keywords: kw[0]?.keywords || '',
+      });
+    }
+
+    // TODO: дописать промпт
+    const prompt = `...`;
+    const response = await axios.post<{ response: string }>(
+      `${this.apiUrl}/api/generate`,
+      { model: 'qwen2:7b', prompt, stream: false, format: 'json' },
+      { headers: { 'Content-Type': 'application/json' } }
+    );
+    return JSON.parse(response.data.response);
+
+}
+
 }
