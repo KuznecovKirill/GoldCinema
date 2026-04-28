@@ -1,6 +1,6 @@
 import { DrizzleService } from "@/database/drizzle.service";
 import { keywordTable, Media, mediaTable } from "@/database/schema";
-import { HttpServer, Injectable } from "@nestjs/common";
+import { HttpServer, Injectable, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import axios from "axios";
 import { eq } from "drizzle-orm";
@@ -8,7 +8,7 @@ import { eq } from "drizzle-orm";
 @Injectable()
 export class MultimodalService {
   private readonly apiUrl: string;
-
+  private readonly log = new Logger(MultimodalService.name); //для логов
   constructor(
     private readonly httpService: HttpServer,
     private readonly configService: ConfigService,
@@ -71,14 +71,19 @@ export class MultimodalService {
       });
     }
 
-    // TODO: дописать промпт
+     // TODO: дописать промпт
     const prompt = `...`;
+    try {
     const response = await axios.post<{ response: string }>(
       `${this.apiUrl}/api/generate`,
       { model: 'qwen2:7b', prompt, stream: false, format: 'json' },
       { headers: { 'Content-Type': 'application/json' } }
     );
     return JSON.parse(response.data.response);
+    } catch(error) {
+        this.log.error(`Ошибка мультимодального поиска: ${error.message}`)
+        return [];
+    }
 
 }
 
