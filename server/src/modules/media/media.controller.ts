@@ -70,9 +70,27 @@ export class MediaController {
 
   @Get("search/:mediaType")
   @ApiOperation({ summary: "Поиск медиа по ключевым словам" })
-  async search(@Param("mediaType", ParseIntPipe) mediaType: string, @Query(new ValidationPipe({ transform: true })) query: SearchQueryDto) {
-    return this.mediaService.search(query.query, mediaType);
-  }
+  async search(
+  @Param('mediaType') mediaType: string,
+  @Query('query') query: string,
+) {
+  const results = await this.mediaService.search(query,mediaType);
+  // results = [{ id_media, score }, ...]
+  // Дополнительно подтягиваете полные данные медиа из БД
+  const ids = results.map(r => r.id_media);
+  const medias = await this.mediaService.getMediasByIds(ids);
+  // Добавляем score к ответу
+  const mediasWithScore = medias.map(m => ({
+    ...m,
+    score: results.find(r => r.id_media === m.idMedia)?.score || 0,
+  }));
+  return mediasWithScore;
+}
+  // @Get("search/:mediaType")
+  // @ApiOperation({ summary: "Поиск медиа по ключевым словам" })
+  // async search(@Param("mediaType", ParseIntPipe) mediaType: string, @Query(new ValidationPipe({ transform: true })) query: SearchQueryDto) {
+  //   return this.mediaService.search(query.query, mediaType);
+  // }
 
   @Get("info/:id_media")
   @ApiOperation({ summary: "Получить детальную информацию о медиа" })

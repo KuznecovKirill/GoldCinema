@@ -11,6 +11,7 @@ import { KeywordService } from "../keyword/keyword.service";
 import { SimilarService } from "../similar/similar.service";
 import { ReviewService } from "../review/review.service";
 import { FavoriteService } from "../favorite/favorite.service";
+import { MultimodalService } from "../multimodal/multimodal.service";
 
 export interface MediaKinopoisk {
      kinopoiskId: number;
@@ -64,6 +65,7 @@ export class MediaService {
     private readonly swaggerApi: SwaggerApiService,
     private readonly keywordService: KeywordService,
     private readonly imageService: ImageService,
+    private readonly multimodalService: MultimodalService,
     @Inject(forwardRef(() => SimilarService))
     private readonly similarService: SimilarService,
     private readonly favoriteService: FavoriteService,
@@ -226,11 +228,15 @@ export class MediaService {
 
     // Запускаем фоновые задачи
     this.keywordService.addInfo(kinopoiskId).catch(console.error);
-    this.imageService.fetchAndSaveImages(kinopoiskId).catch(console.error);
-
+    //this.imageService.fetchAndSaveImages(kinopoiskId).catch(console.error);
+    this.multimodalService.analyzeMediaImages(kinopoiskId).catch(console.error);
     return this.getMediaById(kinopoiskId);
   }
 
+  //Получить несколько медиа по несколько id
+  async getMediasByIds(idList: number[]) {
+  return this.db.select().from(mediaTable).where(inArray(mediaTable.idMedia, idList));
+}
     // Получение медиа по ID с деталями
   async getMediaById(idMedia: number, userId?: number): Promise<MediaWithDetails> {
     const [media] = await this.db

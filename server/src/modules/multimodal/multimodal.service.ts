@@ -73,8 +73,15 @@ export class MultimodalService {
       });
     }
 
-     // TODO: дописать промпт
-    const prompt = `...`;
+    const prompt = `
+Ты – ассистент по поиску фильмов. У нас есть список медиа с их ID, названием, описанием и ключевыми словами.
+Пользовательский запрос: "${query}"
+Список медиа (каждый начинается с ID):
+${items.map(i => `ID: ${i.id_media}, Название: ${i.title}, Описание: ${i.description}, Ключевые слова: ${i.keywords}`).join('\n')}
+
+Верни ТОЛЬКО JSON-массив объектов, каждый объект содержит "id_media" и "score" (число от 0 до 1). Например: [{"id_media": 123, "score": 0.9}, ...]. Без частиц, предлогов и други малоинформативных слов.`
+    ;
+
     try {
     const response = await axios.post<{ response: string }>(
       `${this.apiUrl}/api/generate`,
