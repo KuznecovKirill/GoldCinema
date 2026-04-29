@@ -55,6 +55,7 @@
     "@nestjs/jwt": "^11.0.2",
     "@nestjs/platform-express": "^11.1.13",
     "@nestjs/swagger": "^11.2.6",
+    "@nestjs/testing": "^11.1.19",
     "@types/bcrypt": "^6.0.0",
     "@types/body-parser": "^1.19.6",
     "@types/cookie-parser": "^1.4.10",
