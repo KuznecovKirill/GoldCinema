@@ -95,6 +95,25 @@ export class KeywordService {
       this.logger.error(`Ошибка в addInfo для медиа ${mediaId}:`, error);
     }
   }
+  //Новый метод для добавления ключевых слов
+  async addRawKeywords(mediaId: number, rawText: string): Promise<void> {
+  const lemmas = await this.processText(rawText);
+  const newKeywords = lemmas.join(' ');
+  const existing = await this.db
+    .select()
+    .from(keywordTable)
+    .where(eq(keywordTable.idMedia, mediaId))
+    .limit(1);
+  if (existing.length > 0) {
+    const merged = [...new Set([...(existing[0].keywords?.split(' ') || []), ...lemmas])];
+    await this.db
+      .update(keywordTable)
+      .set({ keywords: merged.join(' ') })
+      .where(eq(keywordTable.idMedia, mediaId));
+  } else {
+    await this.db.insert(keywordTable).values({ idMedia: mediaId, keywords: newKeywords });
+  }
+}
 
   async search(userQuery: string, mediaIds?: number[]) {
     // 1. Получаем все записи ключевых слов (по фильтру mediaIds)

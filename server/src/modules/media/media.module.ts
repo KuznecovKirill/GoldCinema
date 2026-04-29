@@ -11,12 +11,14 @@ import { FavoriteModule } from "@/modules/favorite/favorite.module";
 import { UserModule } from "../users/user.module";
 import { SwaggerModule } from "@/swagger/swagger.module";
 import { ImageModule } from "../image/image.module";
+import { MultimodalModule } from "../multimodal/multimodal.module";
 
 @Module({
   imports: [
     KeywordModule,
     SwaggerModule,
     ImageModule,
+    MultimodalModule,
     forwardRef(() => SimilarModule),
     ReviewModule,
     FavoriteModule,

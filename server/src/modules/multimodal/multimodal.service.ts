@@ -6,6 +6,7 @@ import axios from "axios";
 import { eq } from "drizzle-orm";
 import * as fs from 'fs';
 import * as path from 'path';
+import { KeywordService } from "../keyword/keyword.service";
 
 @Injectable()
 export class MultimodalService {
@@ -15,8 +16,9 @@ export class MultimodalService {
     private readonly httpService: HttpServer,
     private readonly configService: ConfigService,
     private readonly drizzleService: DrizzleService,
+    private readonly keywordService: KeywordService,
   ) {
-    this.apiUrl = this.configService.get("OLLAMA_URL");
+    this.apiUrl = this.configService.get("OLLAMA_URL") || 'http://localhost:11434';
   }
 
   private get db() {
@@ -45,7 +47,7 @@ export class MultimodalService {
       );
       return response.data.response;
     } catch (error) {
-      console.log(error);
+      this.log.error(`Ошибка askImage: ${error.message}`);
       return "";
     }
   }
@@ -97,17 +99,20 @@ ${items.map(i => `ID: ${i.id_media}, Название: ${i.title}, Описан�
 
 //Анализ изображения, когда оно  добавляется в БД
 async analyzeMediaImages(mediaId: number): Promise<void> {
-    const images = await this.db.select().from(imageTable).where(eq(imageTable.idMedia, mediaId));
+    const images = await this.db.select().from(imageTable).where(eq(imageTable.idMedia, mediaId)).limit(10);
     if (images.length === 0) return;
 
-    // Для каждого изображения составляем краткое описание (можно суммировать)
     for (const img of images) {
       try {
         // Изображение нужно загрузить
         const imageBuffer = await this.loadImage(img.imageUrl);
         const description = await this.askImage(imageBuffer, 'Опиши, что изображено на картинке. Пиши описание кратко, без предлогов, междометий. Только существительные, прилагательные и глаголы.');
-
+        if (description) {
+          await this.keywordService.addRawKeywords(mediaId, description);
+          this.log.log(`Добавлено описание для изображения ${img.idImage}`);
+        }
         await this.db.update(imageTable).set({ isAnalyzed: true }).where(eq(imageTable.idImage, img.idImage));
+        
       } catch (error) {
         this.log.warn(`Не удалось проанализировать изображение ${img.idImage}`);
       }

@@ -22,6 +22,7 @@ import { MediaService } from "./media.service";
 import { CheckToken } from "@/middlewares/middleware";
 import z from "zod";
 import { createZodDto } from "nestjs-zod";
+import { MultimodalService } from "../multimodal/multimodal.service";
 
 const GetMediasQuerySchema = z.object({
   mediaType: z.enum(['FILM', 'TV_SERIES']).optional(),
@@ -42,7 +43,10 @@ export class SearchQueryDto extends createZodDto(SearchQuerySchema) {}
 @ApiTags("MEDIA")
 @Controller("medias")
 export class MediaController {
-  constructor(private readonly mediaService: MediaService) {}
+  constructor(
+  private readonly mediaService: MediaService,
+  private readonly multimodalService: MultimodalService,
+) {}
 
   @Get()
   @ApiOperation({ summary: "Получить список медиа с пагинацией и фильтрацией" })
@@ -76,10 +80,10 @@ export class MediaController {
 ) {
   const results = await this.mediaService.search(query,mediaType);
   // results = [{ id_media, score }, ...]
-  // Дополнительно подтягиваете полные данные медиа из БД
+
   const ids = results.map(r => r.id_media);
   const medias = await this.mediaService.getMediasByIds(ids);
-  // Добавляем score к ответу
+  // Добавление score
   const mediasWithScore = medias.map(m => ({
     ...m,
     score: results.find(r => r.id_media === m.idMedia)?.score || 0,
