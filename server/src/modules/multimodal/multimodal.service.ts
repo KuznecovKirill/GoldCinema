@@ -3,7 +3,7 @@ import { imageTable, keywordTable, Media, mediaTable } from "@/database/schema";
 import { HttpServer, Injectable, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import axios from "axios";
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import * as fs from 'fs';
 import * as path from 'path';
 import { KeywordService } from "../keyword/keyword.service";
@@ -96,6 +96,66 @@ ${items.map(i => `ID: ${i.id_media}, Название: ${i.title}, Описан�
         return [];
     }
 }
+//Функция используется для поиска в результате из векторизации
+  async searchMedia1(userQuery: string, topResults: Array<{ id_media: number; score: number }>) {
+    try {
+      const mediaList = await this.db
+        .select({ idMedia: mediaTable.idMedia, title: mediaTable.title })
+        .from(mediaTable)
+        .where(inArray(mediaTable.idMedia, topResults.map(r => r.id_media)));
+
+      const keywordMap = await this.db
+        .select({ idMedia: keywordTable.idMedia, keywords: keywordTable.keywords })
+        .from(keywordTable)
+        .where(inArray(keywordTable.idMedia, topResults.map(r => r.id_media)));
+
+      const combined = topResults.map(r => {
+        const media = mediaList.find(m => m.idMedia === r.id_media);
+        const kw = keywordMap.find(k => k.idMedia === r.id_media);
+        return {
+          id_media: r.id_media,
+          title: media?.title || '',
+          keywords: kw?.keywords || '',
+        };
+      });
+
+      const prompt = `
+Ты – ассистент по поиску фильмов. У нас есть список медиа с их ID, названием, описанием и ключевыми словами.
+Пользовательский запрос: "${userQuery}"
+Список медиа (каждый начинается с ID):
+${combined.map(i => `ID: ${i.id_media}, Название: ${i.title}, Ключевые слова: ${i.keywords}`).join('\n')}
+
+Верни ТОЛЬКО JSON-массив объектов, каждый объект содержит "id_media" и "score" (число от 0 до 1). Например: [{"id_media": 123, "score": 0.9}, ...]. Без частиц, предлогов и други малоинформативных слов.`
+    ;
+// const prompt = `
+// Ты - ассистент по поиску фильмов. Вот список фильмов из базы данных, для каждого указан id_media и набор ключевых слов.
+
+// Твоя задача: на основе пользовательского запроса выбрать из этого списка наиболее подходящий фильм (или фильмы).
+// Очень важно:
+// - Не придумывай фильмы, которых нет в списке.
+// - Не изменяй ключевые слова, используй их ровно так, как они даны в списке!
+// - Отвечай на русском языке.
+// - В ответе укажи id_media и название медиа-контента.
+
+// Пользовательский запрос: "${userQuery}"
+
+// Список фильмов:
+// ${combined.map((item, idx) => `${idx + 1}. id_media: ${item.id_media}\nНазвание: ${item.title}\nКлючевые слова: ${item.keywords}`).join('\n\n')}
+
+// Ответь: какие фильмы наиболее соответствуют запросу?
+// `;
+
+      const response = await fetch('http://localhost:11434/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model: 'qwen2:7b', prompt, stream: false }),
+      });
+      const data: any = await response.json();
+      this.log.log(`RAG ответ: ${data.response}`);
+    } catch (error) {
+      this.log.error('RAG error:', error);
+    }
+  }
 
 //Анализ изображения, когда оно  добавляется в БД
 async analyzeMediaImages(mediaId: number): Promise<void> {
