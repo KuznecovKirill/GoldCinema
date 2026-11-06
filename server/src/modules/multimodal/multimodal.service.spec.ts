@@ -1,11 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { MultimodalService } from './multimodal.service';
 import { ConfigService } from '@nestjs/config';
-import { MockDrizzleService } from '../../test/mocks/drizzle.mock';
-import { MockKeywordService } from '../../test/mocks/keyword.mock';
+import { DrizzleService } from '@/database/drizzle.service';
+import { KeywordService } from '@/modules/keyword/keyword.service';
+import { MockDrizzleService } from '@/test/mocks/drizzle.mock';
+import { MockKeywordService } from '@/test/mocks/keyword.mock';
 
 import axios from 'axios';
-import { beforeEach, describe, it } from 'node:test';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
@@ -14,12 +15,27 @@ describe('MultimodalService', () => {
   let service: MultimodalService;
 
   beforeEach(async () => {
+    // Создаем объект-заглушку для базы данных
+    const mockDb = {
+      select: jest.fn().mockReturnThis(),
+      from: jest.fn().mockReturnThis(),
+      where: jest.fn().mockReturnThis(),
+      limit: jest.fn().mockReturnThis(),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         MultimodalService,
         ConfigService,
-        MockDrizzleService,
-        // MockKeywordService,
+        {
+          provide: DrizzleService,
+          useValue: { db: mockDb }, 
+        },
+        
+        {
+          provide: KeywordService,
+          useValue: MockKeywordService,
+        },
       ],
     }).compile();
 
@@ -28,24 +44,38 @@ describe('MultimodalService', () => {
 
   it('should search media via LLM', async () => {
     const mockItems = [
-      { id_media: 1, title: 'Интерстеллар', description: 'Действие происходит в недалёком будущем (2067 год), где Земля страдает от засухи, пыльных бурь и продовольственного кризиса. Единственная жизнеспособная сельхозкультура — кукуруза', keywords: 'космос' },
-      { id_media: 2, title: 'Властелин колец: Две крепости', description: 'Братство распалось, но Кольцо Всевластья должно быть уничтожено. Фродо и Сэм вынуждены довериться Голлуму, который взялся провести их к вратам Мордора. Громадная армия Сарумана приближается: члены братства и их союзники готовы принять бой. Битва за Средиземье продолжается.', 
-        keywords: 'фильм властелин кольцо два крепость сша новый зеландия братство распасться всевластие должный быть уничтожить фродый сэм вынудить довериться голлум который взяться провести они врата мордор громадный армия саруман приближаться член союзник готовый принять бой битва средиземье продолжаться ребенок старше год' },
+      { 
+        id_media: 1, 
+        title: 'Интерстеллар', 
+        description: 'Действие происходит в недалёком будущем...', 
+        keywords: 'космос' 
+      }
     ];
-    jest.spyOn(service['db'], 'select').mockReturnValue({
-      from: jest.fn().mockReturnThis(),
-      where: jest.fn().mockResolvedValue(mockItems),
+
+    const keywordRow = [{ keywords: 'space' }];
+
+    // Мокаем цепочку вызовов Drizzle ORM
+    const selectMock = jest.fn();
+    // 1-й вызов: db.select().from(mediaTable) -> возвращает массив медиа
+    selectMock.mockReturnValueOnce({
+      from: jest.fn().mockResolvedValue(mockItems),
     } as any);
-    jest.spyOn(service['db'], 'select').mockReturnValueOnce({
+    // 2-й вызов: db.select().from(keywordTable).where(...).limit(1)
+    selectMock.mockReturnValue({
       from: jest.fn().mockReturnThis(),
-      where: jest.fn().mockResolvedValue([{ keywords: 'space' }]),
+      where: jest.fn().mockReturnThis(),
+      limit: jest.fn().mockResolvedValue(keywordRow),
     } as any);
 
+    jest.spyOn(service['db'], 'select').mockImplementation(selectMock as any);
+
+    // Мокаем ответ от Ollama
     mockedAxios.post.mockResolvedValueOnce({
       data: { response: '[{"id_media":1,"score":0.9}]' },
     });
 
     const result = await service.searchMedia('космос будущее Земля');
+    
     expect(result).toHaveLength(1);
     expect(result[0].id_media).toBe(1);
   });

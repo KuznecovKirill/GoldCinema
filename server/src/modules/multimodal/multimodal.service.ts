@@ -13,7 +13,7 @@ export class MultimodalService {
   private readonly apiUrl: string;
   private readonly log = new Logger(MultimodalService.name); //для логов
   constructor(
-    private readonly httpService: HttpServer,
+    // private readonly httpService: HttpServer,
     private readonly configService: ConfigService,
     private readonly drizzleService: DrizzleService,
     private readonly keywordService: KeywordService,
