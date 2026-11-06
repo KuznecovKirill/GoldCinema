@@ -53,7 +53,7 @@ export const restoreUserState = async () => {
   if (token) {
     try {
       const response = await privateClient.get("/user/info");
-      return setUser(response);
+      return setUser(response.data);
     } catch (error) {
       console.error("Ошибка при восстановлении данных пользователя:", error);
       return setUser(null);

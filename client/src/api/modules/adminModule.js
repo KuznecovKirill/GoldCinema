@@ -1,4 +1,4 @@
-import privateClient from "../client/privateClient";
+import axiosClient from "../client/axiosClient";
 
 const adminEndpoints = {
   executeCommand: "admin/add-media", // Единый эндпоинт для выполнения команд
@@ -8,7 +8,7 @@ const adminModule = {
   executeCommand: async ({ command, params }) => {
     try {
       console.log(`POST-запрос: ${command}`);
-      const response = await privateClient.post(adminEndpoints.executeCommand, {
+      const response = await axiosClient.post(adminEndpoints.executeCommand, {
         command,
         params,
       });
