@@ -4,8 +4,13 @@ const adminEndpoints = {
   executeCommand: "admin/add-media", // Единый эндпоинт для выполнения команд
 };
 
+interface ExecuteCommandParams {
+  command: string;
+  params: Record<string, any>;
+}
+
 const adminModule = {
-  executeCommand: async ({ command, params }) => {
+  executeCommand: async ({ command, params }: ExecuteCommandParams): Promise<{ response?: any; err?: any }> => {
     try {
       console.log(`POST-запрос: ${command}`);
       const response = await axiosClient.post(adminEndpoints.executeCommand, {

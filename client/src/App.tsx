@@ -25,7 +25,6 @@ interface AppRoute {
 
 const App: React.FC = () => {
   // Временное решение, если store еще не типизирован: (state: any)
-  // В идеале здесь должен быть RootState из вашего store
   const { themeMode } = useAppSelector((state: any) => state.themeMode);
 
   return (
